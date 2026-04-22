@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install *)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(python -m pip install requests pytest pytest-cov)",
+      "Bash(python -m src.main H2X1Y6)",
+      "Bash(python -m src.main H2X1Y6 --json)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('Total reps:', d['total']\\); [print\\('-', r['name'], '|', r['level'], '|', r['elected_office']\\) for r in d['representatives']]\")",
+      "Bash(python -m pip install flask -q)",
+      "Bash(python web/app.py)",
+      "Bash(curl -s http://localhost:5000)",
+      "Bash(curl -s -X POST http://localhost:5000/api/search -H \"Content-Type: application/json\" -d \"{\\\\\"postal_code\\\\\": \\\\\"H2X 1Y6\\\\\"}\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('OK:', d['success'], '| Reps:', d['total']\\)\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\({k:v for k,v in d.items\\(\\) if k!='representatives'}, indent=2\\)\\); print\\('Reps:', len\\(d.get\\('representatives',[]\\)\\)\\)\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(curl -s http://localhost:5000/api/translations)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('es made_by:', d['es'].get\\('made_by'\\), '| tl made_by:', d['tl'].get\\('made_by'\\)\\)\")",
+      "Bash(python -c \"import json; d=json.load\\(open\\('C:/Users/adiaz/Documents/Dev Projets/Canada-Representatives/web/translations/es.json', encoding='utf-8'\\)\\); print\\(d.get\\('made_by'\\), d.get\\('contribute'\\)\\)\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d['es'], ensure_ascii=False, indent=2\\)\\)\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('Keys in es:', sorted\\(d['es'].keys\\(\\)\\)\\)\")"
+    ]
+  }
+}

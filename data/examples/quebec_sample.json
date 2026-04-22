@@ -1,0 +1,139 @@
+{
+  "_note": "Pre-fetched from represent.opennorth.ca/postcodes/H2X1Y6/ — Montréal (Plateau-Mont-Royal), QC",
+  "_fetched_date": "2026-04-21",
+  "_usage": "Load with: client.load_from_file('data/examples/quebec_sample.json') or use --demo flag (coming soon)",
+  "code": "H2X1Y6",
+  "city": "Montreal",
+  "province": "QC",
+  "centroid": {
+    "type": "Point",
+    "coordinates": [-73.5673, 45.5088]
+  },
+  "representatives_centroid": [
+    {
+      "name": "Steven Guilbeault",
+      "first_name": "Steven",
+      "last_name": "Guilbeault",
+      "elected_office": "MP",
+      "representative_set_name": "House of Commons",
+      "district_name": "Laurier—Sainte-Marie",
+      "party_name": "Liberal",
+      "email": "steven.guilbeault@parl.gc.ca",
+      "url": "https://www.ourcommons.ca/members/en/steven-guilbeault(89263)",
+      "personal_url": "",
+      "photo_url": "https://www.ourcommons.ca/Content/Parliamentarians/Images/OfficialMPPhotos/45/GuilbeaultSteven_Lib.jpg",
+      "gender": "M",
+      "source_url": "https://represent.opennorth.ca/representative-sets/house-of-commons/",
+      "related": {
+        "representative_set_url": "/representative-sets/house-of-commons/",
+        "boundary_url": "/boundaries/federal-electoral-districts/laurier-sainte-marie/"
+      },
+      "offices": [
+        {
+          "type": "legislature",
+          "tel": "613-995-0121",
+          "fax": "613-995-0101",
+          "postal": "House of Commons, Ottawa, ON K1A 0A6"
+        },
+        {
+          "type": "constituency",
+          "tel": "514-522-1339",
+          "fax": "",
+          "postal": "4060 Saint-Denis Street, Montreal, QC H2W 2M5"
+        }
+      ],
+      "extra": {}
+    },
+    {
+      "name": "Andrés Fontecilla",
+      "first_name": "Andrés",
+      "last_name": "Fontecilla",
+      "elected_office": "MNA",
+      "representative_set_name": "Assemblée nationale du Québec",
+      "district_name": "Laurier-Dorion",
+      "party_name": "Québec solidaire",
+      "email": "afontecilla-laurdor@assnat.qc.ca",
+      "url": "http://www.assnat.qc.ca/fr/deputes/fontecilla-andres-8797/index.html",
+      "personal_url": "",
+      "photo_url": "http://www.assnat.qc.ca/Media/Process.aspx?MediaId=ANQ.Vigie.Bll.Photo&filetype=jpg&Id=8797",
+      "gender": "M",
+      "source_url": "https://represent.opennorth.ca/representative-sets/assemblee-nationale-du-quebec/",
+      "related": {
+        "representative_set_url": "/representative-sets/assemblee-nationale-du-quebec/",
+        "boundary_url": "/boundaries/quebec-electoral-districts/laurier-dorion/"
+      },
+      "offices": [
+        {
+          "type": "legislature",
+          "tel": "418-644-0987",
+          "fax": "",
+          "postal": "Assemblée nationale du Québec, Québec, QC G1A 1A4"
+        },
+        {
+          "type": "constituency",
+          "tel": "514-948-2095",
+          "fax": "",
+          "postal": "6431 Saint-Laurent Blvd, Montreal, QC H2S 3C4"
+        }
+      ],
+      "extra": {}
+    },
+    {
+      "name": "Valérie Plante",
+      "first_name": "Valérie",
+      "last_name": "Plante",
+      "elected_office": "Mayor",
+      "representative_set_name": "Ville de Montréal",
+      "district_name": "Montréal",
+      "party_name": "Projet Montréal",
+      "email": "valerie.plante@montreal.ca",
+      "url": "https://ville.montreal.qc.ca/maire",
+      "personal_url": "",
+      "photo_url": "",
+      "gender": "F",
+      "source_url": "https://represent.opennorth.ca/representative-sets/ville-de-montreal/",
+      "related": {
+        "representative_set_url": "/representative-sets/ville-de-montreal/",
+        "boundary_url": "/boundaries/montreal-boroughs/ville-de-montreal/"
+      },
+      "offices": [
+        {
+          "type": "legislature",
+          "tel": "514-872-3101",
+          "fax": "",
+          "postal": "275 Notre-Dame Street East, Montreal, QC H2Y 1C6"
+        }
+      ],
+      "extra": {}
+    },
+    {
+      "name": "Robert Beaudry",
+      "first_name": "Robert",
+      "last_name": "Beaudry",
+      "elected_office": "City Councillor",
+      "representative_set_name": "Ville de Montréal",
+      "district_name": "Saint-Jacques",
+      "party_name": "Projet Montréal",
+      "email": "robert.beaudry@montreal.ca",
+      "url": "https://ville.montreal.qc.ca/conseil-municipal",
+      "personal_url": "",
+      "photo_url": "",
+      "gender": "M",
+      "source_url": "https://represent.opennorth.ca/representative-sets/ville-de-montreal/",
+      "related": {
+        "representative_set_url": "/representative-sets/ville-de-montreal/",
+        "boundary_url": "/boundaries/montreal-boroughs/saint-jacques/"
+      },
+      "offices": [
+        {
+          "type": "constituency",
+          "tel": "514-872-3167",
+          "fax": "",
+          "postal": "801 Brennan Street, Montreal, QC H3C 0G4"
+        }
+      ],
+      "extra": {}
+    }
+  ],
+  "representatives_concordance": []
+}

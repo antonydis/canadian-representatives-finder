@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Find your Canadian elected representatives by postal code — federal, provincial, and municipal." />
+  <meta name="robots" content="index, follow" />
+
+  <title>Canadian Representatives Finder</title>
+
+  <!-- Preconnect for Google Fonts (Noto Sans — supports Latin, Chinese, Tagalog) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!-- Red top stripe — inspired by Canada.ca -->
+  <div class="top-stripe" role="presentation"></div>
+
+  <!-- ================================================================
+       HEADER
+       ================================================================ -->
+  <header role="banner">
+    <div class="header-inner">
+
+      <a href="/" class="site-brand" aria-label="Canadian Representatives Finder — Home">
+        <span class="maple-icon" aria-hidden="true">🍁</span>
+        <div class="site-name">
+          <span class="primary">Canadian Representatives Finder</span>
+          <span class="secondary">Trouveur de représentants canadiens</span>
+        </div>
+      </a>
+
+      <nav aria-label="Language selection">
+        <div class="lang-switcher" id="lang-switcher">
+          <!-- Populated by JS -->
+        </div>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- Dark nav bar — visual separator -->
+  <div class="nav-bar" role="presentation"></div>
+
+  <!-- ================================================================
+       MAIN CONTENT
+       ================================================================ -->
+  <main role="main">
+    <div class="container">
+
+      <h1 data-i18n="title">Find Your Canadian Representatives</h1>
+      <p class="lead" data-i18n="description">
+        Enter your Canadian postal code to find your elected representatives at all three levels of government.
+      </p>
+
+      <!-- Search form -->
+      <div class="search-card">
+        <form id="search-form" novalidate>
+          <label for="postal-input" class="form-label" data-i18n="input_label">
+            Your postal code
+          </label>
+          <div class="input-row">
+            <input
+              type="text"
+              id="postal-input"
+              class="postal-input"
+              maxlength="7"
+              autocomplete="postal-code"
+              spellcheck="false"
+              placeholder="e.g. H2X 1Y6"
+              data-i18n-placeholder="input_placeholder"
+              aria-required="true"
+              aria-describedby="error-msg"
+            />
+            <button type="submit" class="search-btn" data-i18n="button">
+              Find my representatives
+            </button>
+          </div>
+          <div id="error-msg" class="error-msg hidden" role="alert" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <!-- Loading state -->
+      <div id="loading" class="loading-state hidden" aria-live="polite">
+        <div class="spinner" role="status"></div>
+        <p data-i18n="loading">Searching...</p>
+      </div>
+
+      <!-- Results (populated by JS) -->
+      <div id="results" class="hidden" aria-live="polite"></div>
+
+      <!-- Disclaimer -->
+      <div class="disclaimer-box" role="note">
+        <span data-i18n="disclaimer">
+          This is an independent civic tool. It is not affiliated with or endorsed by the Government of Canada.
+        </span>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ================================================================
+       FOOTER
+       ================================================================ -->
+  <footer role="contentinfo">
+  <div class="footer-inner">
+    <p>
+      Built by <a href="https://github.com/antonydis" target="_blank" rel="noopener noreferrer">Antony</a> — Independent civic project.<br>
+      Data provided by <a href="https://represent.opennorth.ca/" target="_blank" rel="noopener noreferrer">OpenNorth</a>. Not an official government website.
+    </p>
+  </div>
+</footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
