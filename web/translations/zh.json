@@ -17,6 +17,10 @@
   "website": "网站",
   "no_results": "未找到该邮政编码的代表。",
   "error_invalid": "请输入有效的加拿大邮政编码（例如 H2X 1Y6）。",
+  "error_classify_fallback": "无法分类您的情况。请重试或从下方选择一个建议。",
+  "error_too_short": "请至少用10个字符描述您的情况。",
+  "error_too_long": "请将描述限制在200个字符以内。",
+  "triage_input_hint": "仅限加拿大公民事务 · 最多200个字符",
   "error_api": "无法获取数据，请重试。",
   "error_rate_limit": "请求过多，请稍后再试。",
   "disclaimer": "这是一个独立的公民工具，与加拿大政府无关。",
@@ -25,5 +29,64 @@
   "results_title": "代表，邮政编码",
   "contact": "联系方式",
   "made_by": "作者",
-  "contribute": "欢迎反馈和贡献"
+  "contribute": "欢迎反馈和贡献",
+
+  "tab_find": "查找我的代表",
+  "tab_triage": "联系谁？",
+
+  "triage_title": "不确定联系谁？",
+  "triage_subtitle": "选择您的情况，我们将为您指向正确的政府级别。",
+  "triage_input_placeholder": "描述您需要联系代表的事务或情况...",
+  "triage_ai_loading": "正在分析管辖权…",
+  "draft_email": "起草邮件",
+  "modal_title": "邮件模板",
+  "modal_to": "收件人",
+  "modal_subject": "主题",
+  "modal_body_label": "消息",
+  "copy_template": "复制模板",
+  "open_mail_app": "打开邮件应用",
+  "copied": "已复制！",
+  "triage_submit": "搜索",
+  "triage_back": "咨询其他情况",
+  "triage_suggestions_label": "快速建议：",
+  "triage_responsibility": "负责级别",
+  "triage_key_contact": "主要联系方式",
+  "triage_next_step": "输入您的邮政编码以找到您的具体代表：",
+  "triage_search_results_title": "您的代表",
+  "level_federal": "联邦政府",
+  "level_provincial": "省级 / 地区政府",
+  "level_municipal": "市政府",
+  "level_mixed": "多个政府级别",
+
+  "case_garbage_title": "我家街道没有收垃圾",
+  "case_garbage_services": "311 · 市议员",
+  "case_garbage_explanation": "垃圾收集是市政府的责任。拨打311报告问题，或者如果问题仍未解决，联系您的市议员。",
+
+  "case_doctor_title": "我找不到家庭医生",
+  "case_doctor_services": "811 · 省级代表",
+  "case_doctor_explanation": "在加拿大，医疗保健是省级责任。拨打811获取健康建议和转诊。您的省级代表可以为您所在地区的医疗服务改善进行倡导。",
+
+  "case_immigration_title": "我的居留或移民申请被延迟",
+  "case_immigration_services": "IRCC · 联邦议员",
+  "case_immigration_explanation": "移民和公民身份由联邦IRCC管理。您的联邦议员可以提交部长级查询，帮助推进您的案件。",
+
+  "case_taxes_title": "我有税务问题或与CRA相关的问题",
+  "case_taxes_services": "CRA 1-800-959-8281 · 联邦议员",
+  "case_taxes_explanation": "联邦税收由加拿大税务局（CRA）管理。如果您无法直接与CRA解决问题，您的联邦议员可以通过纳税人申诉专员办公室提供协助。",
+
+  "case_pothole_title": "我的街道上有坑洼或道路损坏",
+  "case_pothole_services": "311 · 市议员",
+  "case_pothole_explanation": "地方道路维护是市政府的责任。拨打311报告问题，或者如果问题没有及时解决，联系您的市议员。",
+
+  "case_ei_title": "我还没有收到就业保险金",
+  "case_ei_services": "Service Canada 1-800-206-7218 · 联邦议员",
+  "case_ei_explanation": "就业保险（EI）是由Service Canada管理的联邦计划。如果您的申请被延迟或拒绝，您的联邦议员可以代表您联系相关部门。",
+
+  "case_housing_title": "我需要负担得起的住房或社会住房方面的帮助",
+  "case_housing_services": "211 · 311 · 各级政府",
+  "case_housing_explanation": "住房涉及三级政府。社会住房名单由市政府管理，财务援助项目通常是省级的，国家住房战略提供联邦资金。拨打211获取社会服务指导。",
+
+  "case_school_title": "我对孩子的学校有顾虑",
+  "case_school_services": "学区董事会 · 省级代表",
+  "case_school_explanation": "教育是省级责任。从校长或当地学区董事会开始。如果问题是系统性的或未能解决，联系您的省级代表（MLA、MPP或MNA）。"
 }

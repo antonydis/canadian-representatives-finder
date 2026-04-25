@@ -5,26 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Find your Canadian elected representatives by postal code — federal, provincial, and municipal." />
   <meta name="robots" content="index, follow" />
-
   <title>Canadian Representatives Finder</title>
-
-  <!-- Preconnect for Google Fonts (Noto Sans — supports Latin, Chinese, Tagalog) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
   <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
 
-  <!-- Red top stripe — inspired by Canada.ca -->
   <div class="top-stripe" role="presentation"></div>
 
-  <!-- ================================================================
-       HEADER
-       ================================================================ -->
+  <!-- ── HEADER ─────────────────────────────────────────────────── -->
   <header role="banner">
     <div class="header-inner">
-
       <a href="/" class="site-brand" aria-label="Canadian Representatives Finder — Home">
         <span class="maple-icon" aria-hidden="true">🍁</span>
         <div class="site-name">
@@ -32,87 +24,235 @@
           <span class="secondary">Trouveur de représentants canadiens</span>
         </div>
       </a>
-
       <nav aria-label="Language selection">
-        <div class="lang-switcher" id="lang-switcher">
-          <!-- Populated by JS -->
-        </div>
+        <div class="lang-switcher" id="lang-switcher"></div>
       </nav>
-
     </div>
   </header>
 
-  <!-- Dark nav bar — visual separator -->
   <div class="nav-bar" role="presentation"></div>
 
-  <!-- ================================================================
-       MAIN CONTENT
-       ================================================================ -->
+  <!-- ── MAIN ───────────────────────────────────────────────────── -->
   <main role="main">
     <div class="container">
 
-      <h1 data-i18n="title">Find Your Canadian Representatives</h1>
-      <p class="lead" data-i18n="description">
-        Enter your Canadian postal code to find your elected representatives at all three levels of government.
-      </p>
+      <!-- Tab navigation -->
+      <div class="tabs" role="tablist" aria-label="Main sections">
+        <button
+          class="tab-btn active"
+          role="tab"
+          id="tab-find"
+          aria-controls="panel-find"
+          aria-selected="true"
+          data-i18n="tab_find"
+        >Find My Representatives</button>
+        <button
+          class="tab-btn"
+          role="tab"
+          id="tab-triage"
+          aria-controls="panel-triage"
+          aria-selected="false"
+          data-i18n="tab_triage"
+        >Who Do I Contact?</button>
+      </div>
 
-      <!-- Search form -->
-      <div class="search-card">
-        <form id="search-form" novalidate>
-          <label for="postal-input" class="form-label" data-i18n="input_label">
-            Your postal code
-          </label>
-          <div class="input-row">
-            <input
-              type="text"
-              id="postal-input"
-              class="postal-input"
-              maxlength="7"
-              autocomplete="postal-code"
-              spellcheck="false"
-              placeholder="e.g. H2X 1Y6"
-              data-i18n-placeholder="input_placeholder"
-              aria-required="true"
-              aria-describedby="error-msg"
-            />
-            <button type="submit" class="search-btn" data-i18n="button">
-              Find my representatives
-            </button>
+      <!-- ── TAB 1 · Find My Representatives ──────────────────── -->
+      <div id="panel-find" role="tabpanel" aria-labelledby="tab-find">
+
+        <h1 data-i18n="title">Find Your Canadian Representatives</h1>
+        <p class="lead" data-i18n="description">
+          Enter your Canadian postal code to find your elected representatives at all three levels of government.
+        </p>
+
+        <div class="search-card">
+          <form id="search-form" novalidate>
+            <label for="postal-input" class="form-label" data-i18n="input_label">Your postal code</label>
+            <div class="input-row">
+              <input
+                type="text" id="postal-input" class="postal-input"
+                maxlength="7" autocomplete="postal-code" spellcheck="false"
+                placeholder="e.g. H2X 1Y6"
+                data-i18n-placeholder="input_placeholder"
+                aria-required="true" aria-describedby="error-msg"
+              />
+              <button type="submit" class="search-btn" data-i18n="button">
+                Find my representatives
+              </button>
+            </div>
+            <div id="error-msg" class="error-msg hidden" role="alert" aria-live="polite"></div>
+          </form>
+        </div>
+
+        <div id="loading" class="loading-state hidden" aria-live="polite">
+          <div class="spinner" role="status"></div>
+          <p data-i18n="loading">Searching...</p>
+        </div>
+
+        <div id="results" class="hidden" aria-live="polite"></div>
+
+      </div><!-- /panel-find -->
+
+      <!-- ── TAB 2 · Smart Civic Triage ────────────────────────── -->
+      <div id="panel-triage" role="tabpanel" aria-labelledby="tab-triage" hidden>
+
+        <h1 data-i18n="triage_title">Not sure who to contact?</h1>
+        <p class="lead" data-i18n="triage_subtitle">
+          Select your situation and we will point you to the right level of government.
+        </p>
+
+        <!-- PHASE 1: Search input + chips -->
+        <div id="triage-phase-1">
+          <form id="triage-open-form" novalidate>
+            <div class="triage-input-wrapper">
+              <label for="triage-open-input" class="sr-only" data-i18n="triage_input_placeholder">
+                Describe the situation...
+              </label>
+              <input
+                type="text"
+                id="triage-open-input"
+                class="triage-open-input"
+                data-i18n-placeholder="triage_input_placeholder"
+                placeholder="Describe the situation or process for which you need to contact a representative..."
+                autocomplete="off"
+                spellcheck="false"
+                maxlength="200"
+                aria-describedby="triage-input-hint"
+              />
+              <button type="submit" class="triage-send-btn" aria-label="Search">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M5 12h14M12 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+            <div class="triage-input-meta">
+              <span id="triage-input-hint" class="triage-input-hint" data-i18n="triage_input_hint">Canadian civic situations only · 200 characters max</span>
+              <span id="triage-char-count" class="triage-char-count">0 / 200</span>
+            </div>
+            <div id="triage-open-error" class="error-msg hidden" role="alert" aria-live="polite"></div>
+          </form>
+
+          <div id="triage-ai-loading" class="triage-ai-loading hidden" aria-live="polite">
+            <span class="triage-ai-dot" aria-hidden="true"></span>
+            <span data-i18n="triage_ai_loading">Analyzing jurisdiction…</span>
           </div>
-          <div id="error-msg" class="error-msg hidden" role="alert" aria-live="polite"></div>
-        </form>
-      </div>
 
-      <!-- Loading state -->
-      <div id="loading" class="loading-state hidden" aria-live="polite">
-        <div class="spinner" role="status"></div>
-        <p data-i18n="loading">Searching...</p>
-      </div>
+          <p class="triage-suggestions-label" data-i18n="triage_suggestions_label">Quick suggestions:</p>
+          <div class="triage-chips" id="triage-chips" role="list" aria-label="Suggested situations">
+            <!-- Populated by JS -->
+          </div>
+        </div>
 
-      <!-- Results (populated by JS) -->
-      <div id="results" class="hidden" aria-live="polite"></div>
+        <!-- PHASE 2: Result card + postal search (hidden initially) -->
+        <div id="triage-phase-2" hidden>
 
-      <!--
-      <div class="disclaimer-box" role="note">
-        <span data-i18n="disclaimer">
-          This is an independent civic tool.
-        </span>
-      </div>
-      -->
-    </div>
+          <button id="triage-back-btn" class="back-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M19 12H5M12 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span data-i18n="triage_back">Consult another situation</span>
+          </button>
+
+          <div class="triage-result" id="triage-result">
+            <div class="triage-result-header" id="triage-result-header">
+              <div class="triage-level-badge" id="triage-level-badge"></div>
+              <p class="triage-explanation" id="triage-explanation"></p>
+              <div class="triage-services">
+                <span class="triage-services-label" data-i18n="triage_key_contact">Key contacts</span>
+                <span class="triage-services-value" id="triage-services-value"></span>
+              </div>
+            </div>
+
+            <div class="triage-postal-section">
+              <p class="triage-next-step" data-i18n="triage_next_step">
+                Enter your postal code to find your specific representative:
+              </p>
+              <form id="triage-search-form" novalidate>
+                <div class="input-row">
+                  <input
+                    type="text" id="triage-postal-input" class="postal-input"
+                    maxlength="7" autocomplete="postal-code" spellcheck="false"
+                    placeholder="e.g. H2X 1Y6"
+                    data-i18n-placeholder="input_placeholder"
+                    aria-required="true" aria-describedby="triage-error-msg"
+                  />
+                  <button type="submit" class="search-btn" data-i18n="button">
+                    Find my representatives
+                  </button>
+                </div>
+                <div id="triage-error-msg" class="error-msg hidden" role="alert" aria-live="polite"></div>
+              </form>
+            </div>
+          </div>
+
+          <div id="triage-loading" class="loading-state hidden" aria-live="polite">
+            <div class="spinner" role="status"></div>
+            <p data-i18n="loading">Searching...</p>
+          </div>
+
+          <div id="triage-results" class="hidden" aria-live="polite"></div>
+
+        </div><!-- /triage-phase-2 -->
+
+      </div><!-- /panel-triage -->
+
+    </div><!-- /container -->
   </main>
 
-  <!-- ================================================================
-       FOOTER
-       ================================================================ -->
+  <!-- ── FOOTER ─────────────────────────────────────────────────── -->
   <footer role="contentinfo">
-  <div class="footer-inner">
-    <p>
-      Built by <a href="https://github.com/antonydis" target="_blank" rel="noopener noreferrer">Antony</a>.<br>
-      Data provided by <a href="https://represent.opennorth.ca/" target="_blank" rel="noopener noreferrer">OpenNorth</a>. Not an official government website.
-    </p>
+    <div class="footer-inner">
+      <span data-i18n="footer_note">Independent civic project · Not an official government website</span>
+      <span>
+        <span data-i18n="data_source">Data provided by</span>
+        <a href="https://represent.opennorth.ca" target="_blank" rel="noopener noreferrer">
+          Represent API — OpenNorth
+        </a>
+      </span>
+    </div>
+    <div class="footer-author">
+      <span data-i18n="made_by">Made by</span>
+      <a href="https://github.com/antonydis" target="_blank" rel="noopener noreferrer">@antonydis</a>
+      &middot; <span data-i18n="contribute">feedback &amp; contributions welcome</span>
+    </div>
+  </footer>
+
+  <!-- ── EMAIL TEMPLATE MODAL ──────────────────────────────────── -->
+  <div id="email-modal" class="email-modal-overlay hidden"
+       role="dialog" aria-modal="true" aria-labelledby="email-modal-title">
+    <div class="email-modal" role="document">
+
+      <div class="email-modal-header">
+        <h2 id="email-modal-title" class="email-modal-title" data-i18n="modal_title">Email Template</h2>
+        <button class="email-modal-close" id="email-modal-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="18" height="18">
+            <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="email-modal-body">
+        <div class="email-field">
+          <label data-i18n="modal_to">To</label>
+          <div class="email-field-value" id="modal-to"></div>
+        </div>
+        <div class="email-field">
+          <label data-i18n="modal_subject">Subject</label>
+          <div class="email-field-value" id="modal-subject"></div>
+        </div>
+        <div class="email-field">
+          <label data-i18n="modal_body_label">Message</label>
+          <pre class="email-field-body" id="modal-body"></pre>
+        </div>
+      </div>
+
+      <div class="email-modal-actions">
+        <button class="btn-copy-template" id="modal-copy-btn" data-i18n="copy_template">Copy Template</button>
+        <a class="btn-open-mail" id="modal-open-btn" target="_blank" rel="noopener noreferrer" data-i18n="open_mail_app">Open Mail App</a>
+      </div>
+
+    </div>
   </div>
-</footer>
 
   <script src="/static/js/app.js"></script>
 </body>

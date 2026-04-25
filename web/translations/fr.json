@@ -17,6 +17,10 @@
   "website": "Site web",
   "no_results": "Aucun représentant trouvé pour ce code postal.",
   "error_invalid": "Veuillez entrer un code postal canadien valide (ex. H2X 1Y6).",
+  "error_classify_fallback": "Nous n'avons pas pu analyser votre situation. Réessayez ou choisissez une suggestion ci-dessous.",
+  "error_too_short": "Veuillez décrire votre situation en au moins 10 caractères.",
+  "error_too_long": "Veuillez limiter votre description à 200 caractères.",
+  "triage_input_hint": "Situations civiques canadiennes uniquement · 200 caractères max",
   "error_api": "Impossible de récupérer les données. Veuillez réessayer.",
   "error_rate_limit": "Trop de requêtes. Veuillez patienter un moment et réessayer.",
   "disclaimer": "Cet outil civique indépendant n'est pas affilié au gouvernement du Canada.",
@@ -25,5 +29,64 @@
   "results_title": "Représentants pour",
   "contact": "Contact",
   "made_by": "Créé par",
-  "contribute": "commentaires & contributions bienvenus"
+  "contribute": "commentaires et contributions bienvenus",
+
+  "tab_find": "Trouver mes représentants",
+  "tab_triage": "Qui dois-je contacter?",
+
+  "triage_title": "Vous ne savez pas qui contacter?",
+  "triage_subtitle": "Sélectionnez votre situation et nous vous orienterons vers le bon palier de gouvernement.",
+  "triage_input_placeholder": "Décrivez la situation ou la démarche pour laquelle vous avez besoin d'aide...",
+  "triage_ai_loading": "Analyse de la juridiction…",
+  "draft_email": "Rédiger un courriel",
+  "modal_title": "Modèle de courriel",
+  "modal_to": "À",
+  "modal_subject": "Objet",
+  "modal_body_label": "Message",
+  "copy_template": "Copier le modèle",
+  "open_mail_app": "Ouvrir dans Mail",
+  "copied": "Copié !",
+  "triage_submit": "Rechercher",
+  "triage_back": "Consulter une autre situation",
+  "triage_suggestions_label": "Suggestions rapides :",
+  "triage_responsibility": "Niveau responsable",
+  "triage_key_contact": "Contacts principaux",
+  "triage_next_step": "Entrez votre code postal pour trouver votre représentant spécifique:",
+  "triage_search_results_title": "Vos représentants",
+  "level_federal": "Gouvernement fédéral",
+  "level_provincial": "Gouvernement provincial / territorial",
+  "level_municipal": "Gouvernement municipal",
+  "level_mixed": "Plusieurs paliers de gouvernement",
+
+  "case_garbage_title": "La collecte des ordures n'a pas eu lieu dans ma rue",
+  "case_garbage_services": "311 · Conseiller municipal",
+  "case_garbage_explanation": "La collecte des déchets relève de votre municipalité. Composez le 311 pour signaler le problème, ou contactez votre conseiller municipal si la situation n'est pas réglée.",
+
+  "case_doctor_title": "Je n'arrive pas à trouver un médecin de famille",
+  "case_doctor_services": "811 · Député provincial",
+  "case_doctor_explanation": "La santé est une compétence provinciale au Canada. Le 811 offre des conseils santé et des références. Votre député provincial (MLA, MPP ou MNA) peut défendre l'accès aux soins dans votre région.",
+
+  "case_immigration_title": "Mon dossier d'immigration ou de résidence prend trop de temps",
+  "case_immigration_services": "IRCC · Député fédéral",
+  "case_immigration_explanation": "L'immigration et la citoyenneté sont des compétences fédérales gérées par IRCC. Votre député fédéral peut soumettre une demande ministérielle pour faire avancer votre dossier.",
+
+  "case_taxes_title": "J'ai un problème avec mes impôts ou l'ARC",
+  "case_taxes_services": "ARC 1-800-959-7383 · Député fédéral",
+  "case_taxes_explanation": "Les impôts fédéraux sont gérés par l'Agence du revenu du Canada (ARC). Si vous ne pouvez pas résoudre votre problème directement avec l'ARC, votre député peut vous aider via le bureau de l'ombudsman des contribuables.",
+
+  "case_pothole_title": "Il y a un nid-de-poule ou des dommages sur ma rue",
+  "case_pothole_services": "311 · Conseiller municipal",
+  "case_pothole_explanation": "L'entretien des routes locales est une compétence municipale. Composez le 311 pour signaler le problème, ou contactez votre conseiller municipal si ce n'est pas résolu rapidement.",
+
+  "case_ei_title": "Je n'ai pas reçu mes prestations d'assurance-emploi",
+  "case_ei_services": "Service Canada 1-800-206-7218 · Député fédéral",
+  "case_ei_explanation": "L'assurance-emploi (AE) est un programme fédéral géré par Service Canada. Si votre demande est retardée ou refusée, votre député fédéral peut intervenir auprès du département concerné en votre nom.",
+
+  "case_housing_title": "J'ai besoin d'aide pour un logement abordable ou social",
+  "case_housing_services": "211 · 311 · Tous les paliers",
+  "case_housing_explanation": "Le logement implique les trois paliers de gouvernement. Les listes d'attente de logement social sont municipales, les programmes d'aide financière sont souvent provinciaux, et la Stratégie nationale sur le logement assure le financement fédéral. Composez le 211 pour une orientation vers les services sociaux.",
+
+  "case_school_title": "J'ai une préoccupation concernant l'école de mon enfant",
+  "case_school_services": "Conseil scolaire · Député provincial",
+  "case_school_explanation": "L'éducation est une compétence provinciale. Commencez par le directeur d'école ou le conseil scolaire local. Si le problème est systémique ou non résolu, contactez votre député provincial (MLA, MPP ou MNA)."
 }
