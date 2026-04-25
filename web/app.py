@@ -124,7 +124,13 @@ def classify_situation():
             system=_CLASSIFY_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": text}],
         )
-        result = json.loads(response.content[0].text)
+        raw = response.content[0].text.strip()
+        if raw.startswith("```"):
+            raw = raw.split("```", 2)[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+            raw = raw.rsplit("```", 1)[0].strip()
+        result = json.loads(raw)
         return jsonify({"success": True, **result})
     except json.JSONDecodeError:
         return jsonify({"success": False, "error": "parse_error"}), 502

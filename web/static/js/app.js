@@ -416,7 +416,7 @@ async function handleSearch(e, source) {
       return;
     }
 
-    renderResults(data.representatives, displayCode, resultsId, levelFilter);
+    renderResults(data.representatives, displayCode, resultsId, levelFilter, source === 'triage');
   } catch {
     showError(source, t('error_api'));
     hideLoading(source);
@@ -431,7 +431,7 @@ function isValidPostalCode(code) {
    RENDER RESULTS
    ================================================================ */
 
-function renderResults(reps, postalCode, containerId, levelFilter = null) {
+function renderResults(reps, postalCode, containerId, levelFilter = null, showEmailTemplate = false) {
   hideLoading(containerId === 'results' ? 'main' : 'triage');
 
   const section = document.getElementById(containerId);
@@ -467,7 +467,7 @@ function renderResults(reps, postalCode, containerId, levelFilter = null) {
     heading.innerHTML = `${levelSvg(level)}<span>${t(level)}</span>`;
     levelSec.appendChild(heading);
 
-    grouped[level].forEach(rep => levelSec.appendChild(buildRepCard(rep, level)));
+    grouped[level].forEach(rep => levelSec.appendChild(buildRepCard(rep, level, showEmailTemplate)));
     section.appendChild(levelSec);
   });
 
@@ -562,7 +562,7 @@ function fallbackCopy(text, onSuccess) {
   document.body.removeChild(ta);
 }
 
-function buildRepCard(rep, level) {
+function buildRepCard(rep, level, showEmailTemplate = false) {
   const card = el('div', `rep-card ${level}`);
 
   const main   = el('div', 'rep-main');
@@ -581,14 +581,15 @@ function buildRepCard(rep, level) {
     // Plain email link — no pre-fill
     contact.appendChild(contactRow(ICONS.mail, rep.email, `mailto:${rep.email}`));
 
-    // Copy template button — copies directly to clipboard, no modal
-    const copyRow = el('div', 'draft-email-row');
-    const copyBtn = el('button', 'draft-email-btn');
-    copyBtn.type = 'button';
-    copyBtn.innerHTML = `${ICONS.compose}<span data-i18n="copy_template">${t('copy_template')}</span>`;
-    copyBtn.addEventListener('click', () => copyEmailTemplate(copyBtn, rep));
-    copyRow.appendChild(copyBtn);
-    contact.appendChild(copyRow);
+    if (showEmailTemplate) {
+      const copyRow = el('div', 'draft-email-row');
+      const copyBtn = el('button', 'draft-email-btn');
+      copyBtn.type = 'button';
+      copyBtn.innerHTML = `${ICONS.compose}<span data-i18n="copy_template">${t('copy_template')}</span>`;
+      copyBtn.addEventListener('click', () => copyEmailTemplate(copyBtn, rep));
+      copyRow.appendChild(copyBtn);
+      contact.appendChild(copyRow);
+    }
   }
   if (rep.url) contact.appendChild(contactRow(ICONS.link, t('website'), rep.url, true));
 
