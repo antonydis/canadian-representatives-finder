@@ -148,10 +148,8 @@ function applyLang(lang) {
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = t(el.dataset.i18nPlaceholder);
   });
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.lang === lang);
-    btn.setAttribute('aria-pressed', String(btn.dataset.lang === lang));
-  });
+  // Refresh dropdown label
+  document.querySelector('.lang-dropdown-wrapper')?._updateCurrent?.();
 
   // Re-render triage chips with new language
   buildTriageChips();
@@ -166,47 +164,165 @@ function applyLang(lang) {
 function buildLangButtons() {
   const container = document.getElementById('lang-switcher');
   container.innerHTML = '';
+
+  // Compact dropdown
+  const wrapper = document.createElement('div');
+  wrapper.className = 'lang-dropdown-wrapper';
+
+  const btn = document.createElement('button');
+  btn.className = 'lang-dropdown-btn';
+  btn.setAttribute('aria-haspopup', 'listbox');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.setAttribute('aria-label', 'Select language');
+
+  const flagSpan = document.createElement('span');
+  flagSpan.className = 'lang-dropdown-current';
+
+  const chevron = document.createElement('span');
+  chevron.className = 'lang-dropdown-chevron';
+  chevron.setAttribute('aria-hidden', 'true');
+  chevron.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
+
+  btn.appendChild(flagSpan);
+  btn.appendChild(chevron);
+
+  const menu = document.createElement('ul');
+  menu.className = 'lang-dropdown-menu';
+  menu.setAttribute('role', 'listbox');
+  menu.hidden = true;
+
   LANGS.forEach(lang => {
-    const btn = document.createElement('button');
-    btn.className = 'lang-btn';
-    btn.dataset.lang = lang;
-    btn.textContent = translations[lang]?.lang_name || lang.toUpperCase();
-    btn.setAttribute('aria-label', `Switch language to ${translations[lang]?.lang_name || lang}`);
-    btn.setAttribute('aria-pressed', String(lang === currentLang));
-    btn.addEventListener('click', () => applyLang(lang));
-    container.appendChild(btn);
+    const li = document.createElement('li');
+    li.className = 'lang-dropdown-item';
+    li.setAttribute('role', 'option');
+    li.dataset.lang = lang;
+    li.textContent = translations[lang]?.lang_name || lang.toUpperCase();
+    li.addEventListener('click', () => {
+      applyLang(lang);
+      closeDropdown();
+    });
+    menu.appendChild(li);
   });
+
+  function updateCurrent() {
+    flagSpan.textContent = translations[currentLang]?.lang_name || currentLang.toUpperCase();
+    menu.querySelectorAll('.lang-dropdown-item').forEach(li => {
+      li.classList.toggle('active', li.dataset.lang === currentLang);
+      li.setAttribute('aria-selected', String(li.dataset.lang === currentLang));
+    });
+  }
+
+  function openDropdown() {
+    menu.hidden = false;
+    btn.setAttribute('aria-expanded', 'true');
+    wrapper.classList.add('open');
+  }
+
+  function closeDropdown() {
+    menu.hidden = true;
+    btn.setAttribute('aria-expanded', 'false');
+    wrapper.classList.remove('open');
+  }
+
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    menu.hidden ? openDropdown() : closeDropdown();
+  });
+
+  document.addEventListener('click', () => closeDropdown());
+  menu.addEventListener('click', e => e.stopPropagation());
+
+  // Keyboard navigation
+  btn.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeDropdown();
+    if (e.key === 'ArrowDown') { e.preventDefault(); openDropdown(); menu.querySelector('.lang-dropdown-item')?.focus(); }
+  });
+  menu.addEventListener('keydown', e => {
+    const items = [...menu.querySelectorAll('.lang-dropdown-item')];
+    const idx = items.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); items[(idx + 1) % items.length]?.focus(); }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); items[(idx - 1 + items.length) % items.length]?.focus(); }
+    if (e.key === 'Enter')     { e.preventDefault(); document.activeElement.click(); }
+    if (e.key === 'Escape')    { closeDropdown(); btn.focus(); }
+  });
+  menu.querySelectorAll('.lang-dropdown-item').forEach(li => { li.tabIndex = 0; });
+
+  // Expose update function so applyLang can refresh the label
+  wrapper._updateCurrent = updateCurrent;
+  updateCurrent();
+
+  wrapper.appendChild(btn);
+  wrapper.appendChild(menu);
+  container.appendChild(wrapper);
 }
 
 /* ================================================================
-   TABS
+   CLIENT-SIDE ROUTER
    ================================================================ */
 
-function initTabs() {
-  const tabBtns  = document.querySelectorAll('.tab-btn');
-  const panels   = { find: document.getElementById('panel-find'), triage: document.getElementById('panel-triage') };
+const ROUTES = {
+  '/':       'find',
+  '/reps':   'find',
+  '/triage': 'triage',
+};
 
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.id === 'tab-find' ? 'find' : 'triage'));
+const PAGE_TITLES = {
+  find:   'Find Your Reps | InfoCivic 🍁',
+  triage: 'Who Do I Contact? | InfoCivic 🍁',
+};
+
+function resolveRoute(pathname) {
+  return ROUTES[pathname] || ROUTES['/'];
+}
+
+function navigateTo(which, pushState = true) {
+  const path = which === 'triage' ? '/triage' : '/reps';
+  if (pushState && window.location.pathname !== path) {
+    history.pushState({ view: which }, '', path);
+  }
+  document.title = PAGE_TITLES[which];
+  _applyTab(which);
+}
+
+function _applyTab(which) {
+  const panels = { find: document.getElementById('panel-find'), triage: document.getElementById('panel-triage') };
+  const active   = which === 'find' ? 'tab-find'   : 'tab-triage';
+  const inactive = which === 'find' ? 'tab-triage' : 'tab-find';
+  document.getElementById(active).classList.add('active');
+  document.getElementById(active).setAttribute('aria-selected', 'true');
+  document.getElementById(inactive).classList.remove('active');
+  document.getElementById(inactive).setAttribute('aria-selected', 'false');
+  panels.find.hidden   = which !== 'find';
+  panels.triage.hidden = which !== 'triage';
+}
+
+function initTabs() {
+  // Read initial route from URL
+  const initial = resolveRoute(window.location.pathname);
+  navigateTo(initial, false);
+
+  // Tab click → push to history
+  document.getElementById('tab-find').addEventListener('click', () => navigateTo('find'));
+  document.getElementById('tab-triage').addEventListener('click', () => navigateTo('triage'));
+
+  // Keyboard arrow navigation between tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('keydown', e => {
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
         e.preventDefault();
-        switchTab(btn.id === 'tab-find' ? 'triage' : 'find');
-        document.querySelector(`.tab-btn[aria-controls="panel-${btn.id === 'tab-find' ? 'triage' : 'find'}"]`)?.focus();
+        const next = btn.id === 'tab-find' ? 'triage' : 'find';
+        navigateTo(next);
+        document.getElementById(`tab-${next}`)?.focus();
       }
     });
   });
 
-  function switchTab(which) {
-    const active   = which === 'find' ? 'tab-find'   : 'tab-triage';
-    const inactive = which === 'find' ? 'tab-triage' : 'tab-find';
-    document.getElementById(active).classList.add('active');
-    document.getElementById(active).setAttribute('aria-selected', 'true');
-    document.getElementById(inactive).classList.remove('active');
-    document.getElementById(inactive).setAttribute('aria-selected', 'false');
-    panels.find.hidden   = which !== 'find';
-    panels.triage.hidden = which !== 'triage';
-  }
+  // Browser back / forward
+  window.addEventListener('popstate', e => {
+    const which = e.state?.view || resolveRoute(window.location.pathname);
+    _applyTab(which);
+    document.title = PAGE_TITLES[which];
+  });
 }
 
 /* ================================================================
