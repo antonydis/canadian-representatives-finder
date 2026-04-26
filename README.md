@@ -120,6 +120,11 @@ Representative data is provided by the **[Represent API](https://represent.openn
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
+---
+
+## Development notes
+
+This project was developed and optimized with the help of [Claude](https://claude.ai) (Anthropic) — for architecture decisions, security hardening, multilingual support, and iteration speed.
 
 ## License
 

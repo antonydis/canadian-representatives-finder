@@ -19,9 +19,25 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from src.api_client import RepresentAPIError, RepresentClient, RepresentRateLimitError
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
-
-# Fix #2: Trust X-Forwarded-For only from one trusted proxy (Azure / reverse proxy)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+
+# Application Insights — only active when connection string is configured
+_ai_telemetry = None
+_APPINSIGHTS_CONN = os.environ.get("APPLICATIONINSIGHTS_CONNECTION_STRING", "")
+if _APPINSIGHTS_CONN:
+    try:
+        from opencensus.ext.azure import log_exporter
+        from opencensus.ext.azure.trace_exporter import AzureExporter
+        from opencensus.trace.samplers import AlwaysOnSampler
+        from opencensus.trace.tracer import Tracer
+        from opencensus.ext.azure.common.protocol import Envelope
+        import opencensus.ext.azure.log_exporter as _azure_log
+        _handler = _azure_log.AzureLogHandler(connection_string=_APPINSIGHTS_CONN)
+        logging.getLogger().addHandler(_handler)
+        _ai_telemetry = True
+        logging.info("Application Insights connected.")
+    except Exception as _e:
+        logging.warning(f"Application Insights not loaded: {_e}")
 
 client = RepresentClient()
 ai_client = anthropic.Anthropic()
@@ -120,6 +136,10 @@ def search():
 
     try:
         reps = client.get_representatives_by_postal_code(postal_code)
+        logger.info("postal_search", extra={"custom_dimensions": {
+            "postal_code": postal_code,
+            "result_count": len(reps),
+        }})
         return jsonify({
             "success": True,
             "postal_code": postal_code,
@@ -189,6 +209,11 @@ def classify_situation():
         if result.get("jurisdiction") not in _VALID_JURISDICTIONS:
             raise ValueError("invalid jurisdiction in AI response")
 
+        logger.info("classify_situation", extra={"custom_dimensions": {
+            "jurisdiction": result.get("jurisdiction"),
+            "service": result.get("service"),
+            "lang": lang,
+        }})
         return jsonify({"success": True, **result})
 
     except (json.JSONDecodeError, ValueError, KeyError):
