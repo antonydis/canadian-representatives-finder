@@ -117,6 +117,8 @@ def set_security_headers(response):
 
 
 @app.route("/")
+@app.route("/reps")
+@app.route("/triage")
 def index():
     return render_template("index.html", translations=TRANSLATIONS, langs=SUPPORTED_LANGS)
 
