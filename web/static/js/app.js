@@ -2,7 +2,7 @@
    Canadian Representatives Finder — Frontend Logic
    ================================================================ */
 
-const LANGS = ['en', 'fr', 'es', 'zh', 'tl'];
+const LANGS = ['en', 'fr', 'es', 'pt', 'zh', 'tl'];
 let translations = {};
 let currentLang = 'en';
 
@@ -92,6 +92,8 @@ async function init() {
   applyLang(currentLang);
   buildTriageChips();
   initTabs();
+
+  initEmailModal();
 
   document.getElementById('search-form').addEventListener('submit', e => handleSearch(e, 'main'));
   document.getElementById('triage-search-form').addEventListener('submit', e => handleSearch(e, 'triage'));
@@ -268,7 +270,7 @@ async function handleOpenFormSubmit(e) {
     const resp = await fetch('/api/classify-situation', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ text }),
+      body:    JSON.stringify({ text, lang: currentLang }),
     });
     const data = await resp.json();
 
@@ -503,14 +505,54 @@ function isQuebecRep(rep) {
   );
 }
 
+function resolveTitle(rep, useFr) {
+  const office = (rep.elected_office || '').toLowerCase();
+  if (useFr) {
+    if (office.includes('maire') || office.includes('mairesse')) return `Monsieur le Maire / Madame la Mairesse ${rep.name}`;
+    if (office.includes('conseill')) return `Monsieur le Conseiller / Madame la Conseillère ${rep.name}`;
+    if (office.includes('mna') || office.includes('député')) return `Monsieur le Député / Madame la Députée ${rep.name}`;
+    if (office.includes('senator') || office.includes('sénat')) return `Monsieur le Sénateur / Madame la Sénatrice ${rep.name}`;
+    return `${rep.name}`;
+  } else {
+    if (office.includes('mayor') || office.includes('maire')) return `Mayor ${rep.name}`;
+    if (office.includes('councillor') || office.includes('councilor') || office.includes('conseill')) return `Councillor ${rep.name}`;
+    if (office === 'mp' || office.includes('member of parliament')) return `${rep.name}, MP`;
+    if (office.includes('mla') || office.includes('mpp') || office.includes('mna')) return `${rep.name}, ${rep.elected_office}`;
+    if (office.includes('senator')) return `Senator ${rep.name}`;
+    return `${rep.elected_office} ${rep.name}`;
+  }
+}
+
+function buildContextualGuide(useFr) {
+  const level = activeTriageLevel || 'municipal';
+  if (useFr) {
+    const base = [
+      '• Adresse exacte ou localisation concernée : [ex. 123 rue Principale, près du feu de signalisation]',
+      '• Date depuis laquelle vous avez constaté le problème : [ex. depuis 2 semaines]',
+      '• Description précise : [décrivez le problème en détail]',
+    ];
+    if (level === 'municipal') base.push('• Photo jointe si possible : [joindre une photo du problème]');
+    if (level === 'federal') base.push('• Numéro de dossier ou de référence (si applicable) : [ex. numéro IRCC, numéro de demande]');
+    if (level === 'provincial') base.push('• Numéro de référence (si applicable) : [ex. numéro de dossier médical, no. de demande]');
+    return base.join('\n');
+  } else {
+    const base = [
+      '• Exact location or address: [e.g. 123 Main Street, near the traffic light]',
+      '• When you first noticed the issue: [e.g. approximately 2 weeks ago]',
+      '• Detailed description: [describe the problem clearly]',
+    ];
+    if (level === 'municipal') base.push('• Photo attached if possible: [attach a photo of the issue]');
+    if (level === 'federal') base.push('• File or reference number (if applicable): [e.g. IRCC application number]');
+    if (level === 'provincial') base.push('• Reference number (if applicable): [e.g. case number, application ID]');
+    return base.join('\n');
+  }
+}
+
 function buildEmailTemplate(rep) {
   const useFr     = isQuebecRep(rep);
   const emailLang = useFr ? 'fr' : 'en';
 
-  // Resolve situation in the EMAIL language:
-  // 1. Predefined chip → look up translated title
-  // 2. Free text with AI translations → use situation_en / situation_fr
-  // 3. Fallback → raw user text
+  // Resolve situation in the EMAIL language
   let situation;
   if (activeCaseId) {
     situation = translations[emailLang]?.[`case_${activeCaseId}_title`] || activeTriageSituation || '';
@@ -522,123 +564,40 @@ function buildEmailTemplate(rep) {
     situation = activeTriageSituation || '';
   }
 
+  const title   = resolveTitle(rep, useFr);
   const snippet = situation.length > 60 ? situation.substring(0, 60) + '…' : situation;
+  const guide   = buildContextualGuide(useFr);
 
   let subject, body;
   if (useFr) {
     subject = `Demande citoyenne${snippet ? ' — ' + snippet : ''}`;
-    body    = `Bonjour ${rep.name},\n\n` +
-              (situation
-                ? `Je vous écris concernant la situation suivante :\n\n${situation}\n\n`
-                : `Je vous écris en tant que citoyen(ne) de votre circonscription.\n\n`) +
-              `Je vous serais reconnaissant(e) de bien vouloir m'informer des démarches possibles.\n\n` +
-              `Cordialement,\n[Votre nom]\n[Votre adresse]`;
+    body =
+      `${title},\n\n` +
+      (situation
+        ? `Je me permets de vous contacter au sujet de la situation suivante dans votre circonscription :\n\n` +
+          `${situation}\n\n`
+        : `Je me permets de vous contacter en tant que citoyen(ne) de votre circonscription.\n\n`) +
+      `Afin de vous permettre de traiter cette demande efficacement, voici les informations pertinentes :\n\n` +
+      `${guide}\n\n` +
+      `Je vous serais très reconnaissant(e) de bien vouloir examiner cette situation et m'informer des démarches possibles.\n\n` +
+      `Dans l'attente de votre réponse, je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.\n\n` +
+      `[Votre prénom et nom]\n[Votre adresse]\n[Votre courriel / téléphone]`;
   } else {
     subject = `Constituent Inquiry${snippet ? ' — ' + snippet : ''}`;
-    body    = `Dear ${rep.elected_office} ${rep.name},\n\n` +
-              (situation
-                ? `I am writing regarding the following situation:\n\n${situation}\n\n`
-                : `I am writing as a constituent in your riding.\n\n`) +
-              `I would appreciate any information or assistance you can provide.\n\n` +
-              `Sincerely,\n[Your Name]\n[Your Address]`;
+    body =
+      `Dear ${title},\n\n` +
+      `I am writing to bring to your attention the following matter in your constituency:\n\n` +
+      (situation ? `${situation}\n\n` : '') +
+      `To help you address this efficiently, here are the relevant details:\n\n` +
+      `${guide}\n\n` +
+      `I would greatly appreciate your attention to this matter and any guidance on next steps or available resources.\n\n` +
+      `Thank you for your service to our community.\n\n` +
+      `Sincerely,\n[Your Full Name]\n[Your Address]\n[Your Email / Phone]`;
   }
 
   return { subject, body, to: rep.email };
 }
 
-function openEmailModal(rep) {
-  const { subject, body, to } = buildEmailTemplate(rep);
-
-  // Remove any existing modal
-  document.getElementById('email-modal')?.remove();
-
-  const overlay = document.createElement('div');
-  overlay.id = 'email-modal';
-  overlay.className = 'email-modal-overlay';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-modal', 'true');
-  overlay.setAttribute('aria-label', t('modal_title'));
-
-  const modal = document.createElement('div');
-  modal.className = 'email-modal';
-
-  const header = document.createElement('div');
-  header.className = 'email-modal-header';
-  const title = document.createElement('h3');
-  title.textContent = t('modal_title');
-  const closeBtn = document.createElement('button');
-  closeBtn.className = 'email-modal-close';
-  closeBtn.setAttribute('aria-label', 'Close');
-  closeBtn.innerHTML = '&times;';
-  closeBtn.addEventListener('click', () => overlay.remove());
-  header.append(title, closeBtn);
-
-  const fields = document.createElement('div');
-  fields.className = 'email-modal-fields';
-
-  const makeField = (label, value) => {
-    const row = document.createElement('div');
-    row.className = 'email-modal-field';
-    const lbl = document.createElement('span');
-    lbl.className = 'email-field-label';
-    lbl.textContent = label;
-    const val = document.createElement('span');
-    val.className = 'email-field-value';
-    val.textContent = value;
-    row.append(lbl, val);
-    return row;
-  };
-
-  fields.append(
-    makeField(t('modal_to'), to),
-    makeField(t('modal_subject'), subject),
-  );
-
-  const bodyLabel = document.createElement('div');
-  bodyLabel.className = 'email-modal-field';
-  const bodyLbl = document.createElement('span');
-  bodyLbl.className = 'email-field-label';
-  bodyLbl.textContent = t('modal_body_label');
-  const bodyPre = document.createElement('pre');
-  bodyPre.className = 'email-body-preview';
-  bodyPre.textContent = body;
-  bodyLabel.append(bodyLbl, bodyPre);
-  fields.appendChild(bodyLabel);
-
-  const actions = document.createElement('div');
-  actions.className = 'email-modal-actions';
-
-  const copyBtn = document.createElement('button');
-  copyBtn.className = 'email-action-btn secondary';
-  copyBtn.textContent = t('copy_template');
-  copyBtn.addEventListener('click', () => {
-    const fullText = `${body}`;
-    const doCopy = () => {
-      copyBtn.textContent = t('copied');
-      setTimeout(() => { copyBtn.textContent = t('copy_template'); }, 2200);
-    };
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(fullText).then(doCopy).catch(() => fallbackCopy(fullText, doCopy));
-    } else {
-      fallbackCopy(fullText, doCopy);
-    }
-  });
-
-  const mailBtn = document.createElement('a');
-  mailBtn.className = 'email-action-btn primary';
-  mailBtn.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  mailBtn.textContent = t('open_mail_app');
-
-  actions.append(copyBtn, mailBtn);
-  modal.append(header, fields, actions);
-  overlay.appendChild(modal);
-
-  // Close on backdrop click
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
-
-  document.body.appendChild(overlay);
-  closeBtn.focus();
-}
 
 function fallbackCopy(text, onSuccess) {
   const ta = document.createElement('textarea');
@@ -725,23 +684,20 @@ function initEmailModal() {
 
   // Copy to clipboard
   copyBtn.addEventListener('click', () => {
-    const subject = document.getElementById('modal-subject').textContent;
-    const body    = document.getElementById('modal-body').textContent;
-    const full    = `Subject: ${subject}\n\n${body}`;
-    navigator.clipboard.writeText(full).then(() => {
+    const body = document.getElementById('modal-body').textContent;
+    const confirm = () => {
       copyBtn.textContent = t('copied');
       copyBtn.classList.add('copied');
       setTimeout(() => {
         copyBtn.textContent = t('copy_template');
         copyBtn.classList.remove('copied');
       }, 2200);
-    }).catch(() => {
-      // Fallback: select the body text
-      const range = document.createRange();
-      range.selectNodeContents(document.getElementById('modal-body'));
-      window.getSelection().removeAllRanges();
-      window.getSelection().addRange(range);
-    });
+    };
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(body).then(confirm).catch(() => fallbackCopy(body, confirm));
+    } else {
+      fallbackCopy(body, confirm);
+    }
   });
 
   // Keyboard: Escape closes
@@ -753,28 +709,24 @@ function initEmailModal() {
 }
 
 function openEmailModal(rep) {
-  const { subject, body } = buildEmailTemplate(rep);
+  const { subject, body, to } = buildEmailTemplate(rep);
 
-  document.getElementById('modal-to').textContent      = rep.email;
-  document.getElementById('modal-subject').textContent  = subject;
-  document.getElementById('modal-body').textContent     = body;
+  document.getElementById('modal-to').textContent     = to;
+  document.getElementById('modal-subject').textContent = subject;
+  document.getElementById('modal-body').textContent    = body;
 
-  // Wire "Open Mail App" button
   const openBtn = document.getElementById('modal-open-btn');
-  openBtn.href = `mailto:${rep.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  openBtn.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-  // Reset copy button state + re-translate all modal labels
+  // Re-translate labels and reset copy button
   document.querySelectorAll('#email-modal [data-i18n]').forEach(node => {
     node.textContent = t(node.dataset.i18n);
   });
-  const copyBtnEl = document.getElementById('modal-copy-btn');
-  copyBtnEl.classList.remove('copied');
+  document.getElementById('modal-copy-btn').classList.remove('copied');
 
   const overlay = document.getElementById('email-modal');
   overlay.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
-
-  // Focus trap: focus the close button
   document.getElementById('email-modal-close').focus();
 }
 
