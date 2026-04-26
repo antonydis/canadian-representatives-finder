@@ -133,8 +133,13 @@ function t(key) {
 }
 
 function applyLang(lang) {
+  const prevLang = currentLang;
   currentLang = lang;
   localStorage.setItem('canrep-lang', lang);
+  // GA4: track language selection (only when user actively changes it)
+  if (prevLang && prevLang !== lang && typeof gtag !== 'undefined') {
+    gtag('event', 'change_language', { language: lang });
+  }
   document.documentElement.lang = lang;
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -283,6 +288,13 @@ async function handleOpenFormSubmit(e) {
         explanation: data.explanation,
         service:     data.service,
       });
+      // GA4: track AI situation classification
+      gtag('event', 'classify_situation', {
+        jurisdiction: data.jurisdiction,
+        service: data.service || 'none',
+        lang: currentLang,
+        situation_en: data.situation_en || '',
+      });
     } else if (resp.status === 429) {
       showErr(t('error_rate_limit'));
     } else {
@@ -427,6 +439,13 @@ async function handleSearch(e, source) {
     }
 
     renderResults(data.representatives, displayCode, resultsId, levelFilter, source === 'triage');
+    // GA4: track postal code search
+    gtag('event', 'search_representatives', {
+      postal_code: displayCode,
+      source: source,
+      lang: currentLang,
+      result_count: data.representatives.length,
+    });
   } catch {
     showError(source, t('error_api'));
     hideLoading(source);
