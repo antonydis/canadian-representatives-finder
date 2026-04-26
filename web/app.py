@@ -192,15 +192,28 @@ def classify_situation():
         return jsonify({"success": True, **result})
 
     except (json.JSONDecodeError, ValueError, KeyError):
-        # Fix #7: log internally, return generic message
         logger.exception("AI response validation failed")
         return jsonify({"success": False, "error": "parse_error"}), 502
+    except anthropic.AuthenticationError:
+        logger.error("Anthropic API key invalid or not set")
+        return jsonify({"success": False, "error": "auth_error"}), 502
     except anthropic.APIError:
         logger.exception("Anthropic API error")
         return jsonify({"success": False, "error": "ai_error"}), 502
     except Exception:
         logger.exception("Unexpected error in classify_situation")
         return jsonify({"success": False, "error": "ai_error"}), 502
+
+
+@app.route("/api/health")
+def health():
+    key = os.environ.get("ANTHROPIC_API_KEY", "")
+    key_set = bool(key and len(key) > 10)
+    return jsonify({
+        "status": "ok",
+        "anthropic_key_configured": key_set,
+        "key_prefix": key[:12] + "..." if key_set else "NOT SET",
+    })
 
 
 @app.route("/api/translations")
