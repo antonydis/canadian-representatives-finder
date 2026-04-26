@@ -1,169 +1,125 @@
 # Canadian Representatives Finder
 
-**Find your federal MP, provincial MNA/MLA/MPP, and municipal councillors by postal code.**
+**Find your federal MP, provincial MNA/MLA/MPP, and municipal councillors by Canadian postal code — and get help contacting them.**
 
-Powered by the [Represent API](https://represent.opennorth.ca) — free, no API key required.
-
----
-
-🇫🇷 *La version française complète est disponible dans [README.fr.md](README.fr.md).*
+A bilingual civic web tool with AI-powered situation routing, multilingual support, and smart email templates.
 
 ---
 
-## Features
+## What it does
 
-- Look up all elected representatives for any Canadian postal code
-- Covers all **3 levels of government**: federal, provincial/territorial, and municipal
-- Live data from the Represent API — always up to date
-- 24-hour local cache to minimize API requests
-- JSON output for easy integration with other tools
-- Bilingual display (English / French)
+### 🔍 Find My Representatives
+Enter any Canadian postal code to instantly see your elected representatives across all three levels of government — federal, provincial/territorial, and municipal — with their contact information (phone, email, website).
 
-## Requirements
+### 🤔 Who Do I Contact?
+Not sure which level of government handles your issue? Describe your situation in plain language and the AI classifier will:
+- Identify the most relevant level of government (federal, provincial, or municipal)
+- Suggest a key contact service
 
+Once classified, enter your postal code to find your specific representative and get a ready-to-personalize email example.
+
+### ✉️ Smart Email Templates
+Each representative card in the triage flow includes an **"Get email example"** button that opens a pre-drafted email with:
+- A contextual guide on what details to include (exact address, date of issue, description)
+- Language-matched content: French for Quebec representatives, English for all others
+
+---
+
+## Languages supported
+
+| Language | Code |
+|----------|------|
+| English | `en` |
+| Français | `fr` |
+| Español | `es` |
+| Português | `pt` |
+| 中文 | `zh` |
+| Filipino | `tl` |
+
+---
+
+## Tech stack
+
+- **Backend:** Python / Flask
+- **AI classifier:** Claude Haiku (Anthropic) — fast, low-cost civic situation routing
+- **Representative data:** Represent API by OpenNorth
+- **Frontend:** Vanilla JS, no framework dependencies
+
+---
+
+## Running locally
+
+### Requirements
 - Python 3.10+
-- Internet connection (for live data)
+- An [Anthropic API key](https://console.anthropic.com)
 
-## Installation
+### Setup
 
 ```bash
-git clone https://github.com/yourusername/canadian-representatives-finder.git
+git clone https://github.com/antonydis/canadian-representatives-finder.git
 cd canadian-representatives-finder
 pip install -r requirements.txt
+cp .env.example .env
+# Add your ANTHROPIC_API_KEY to .env
 ```
 
-Or install as a CLI tool:
+### Start the web app
 
 ```bash
-pip install -e .
+cd web
+python app.py
+# Open http://localhost:5000
 ```
 
-## Quick Start
+### CLI (original tool)
 
 ```bash
-# By postal code (with or without space)
 python -m src.main H2X1Y6
-python -m src.main "H2X 1Y6"
-
-# Interactive prompt (no argument)
-python -m src.main
-
-# After pip install -e .
-canrep H2X1Y6
-```
-
-## Sample Output
-
-```
-============================================================
-Representatives for postal code H2X 1Y6
-============================================================
-
---- FEDERAL ---
-
-  MP: Steven Guilbeault
-  Party / Parti: Liberal
-  District: Laurier—Sainte-Marie
-  Phone / Tél.: 514-522-1339
-  Email: steven.guilbeault@parl.gc.ca
-  Web: https://www.ourcommons.ca/members/en/steven-guilbeault(89263)
-
---- PROVINCIAL ---
-
-  MNA: Andrés Fontecilla
-  Party / Parti: Québec solidaire
-  District: Laurier-Dorion
-  Phone / Tél.: 514-948-2095
-  Email: afontecilla-laurdor@assnat.qc.ca
-
---- MUNICIPAL ---
-
-  Mayor: Valérie Plante
-  Party / Parti: Projet Montréal
-  District: Montréal
-  Phone / Tél.: 514-872-3101
-  Email: valerie.plante@montreal.ca
-
-  City Councillor: Robert Beaudry
-  Party / Parti: Projet Montréal
-  District: Saint-Jacques
-  Phone / Tél.: 514-872-3167
-  Email: robert.beaudry@montreal.ca
-
-============================================================
-Data provided by the Represent API (represent.opennorth.ca)
-```
-
-## Options
-
-| Flag | Description |
-|------|-------------|
-| `--json` | Output results as JSON |
-| `--level federal\|provincial\|municipal` | Filter by government level |
-| `--lang en\|fr` | Display language (default: `en`) |
-| `--no-cache` | Bypass 24-hour local cache, fetch fresh data |
-
-### Examples
-
-```bash
-# JSON output
-python -m src.main K1A0A6 --json
-
-# Federal representatives only
 python -m src.main H2X1Y6 --level federal
-
-# French labels
-python -m src.main H2X1Y6 --lang fr
-
-# Force fresh fetch
-python -m src.main H2X1Y6 --no-cache
+python -m src.main H2X1Y6 --json
 ```
 
-## Running Tests
+---
+
+## Running tests
 
 ```bash
 pytest tests/ -v
 pytest tests/ --cov=src --cov-report=term-missing
 ```
+---
 
-## Project Structure
+## Project structure
 
 ```
 canadian-representatives-finder/
+├── web/
+│   ├── app.py                  Flask server + AI classifier endpoint
+│   ├── templates/index.html    Single-page web UI
+│   ├── static/
+│   │   ├── js/app.js           Frontend logic (tabs, triage, email modal)
+│   │   └── css/style.css       Styles
+│   └── translations/           JSON files for en, fr, es, pt, zh, tl
 ├── src/
-│   ├── models.py       Representative and Office dataclasses
-│   ├── validators.py   Postal code validation and normalization
-│   ├── api_client.py   Represent API wrapper with caching
-│   ├── formatters.py   Text and JSON output formatters
-│   └── main.py         CLI entry point
-├── tests/
-│   ├── test_validators.py
-│   ├── test_formatters.py
-│   └── test_api_client.py
-├── data/
-│   ├── cache/          Live API responses (gitignored, 24h TTL)
-│   └── examples/
-│       └── quebec_sample.json   Demo data for H2X 1Y6 (Montréal)
-└── docs/
-    └── API_REFERENCE.md
+│   ├── api_client.py           Represent API wrapper
+│   ├── models.py               Representative dataclasses
+│   ├── validators.py           Postal code validation
+│   └── main.py                 CLI entry point
+└── tests/
 ```
+---
+## Data & attribution
 
-## Data Source & Attribution
+Representative data is provided by the **[Represent API](https://represent.opennorth.ca)** by [OpenNorth](https://opennorth.ca), a Canadian non-profit. The API is free and open with no authentication required.
 
-This project uses the **[Represent API](https://represent.opennorth.ca)** by
-[OpenNorth](https://opennorth.ca), a Canadian non-profit. The API is free and
-open with no authentication required.
-
-- Coverage: 338 federal MPs, all provincial/territorial legislators, 7,000+ municipal officials
+- 338 federal MPs, all provincial/territorial legislators, 7,000+ municipal officials
+- Data updated as elections occur
 - Rate limit: 60 requests/minute
-- Data is updated as elections occur
-
-Please review [OpenNorth's terms of use](https://represent.opennorth.ca/api/) before
-deploying this tool publicly.
 
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 
 ## License
 
