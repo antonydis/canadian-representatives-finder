@@ -216,6 +216,13 @@ function buildLangButtons() {
     menu.hidden = false;
     btn.setAttribute('aria-expanded', 'true');
     wrapper.classList.add('open');
+    // Position menu using fixed coords so it never gets clipped
+    const rect = btn.getBoundingClientRect();
+    menu.style.top  = (rect.bottom + 6) + 'px';
+    // Align right edge to button right, but clamp to viewport
+    const menuW = 160;
+    const left  = Math.max(8, rect.right - menuW);
+    menu.style.left = left + 'px';
   }
 
   function closeDropdown() {
