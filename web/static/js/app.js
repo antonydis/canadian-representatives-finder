@@ -75,6 +75,10 @@ let activeTriageSituation = null;
 /* active case id — for language-aware email template */
 let activeCaseId = null;
 
+/* AI-provided situation summaries in EN/FR for bilingual email templates */
+let activeSituationEn = null;
+let activeSituationFr = null;
+
 /* ================================================================
    INIT
    ================================================================ */
@@ -270,6 +274,8 @@ async function handleOpenFormSubmit(e) {
 
     const validLevels = ['federal', 'provincial', 'municipal'];
     if (resp.ok && data.success && validLevels.includes(data.jurisdiction)) {
+      activeSituationEn = data.situation_en || null;
+      activeSituationFr = data.situation_fr || null;
       activateTriage(null, text, {
         level:       data.jurisdiction,
         explanation: data.explanation,
@@ -371,6 +377,8 @@ function resetTriageToPhase1() {
   activeTriageLevel     = null;
   activeTriageSituation = null;
   activeCaseId          = null;
+  activeSituationEn     = null;
+  activeSituationFr     = null;
   document.getElementById('triage-phase-1').hidden = false;
   document.getElementById('triage-phase-2').hidden = true;
   document.getElementById('triage-open-input').value = '';
@@ -496,16 +504,23 @@ function isQuebecRep(rep) {
 }
 
 function buildEmailTemplate(rep) {
-  const useFr    = isQuebecRep(rep);
+  const useFr     = isQuebecRep(rep);
   const emailLang = useFr ? 'fr' : 'en';
 
-  // Resolve situation text in the EMAIL's language (not the UI language)
-  // If it was a predefined chip, look up the title in the email language.
-  // If it was free text typed by the user, use it as-is.
-  const rawSituation = activeTriageSituation || '';
-  const situation = activeCaseId
-    ? (translations[emailLang]?.[`case_${activeCaseId}_title`] || rawSituation)
-    : rawSituation;
+  // Resolve situation in the EMAIL language:
+  // 1. Predefined chip → look up translated title
+  // 2. Free text with AI translations → use situation_en / situation_fr
+  // 3. Fallback → raw user text
+  let situation;
+  if (activeCaseId) {
+    situation = translations[emailLang]?.[`case_${activeCaseId}_title`] || activeTriageSituation || '';
+  } else if (useFr && activeSituationFr) {
+    situation = activeSituationFr;
+  } else if (!useFr && activeSituationEn) {
+    situation = activeSituationEn;
+  } else {
+    situation = activeTriageSituation || '';
+  }
 
   const snippet = situation.length > 60 ? situation.substring(0, 60) + '…' : situation;
 
@@ -528,28 +543,101 @@ function buildEmailTemplate(rep) {
               `Sincerely,\n[Your Name]\n[Your Address]`;
   }
 
-  return { subject, body };
+  return { subject, body, to: rep.email };
 }
 
-function copyEmailTemplate(btn, rep) {
-  const { subject, body } = buildEmailTemplate(rep);
-  const fullText = `Subject: ${subject}\n\n${body}`;
-  const span = btn.querySelector('span');
+function openEmailModal(rep) {
+  const { subject, body, to } = buildEmailTemplate(rep);
 
-  const confirm = () => {
-    span.textContent = t('copied');
-    btn.classList.add('copied');
-    setTimeout(() => {
-      span.textContent = t('copy_template');
-      btn.classList.remove('copied');
-    }, 2200);
+  // Remove any existing modal
+  document.getElementById('email-modal')?.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'email-modal';
+  overlay.className = 'email-modal-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', t('modal_title'));
+
+  const modal = document.createElement('div');
+  modal.className = 'email-modal';
+
+  const header = document.createElement('div');
+  header.className = 'email-modal-header';
+  const title = document.createElement('h3');
+  title.textContent = t('modal_title');
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'email-modal-close';
+  closeBtn.setAttribute('aria-label', 'Close');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.addEventListener('click', () => overlay.remove());
+  header.append(title, closeBtn);
+
+  const fields = document.createElement('div');
+  fields.className = 'email-modal-fields';
+
+  const makeField = (label, value) => {
+    const row = document.createElement('div');
+    row.className = 'email-modal-field';
+    const lbl = document.createElement('span');
+    lbl.className = 'email-field-label';
+    lbl.textContent = label;
+    const val = document.createElement('span');
+    val.className = 'email-field-value';
+    val.textContent = value;
+    row.append(lbl, val);
+    return row;
   };
 
-  if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(fullText).then(confirm).catch(() => fallbackCopy(fullText, confirm));
-  } else {
-    fallbackCopy(fullText, confirm);
-  }
+  fields.append(
+    makeField(t('modal_to'), to),
+    makeField(t('modal_subject'), subject),
+  );
+
+  const bodyLabel = document.createElement('div');
+  bodyLabel.className = 'email-modal-field';
+  const bodyLbl = document.createElement('span');
+  bodyLbl.className = 'email-field-label';
+  bodyLbl.textContent = t('modal_body_label');
+  const bodyPre = document.createElement('pre');
+  bodyPre.className = 'email-body-preview';
+  bodyPre.textContent = body;
+  bodyLabel.append(bodyLbl, bodyPre);
+  fields.appendChild(bodyLabel);
+
+  const actions = document.createElement('div');
+  actions.className = 'email-modal-actions';
+
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'email-action-btn secondary';
+  copyBtn.textContent = t('copy_template');
+  copyBtn.addEventListener('click', () => {
+    const fullText = `${body}`;
+    const doCopy = () => {
+      copyBtn.textContent = t('copied');
+      setTimeout(() => { copyBtn.textContent = t('copy_template'); }, 2200);
+    };
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(fullText).then(doCopy).catch(() => fallbackCopy(fullText, doCopy));
+    } else {
+      fallbackCopy(fullText, doCopy);
+    }
+  });
+
+  const mailBtn = document.createElement('a');
+  mailBtn.className = 'email-action-btn primary';
+  mailBtn.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  mailBtn.textContent = t('open_mail_app');
+
+  actions.append(copyBtn, mailBtn);
+  modal.append(header, fields, actions);
+  overlay.appendChild(modal);
+
+  // Close on backdrop click
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+  document.body.appendChild(overlay);
+  closeBtn.focus();
 }
 
 function fallbackCopy(text, onSuccess) {
@@ -586,7 +674,7 @@ function buildRepCard(rep, level, showEmailTemplate = false) {
       const copyBtn = el('button', 'draft-email-btn');
       copyBtn.type = 'button';
       copyBtn.innerHTML = `${ICONS.compose}<span data-i18n="copy_template">${t('copy_template')}</span>`;
-      copyBtn.addEventListener('click', () => copyEmailTemplate(copyBtn, rep));
+      copyBtn.addEventListener('click', () => openEmailModal(rep));
       copyRow.appendChild(copyBtn);
       contact.appendChild(copyRow);
     }

@@ -37,12 +37,14 @@ def _allow_request(ip: str) -> bool:
 _CLASSIFY_SYSTEM_PROMPT = (
     "You are a Canadian civic assistant. The user will describe a situation or problem. "
     "Determine which SINGLE level of government is primarily responsible. "
-    "Return ONLY a valid JSON object with exactly three keys: "
+    "Return ONLY a valid JSON object with exactly five keys: "
     '"jurisdiction": MUST be exactly one of "federal", "provincial", or "municipal". '
     'NEVER return "mixed" or multiple levels. Force a decision to the most pertinent level. '
     '"service": Can be "311", "811", "211", or "null" if not applicable. '
     '"explanation": A polite, helpful explanation (max 20 words) in the exact same language '
-    "the user wrote, explaining why this specific level of government handles it."
+    "the user wrote, explaining why this specific level of government handles it. "
+    '"situation_en": A short neutral English summary of the user\'s situation (max 8 words, no period). '
+    '"situation_fr": A short neutral French summary of the user\'s situation (max 8 words, no period).'
 )
 
 TRANSLATIONS_DIR = os.path.join(os.path.dirname(__file__), "translations")
