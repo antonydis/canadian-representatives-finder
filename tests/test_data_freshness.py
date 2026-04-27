@@ -85,7 +85,7 @@ GROUND_TRUTH = [
     {
         "postal": "T2P1J9",   # downtown Calgary
         "label": "Calgary Mayor",
-        "name_contains": "Gondek",              # Jyoti Gondek, elected Oct 2021
+        "name_contains": "Farkas",              # Jeromy Farkas, elected Oct 2025
         "office_contains": "Mayor",
         "level": "municipal",
     },
