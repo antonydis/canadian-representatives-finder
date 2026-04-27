@@ -10,6 +10,19 @@ from .validators import normalize_postal_code, validate_postal_code
 BASE_URL = "https://represent.opennorth.ca"
 CACHE_DIR = Path(__file__).parent.parent / "data" / "cache"
 CACHE_TTL_HOURS = 24
+OVERRIDES_FILE = Path(__file__).parent.parent / "data" / "overrides.json"
+
+
+def _load_overrides() -> list[dict]:
+    """Load manual override rules from data/overrides.json."""
+    try:
+        with OVERRIDES_FILE.open("r", encoding="utf-8") as f:
+            return json.load(f).get("overrides", [])
+    except (OSError, json.JSONDecodeError):
+        return []
+
+
+OVERRIDES = _load_overrides()
 
 
 class RepresentAPIError(Exception):
@@ -51,11 +64,11 @@ class RepresentClient:
 
         cached = self._load_cache(normalized)
         if cached is not None:
-            return self._parse_response(cached)
+            return self._apply_overrides(self._parse_response(cached), normalized)
 
         raw = self._fetch_from_api(normalized)
         self._save_cache(normalized, raw)
-        return self._parse_response(raw)
+        return self._apply_overrides(self._parse_response(raw), normalized)
 
     # ------------------------------------------------------------------
     # API communication
@@ -179,6 +192,63 @@ class RepresentClient:
             return "municipal"
 
         return "municipal"
+
+    # ------------------------------------------------------------------
+    # Overrides
+    # ------------------------------------------------------------------
+
+    def _apply_overrides(
+        self, reps: list[Representative], postal: str
+    ) -> list[Representative]:
+        """
+        Apply manual corrections on top of OpenNorth data.
+        - 'inject': add a rep that is missing from the API response.
+        - 'replace': swap a stale rep matched by (elected_office, level).
+        Keyed by 3-character postal prefix (e.g. 'H2X').
+        """
+        prefix = postal.replace(" ", "")[:3].upper()
+
+        for rule in OVERRIDES:
+            if prefix not in rule.get("postal_prefixes", []):
+                continue
+
+            r = rule["representative"]
+            action = rule.get("action", "inject")
+
+            new_rep = Representative(
+                name=r["name"],
+                elected_office=r["elected_office"],
+                level=r["level"],
+                party_name=r.get("party_name"),
+                district_name=r.get("district_name", ""),
+                email=r.get("email"),
+                url=r.get("url"),
+                photo_url=r.get("photo_url") or None,
+                offices=[],
+                # fields not in overrides
+                first_name=None, last_name=None,
+                personal_url=None, representative_set_name="",
+                source_url="", boundary_url="",
+            )
+
+            if action == "replace":
+                reps = [
+                    new_rep
+                    if (rep.elected_office == r["elected_office"]
+                        and rep.level == r["level"])
+                    else rep
+                    for rep in reps
+                ]
+            else:  # inject — only if no rep with same office+level already exists
+                already = any(
+                    rep.elected_office == r["elected_office"]
+                    and rep.level == r["level"]
+                    for rep in reps
+                )
+                if not already:
+                    reps.append(new_rep)
+
+        return reps
 
     # ------------------------------------------------------------------
     # Cache
