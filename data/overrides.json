@@ -7,8 +7,8 @@
   "overrides": [
 
     {
-      "_note": "Montreal Mayor — Soraya Martinez Ferrada elected Nov 2025, replacing Valerie Plante. OpenNorth office title: 'Maire de la Ville de Montreal'",
-      "action": "replace",
+      "_note": "Montreal Mayor — Soraya Martinez Ferrada elected Nov 2025, replacing Valerie Plante. Uses replace_or_inject: replaces Plante where OpenNorth has her, injects alongside borough mayor where OpenNorth only has a Maire d'arrondissement.",
+      "action": "replace_or_inject",
       "postal_prefixes": [
         "H1A","H1B","H1C","H1E","H1G","H1H","H1J","H1K","H1L","H1M","H1N","H1P","H1R","H1S","H1T","H1V","H1W","H1X","H1Y","H1Z",
         "H2A","H2B","H2C","H2E","H2G","H2H","H2J","H2K","H2L","H2M","H2N","H2P","H2R","H2S","H2T","H2V","H2W","H2X","H2Y","H2Z",

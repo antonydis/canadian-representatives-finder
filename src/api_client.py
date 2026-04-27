@@ -1,3 +1,4 @@
+import dataclasses
 import json
 import requests
 from datetime import datetime, timedelta
@@ -23,6 +24,34 @@ def _load_overrides() -> list[dict]:
 
 
 OVERRIDES = _load_overrides()
+
+# Fallback URLs for municipal reps when OpenNorth has none
+# Keyed by lowercase substring of district_name or representative_set_name
+_MUNICIPAL_URL_FALLBACK: dict[str, str] = {
+    "montréal":      "https://montreal.ca/en/city-government/elected-officials",
+    "montreal":      "https://montreal.ca/en/city-government/elected-officials",
+    "laval":         "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+    "longueuil":     "https://www.longueuil.quebec/fr/conseil-municipal",
+    "gatineau":      "https://www.gatineau.ca/portail/default.aspx?p=guichet_municipal/conseil_municipal",
+    "sherbrooke":    "https://www.sherbrooke.ca/fr/administration-municipale",
+    "saguenay":      "https://www.ville.saguenay.ca/fr/mairie-et-administration",
+    "lévis":         "https://www.ville.levis.qc.ca/ville-et-services/administration-municipale",
+    "levis":         "https://www.ville.levis.qc.ca/ville-et-services/administration-municipale",
+    "trois-rivières":"https://www.v3r.net/mairie-et-administration",
+    "trois-rivieres":"https://www.v3r.net/mairie-et-administration",
+    "terrebonne":    "https://www.ville.terrebonne.qc.ca",
+    "brossard":      "https://www.brossard.ca/fr/mairie",
+    "saint-jérôme":  "https://www.vsj.ca/fr/administration/conseil-municipal",
+    "saint-jerome":  "https://www.vsj.ca/fr/administration/conseil-municipal",
+    "repentigny":    "https://www.repentigny.ca/mairie-administration",
+    "blainville":    "https://www.blainville.ca/fr/mairie",
+    "mirabel":       "https://www.mirabel.ca/fr/mairie-et-administration",
+    "drummondville": "https://www.drummondville.ca/fr/administration-municipale",
+    "granby":        "https://www.granby.ca/fr/administration",
+    "saint-hyacinthe":"https://www.st-hyacinthe.qc.ca/mairie",
+    "québec":        "https://www.ville.quebec.qc.ca/apropos/administration/elus",
+    "quebec":        "https://www.ville.quebec.qc.ca/apropos/administration/elus",
+}
 
 
 class RepresentAPIError(Exception):
@@ -239,6 +268,24 @@ class RepresentClient:
                     else rep
                     for rep in reps
                 ]
+            elif action == "force_inject":
+                # Always inject, even if a rep with same office+level exists
+                reps.append(new_rep)
+            elif action == "replace_or_inject":
+                # Replace if a rep with exact same elected_office exists, otherwise inject
+                # Used for city-wide mayors: replaces stale city mayor if present,
+                # or injects alongside borough mayor if city mayor is missing entirely
+                replaced = False
+                new_reps = []
+                for rep in reps:
+                    if rep.elected_office == r["elected_office"] and rep.level == r["level"]:
+                        new_reps.append(new_rep)
+                        replaced = True
+                    else:
+                        new_reps.append(rep)
+                if not replaced:
+                    new_reps.append(new_rep)
+                reps = new_reps
             else:  # inject — only if no rep with same office+level already exists
                 already = any(
                     rep.elected_office == r["elected_office"]
@@ -248,7 +295,24 @@ class RepresentClient:
                 if not already:
                     reps.append(new_rep)
 
-        return reps
+        # Apply URL fallback for municipal reps missing a URL
+        return [self._fill_municipal_url(r) for r in reps]
+
+    def _fill_municipal_url(self, rep: Representative) -> Representative:
+        """If a municipal rep has no URL, try to find one from the fallback map."""
+        if rep.level != "municipal" or rep.url:
+            return rep
+        search_text = (
+            (rep.district_name or "") + " " + (rep.representative_set_name or "")
+        ).lower()
+        for key, url in _MUNICIPAL_URL_FALLBACK.items():
+            if key in search_text:
+                d = dataclasses.asdict(rep)
+                d["url"] = url
+                # offices is a list of dicts after asdict — reconstruct
+                d["offices"] = rep.offices
+                return Representative(**d)
+        return rep
 
     # ------------------------------------------------------------------
     # Cache
