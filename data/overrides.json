@@ -1,11 +1,13 @@
 {
   "_comment": "Manual overrides for known stale/missing data in the OpenNorth Represent API.",
   "_instructions": "postal_prefixes: list of 3-char postal prefixes this override applies to. action: 'inject' adds a missing rep, 'replace' corrects a wrong name (matches by elected_office + level).",
+  "_last_updated": "2026-04-27",
+  "_sources": "Official city websites, Elections Quebec, municipal council pages",
 
   "overrides": [
 
     {
-      "_note": "Montréal Mayor — Soraya Martínez Ferrada elected Nov 2025, replacing Valérie Plante. OpenNorth office title: 'Maire de la Ville de Montréal'",
+      "_note": "Montreal Mayor — Soraya Martinez Ferrada elected Nov 2025, replacing Valerie Plante. OpenNorth office title: 'Maire de la Ville de Montreal'",
       "action": "replace",
       "postal_prefixes": [
         "H1A","H1B","H1C","H1E","H1G","H1H","H1J","H1K","H1L","H1M","H1N","H1P","H1R","H1S","H1T","H1V","H1W","H1X","H1Y","H1Z",
@@ -29,7 +31,7 @@
     },
 
     {
-      "_note": "Québec City Mayor — Bruno Marchand re-elected Nov 2025. OpenNorth already returns him as 'Maire' so no override needed. Kept here as documentation.",
+      "_note": "Quebec City Mayor — Bruno Marchand re-elected Nov 2025. OpenNorth already returns him correctly as 'Maire'. Kept as documentation only.",
       "action": "inject",
       "postal_prefixes": [],
       "representative": {
@@ -41,6 +43,100 @@
         "email": "maire@ville.quebec.qc.ca",
         "phone": "418-641-6411",
         "url": "https://www.ville.quebec.qc.ca/apropos/administration/elus/maire/index.aspx",
+        "photo_url": ""
+      }
+    },
+
+    {
+      "_note": "Laval Mayor — Stéphane Boyer re-elected Nov 2025. OpenNorth returns no mayor for Laval.",
+      "action": "inject",
+      "postal_prefixes": [
+        "H7A","H7B","H7C","H7E","H7G","H7H","H7J","H7K","H7L","H7M","H7N","H7P","H7R","H7S","H7T","H7V","H7W","H7X","H7Y"
+      ],
+      "representative": {
+        "name": "Stéphane Boyer",
+        "elected_office": "Mayor",
+        "level": "municipal",
+        "party_name": "Action Laval",
+        "district_name": "Ville de Laval",
+        "email": "maire@laval.ca",
+        "phone": "450-662-4900",
+        "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+        "photo_url": ""
+      }
+    },
+
+    {
+      "_note": "Gatineau Mayor — Maude Marquis-Bissonnette elected Nov 2025, replacing France Belisle. OpenNorth has France Belisle (stale).",
+      "action": "replace",
+      "postal_prefixes": [
+        "J8L","J8M","J8P","J8R","J8T","J8V","J8X","J8Y","J8Z",
+        "J9A","J9H","J9J"
+      ],
+      "representative": {
+        "name": "Maude Marquis-Bissonnette",
+        "elected_office": "Mayor",
+        "level": "municipal",
+        "party_name": "Gatineau de coeur",
+        "district_name": "Ville de Gatineau",
+        "email": "maire@gatineau.ca",
+        "phone": "819-595-7100",
+        "url": "https://www.gatineau.ca/portail/default.aspx?p=guichet_municipal/conseil_municipal/mairesse",
+        "photo_url": ""
+      }
+    },
+
+    {
+      "_note": "Sherbrooke Mayor — Évelyne Beaudin re-elected Nov 2025. OpenNorth returns Marie-Claude Bibeau with office='Maire' (stale/wrong).",
+      "action": "replace",
+      "postal_prefixes": [
+        "J1E","J1G","J1H","J1J","J1K","J1L","J1M","J1N","J1R","J1T","J1X"
+      ],
+      "representative": {
+        "name": "Évelyne Beaudin",
+        "elected_office": "Maire",
+        "level": "municipal",
+        "party_name": "Sherbrooke Citoyen",
+        "district_name": "Ville de Sherbrooke",
+        "email": "maire@ville.sherbrooke.qc.ca",
+        "phone": "819-821-5000",
+        "url": "https://www.sherbrooke.ca/fr/administration-municipale/maire",
+        "photo_url": ""
+      }
+    },
+
+    {
+      "_note": "Saint-Jérôme Mayor — Marc Bourcier elected Nov 2021. OpenNorth returns Rémi Barbeau with office='Maire' (stale).",
+      "action": "replace",
+      "postal_prefixes": [
+        "J7Y","J7Z"
+      ],
+      "representative": {
+        "name": "Marc Bourcier",
+        "elected_office": "Maire",
+        "level": "municipal",
+        "party_name": "",
+        "district_name": "Ville de Saint-Jérôme",
+        "email": "greffe@vsj.ca",
+        "phone": "450-436-1511",
+        "url": "https://www.vsj.ca/fr/administration/conseil-municipal/maire",
+        "photo_url": ""
+      }
+    },
+
+    {
+      "_note": "Terrebonne Mayor — Mathieu Traversy elected Nov 2021. OpenNorth confirmed correct via audit [CHECK].",
+      "action": "inject",
+      "postal_prefixes": [],
+      "representative": {
+        "name": "Mathieu Traversy",
+        "elected_office": "Mayor",
+        "level": "municipal",
+        "party_name": "Équipe Traversy",
+        "district_name": "Ville de Terrebonne",
+        "email": "info@ville.terrebonne.qc.ca",
+        "phone": "450-961-2001",
+        "url": "https://www.ville.terrebonne.qc.ca",
         "photo_url": ""
       }
     }
