@@ -5,7 +5,7 @@
   "overrides": [
     {
       "_note": "Montréal – Ahuntsic-Cartierville — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H2B",
         "H2C",
@@ -72,7 +72,7 @@
     },
     {
       "_note": "Montréal – Anjou — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H1J",
         "H1K"
@@ -137,7 +137,7 @@
     },
     {
       "_note": "Montréal – Côte-des-Neiges–Notre-Dame-de-Grâce — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H3S",
         "H3T",
@@ -215,7 +215,7 @@
     },
     {
       "_note": "Montréal – L'Île-Bizard–Sainte-Geneviève — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H9C",
         "H9E"
@@ -278,7 +278,7 @@
     },
     {
       "_note": "Montréal – LaSalle — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H8N",
         "H8P",
@@ -365,7 +365,7 @@
     },
     {
       "_note": "Montréal – Lachine — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H8S",
         "H8T"
@@ -425,8 +425,8 @@
       ]
     },
     {
-      "_note": "Montréal – Le Plateau-Mont-Royal — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "_note": "Montréal – Plateau-Mont-Royal — verified Apr 2026 from donnees.montreal.ca",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H2H",
         "H2J",
@@ -440,7 +440,7 @@
           "elected_office": "Maire(sse) d'arrondissement",
           "level": "municipal",
           "party_name": "Projet Montréal",
-          "district_name": "Le Plateau-Mont-Royal",
+          "district_name": "Plateau-Mont-Royal",
           "email": "cathy.wong@montreal.ca",
           "url": "https://montreal.ca/arrondissements/plateau-mont-royal",
           "photo_url": ""
@@ -450,7 +450,7 @@
           "elected_office": "Conseiller(ère) de la Ville – Jeanne-Mance",
           "level": "municipal",
           "party_name": "Projet Montréal",
-          "district_name": "Le Plateau-Mont-Royal – Jeanne-Mance",
+          "district_name": "Plateau-Mont-Royal – Jeanne-Mance",
           "email": "alex.norris@montreal.ca",
           "url": "https://montreal.ca/arrondissements/plateau-mont-royal",
           "photo_url": "",
@@ -461,7 +461,7 @@
           "elected_office": "Conseiller(ère) d'arrondissement – Jeanne-Mance",
           "level": "municipal",
           "party_name": "Projet Montréal",
-          "district_name": "Le Plateau-Mont-Royal – Jeanne-Mance",
+          "district_name": "Plateau-Mont-Royal – Jeanne-Mance",
           "email": "gabriel.fortin@montreal.ca",
           "url": "https://montreal.ca/arrondissements/plateau-mont-royal",
           "photo_url": ""
@@ -471,7 +471,7 @@
           "elected_office": "Conseiller(ère) de la Ville – De Lorimier",
           "level": "municipal",
           "party_name": "Projet Montréal",
-          "district_name": "Le Plateau-Mont-Royal – De Lorimier",
+          "district_name": "Plateau-Mont-Royal – De Lorimier",
           "email": "maeva.vilain@montreal.ca",
           "url": "https://montreal.ca/arrondissements/plateau-mont-royal",
           "photo_url": "",
@@ -482,7 +482,7 @@
           "elected_office": "Conseiller(ère) d'arrondissement – De Lorimier",
           "level": "municipal",
           "party_name": "Projet Montréal",
-          "district_name": "Le Plateau-Mont-Royal – De Lorimier",
+          "district_name": "Plateau-Mont-Royal – De Lorimier",
           "email": "laurence.parent@montreal.ca",
           "url": "https://montreal.ca/arrondissements/plateau-mont-royal",
           "photo_url": "",
@@ -493,7 +493,7 @@
           "elected_office": "Conseiller(ère) de la Ville – Mile-End",
           "level": "municipal",
           "party_name": "Projet Montréal",
-          "district_name": "Le Plateau-Mont-Royal – Mile-End",
+          "district_name": "Plateau-Mont-Royal – Mile-End",
           "email": "marie.plourde@montreal.ca",
           "url": "https://montreal.ca/arrondissements/plateau-mont-royal",
           "photo_url": "",
@@ -504,7 +504,7 @@
           "elected_office": "Conseiller(ère) d'arrondissement – Mile-End",
           "level": "municipal",
           "party_name": "Projet Montréal",
-          "district_name": "Le Plateau-Mont-Royal – Mile-End",
+          "district_name": "Plateau-Mont-Royal – Mile-End",
           "email": "marie.sterlin@montreal.ca",
           "url": "https://montreal.ca/arrondissements/plateau-mont-royal",
           "photo_url": "",
@@ -514,7 +514,7 @@
     },
     {
       "_note": "Montréal – Le Sud-Ouest — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H3C",
         "H3J",
@@ -577,7 +577,7 @@
     },
     {
       "_note": "Montréal – Mercier–Hochelaga-Maisonneuve — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H1L",
         "H1M",
@@ -642,7 +642,7 @@
     },
     {
       "_note": "Montréal – Montréal-Nord — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H1G",
         "H1H"
@@ -706,7 +706,7 @@
     },
     {
       "_note": "Montréal – Outremont — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H2V"
       ],
@@ -766,7 +766,7 @@
     },
     {
       "_note": "Montréal – Pierrefonds-Roxboro — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H8Y",
         "H8Z",
@@ -833,7 +833,7 @@
     },
     {
       "_note": "Montréal – Rivière-des-Prairies–Pointe-aux-Trembles — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H1A",
         "H1B",
@@ -918,7 +918,7 @@
     },
     {
       "_note": "Montréal – Rosemont–La Petite-Patrie — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H1T",
         "H1X",
@@ -985,7 +985,7 @@
     },
     {
       "_note": "Montréal – Saint-Laurent — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H4L",
         "H4M",
@@ -1054,7 +1054,7 @@
     },
     {
       "_note": "Montréal – Saint-Léonard — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H1P",
         "H1R",
@@ -1120,7 +1120,7 @@
     },
     {
       "_note": "Montréal – Verdun — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H3E",
         "H4G",
@@ -1204,7 +1204,7 @@
     },
     {
       "_note": "Montréal – Ville-Marie — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H2K",
         "H2L",
@@ -1250,7 +1250,7 @@
     },
     {
       "_note": "Montréal – Villeray–Saint-Michel–Parc-Extension — verified Apr 2026 from donnees.montreal.ca",
-      "action": "inject_all",
+      "action": "enrich_by_district",
       "postal_prefixes": [
         "H1Z",
         "H2E",
