@@ -1,7 +1,7 @@
 {
   "_comment": "Manual overrides for known stale/missing data in the OpenNorth Represent API.",
-  "_instructions": "postal_prefixes: list of 3-char postal prefixes this override applies to. action: 'inject' adds a missing rep, 'replace' corrects a wrong name (matches by elected_office + level).",
-  "_last_updated": "2026-04-27",
+  "_instructions": "postal_prefixes: list of 3-char postal prefixes this override applies to. action: 'inject' adds a missing rep, 'replace' corrects a wrong name, 'inject_all' injects a full city council (uses 'representatives' array instead of 'representative' object).",
+  "_last_updated": "2026-04-28",
   "_sources": "Official city websites, Elections Quebec, municipal council pages",
 
   "overrides": [
@@ -21,11 +21,11 @@
         "name": "Soraya Martínez Ferrada",
         "elected_office": "Maire de la Ville de Montréal",
         "level": "municipal",
-        "party_name": "Projet Montréal",
+        "party_name": "Ensemble Montréal",
         "district_name": "Ville de Montréal",
-        "email": "maire@montreal.ca",
+        "email": "soraya.martinezferrada@montreal.ca",
         "phone": "514-872-3101",
-        "url": "https://montreal.ca/en/city-government/elected-officials/mayor",
+        "url": "https://montreal.ca/fr/gouvernement/elus/mairesse",
         "photo_url": ""
       }
     },
@@ -48,22 +48,266 @@
     },
 
     {
-      "_note": "Laval Mayor — Stéphane Boyer re-elected Nov 2025. OpenNorth returns no mayor for Laval.",
-      "action": "inject",
+      "_note": "Laval full council — verified Apr 2026 from laval.ca. Maire + 21 conseillers (Districts 01-22). Individual emails and phones. RTAs: H7A-H7Y.",
+      "action": "inject_all",
       "postal_prefixes": [
         "H7A","H7B","H7C","H7E","H7G","H7H","H7J","H7K","H7L","H7M","H7N","H7P","H7R","H7S","H7T","H7V","H7W","H7X","H7Y"
       ],
-      "representative": {
-        "name": "Stéphane Boyer",
-        "elected_office": "Mayor",
-        "level": "municipal",
-        "party_name": "Action Laval",
-        "district_name": "Ville de Laval",
-        "email": "maire@laval.ca",
-        "phone": "450-662-4900",
-        "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
-        "photo_url": ""
-      }
+      "representatives": [
+        {
+          "name": "Stéphane Boyer",
+          "elected_office": "Maire",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Ville de Laval",
+          "email": "bdm.laval@laval.ca",
+          "phone": "450 662-4140",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Isabelle Piché",
+          "elected_office": "Conseillère – District 01 (Saint-François)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 01",
+          "email": "i.piche@laval.ca",
+          "phone": "438 886-7254",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Annick Senghor",
+          "elected_office": "Conseillère – District 02 (Saint-Vincent-de-Paul)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 02",
+          "email": "am.senghor@laval.ca",
+          "phone": "263 378-1818",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Anick Brunet",
+          "elected_office": "Conseillère – District 03 (Duvernay)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 03",
+          "email": "an.brunet@laval.ca",
+          "phone": "450 341-3093",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Christine Poirier",
+          "elected_office": "Conseillère – District 04 (Pont-Viau)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 04",
+          "email": "c.poirier@laval.ca",
+          "phone": "438 831-2106",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Cecilia Macedo",
+          "elected_office": "Conseillère – District 05 (Marigot)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 05",
+          "email": "c.macedo@laval.ca",
+          "phone": "514 944-0020",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Martin Fiola",
+          "elected_office": "Conseiller – District 06 (Laval-des-Rapides)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 06",
+          "email": "m.fiola@laval.ca",
+          "phone": "514 604-5669",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Seta Topouzian",
+          "elected_office": "Conseillère – District 07 (Renaud-Coursol)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 07",
+          "email": "s.topouzian@laval.ca",
+          "phone": "514 862-1402",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Pierre Brabant",
+          "elected_office": "Conseiller – District 08 (Vimont)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 08",
+          "email": "p.brabant@laval.ca",
+          "phone": "514 929-8187",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "David De Cotis",
+          "elected_office": "Conseiller – District 09 (Saint-Bruno)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 09",
+          "email": "d.decotis@laval.ca",
+          "phone": "514 467-1712",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Sylvain Yelle",
+          "elected_office": "Conseiller – District 10 (Auteuil)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 10",
+          "email": "s.yelle@laval.ca",
+          "phone": "514 829-1640",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Mohamed Bâ",
+          "elected_office": "Conseiller – District 11 (Le Carrefour)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 11",
+          "email": "m.ba@laval.ca",
+          "phone": "438 405-6173",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Sandra El-Helou",
+          "elected_office": "Conseillère – District 12 (Souvenir-Labelle)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 12",
+          "email": "s.el-helou@laval.ca",
+          "phone": "514 702-2225",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Vasilios Karidogiannis",
+          "elected_office": "Conseiller – District 13 (L'Abord-à-Plouffe)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 13",
+          "email": "v.karidogiannis@laval.ca",
+          "phone": "514 887-2455",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Aglaia Revelakis",
+          "elected_office": "Conseillère – District 14 (Chomedey)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 14",
+          "email": "a.revelakis@laval.ca",
+          "phone": "514 242-5761",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Aline Dib",
+          "elected_office": "Conseillère – District 15 (Saint-Martin)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 15",
+          "email": "a.dib@laval.ca",
+          "phone": "514 577-6088",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Ray Khalil",
+          "elected_office": "Conseiller – District 16 (Sainte-Dorothée)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 16",
+          "email": "r.khalil@laval.ca",
+          "phone": "514 825-2493",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Nicholas Borne",
+          "elected_office": "Conseiller – District 17 (Laval-les-Îles)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 17",
+          "email": "n.borne@laval.ca",
+          "phone": "450 978-6888",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Yannick Langlois",
+          "elected_office": "Conseiller – District 18 (L'Orée-des-Bois)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 18",
+          "email": "y.langlois@laval.ca",
+          "phone": "514 979-5343",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Louise Lortie",
+          "elected_office": "Conseillère – District 19 (Marc-Aurèle-Fortin)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 19",
+          "email": "l.lortie@laval.ca",
+          "phone": "514 962-1090",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Carole St-Denis",
+          "elected_office": "Conseillère – District 20 (Champfleury)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 20",
+          "email": "c.st-denis@laval.ca",
+          "phone": "438 543-8457",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Flavia Alexandra Novac",
+          "elected_office": "Conseillère – District 21 (Sainte-Rose)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 21",
+          "email": "fa.novac@laval.ca",
+          "phone": "438 875-8337",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        },
+        {
+          "name": "Martin Vaillancourt",
+          "elected_office": "Conseiller – District 22 (Fabreville-Sud)",
+          "level": "municipal",
+          "party_name": "Action Laval",
+          "district_name": "Laval – District 22",
+          "email": "ma.vaillancourt@laval.ca",
+          "phone": "514 862-1175",
+          "url": "https://www.laval.ca/Pages/Fr/Citoyens/administration-municipale.aspx",
+          "photo_url": ""
+        }
+      ]
     },
 
     {
@@ -139,6 +383,622 @@
         "url": "https://www.ville.terrebonne.qc.ca",
         "photo_url": ""
       }
+    },
+
+    {
+      "_note": "Saint-Constant full council — verified Apr 2026 from saint-constant.ca. Mayor + 7 councillors (Districts 1-6 + 8; District 7 vacant). RTA: J5A.",
+      "action": "inject_all",
+      "postal_prefixes": ["J5A"],
+      "representatives": [
+        {
+          "name": "Jean-Claude Boyer",
+          "elected_office": "Maire",
+          "level": "municipal",
+          "party_name": "Équipe Jean-Claude Boyer",
+          "district_name": "Saint-Constant",
+          "email": "conseil@saint-constant.ca",
+          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Abdoul Amar",
+          "elected_office": "Conseiller – District 1 (de l'Église)",
+          "level": "municipal",
+          "party_name": "Équipe Jean-Claude Boyer",
+          "district_name": "Saint-Constant – District 1",
+          "email": "mairie@saint-constant.ca",
+          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Robert Dupuis",
+          "elected_office": "Conseiller – District 2 (des Grandes terres)",
+          "level": "municipal",
+          "party_name": "Équipe Jean-Claude Boyer",
+          "district_name": "Saint-Constant – District 2",
+          "email": "mairie@saint-constant.ca",
+          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Gilles Lapierre",
+          "elected_office": "Conseiller – District 3 (de la Mairie)",
+          "level": "municipal",
+          "party_name": "Équipe Jean-Claude Boyer",
+          "district_name": "Saint-Constant – District 3",
+          "email": "mairie@saint-constant.ca",
+          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Chantale Boudrias",
+          "elected_office": "Conseillère – District 4 (des Vieux chênes)",
+          "level": "municipal",
+          "party_name": "Équipe Jean-Claude Boyer",
+          "district_name": "Saint-Constant – District 4",
+          "email": "mairie@saint-constant.ca",
+          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Sylvain Cazes",
+          "elected_office": "Conseiller – District 5 (des Bouleaux)",
+          "level": "municipal",
+          "party_name": "Équipe Jean-Claude Boyer",
+          "district_name": "Saint-Constant – District 5",
+          "email": "mairie@saint-constant.ca",
+          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Johanne Di Cesare",
+          "elected_office": "Conseillère – District 6 (de la Biodiversité)",
+          "level": "municipal",
+          "party_name": "Équipe Jean-Claude Boyer",
+          "district_name": "Saint-Constant – District 6",
+          "email": "mairie@saint-constant.ca",
+          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Natalia Zuluaga Puyana",
+          "elected_office": "Conseillère – District 8",
+          "level": "municipal",
+          "party_name": "Équipe Jean-Claude Boyer",
+          "district_name": "Saint-Constant – District 8",
+          "email": "mairie@saint-constant.ca",
+          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        }
+      ]
+    },
+
+    {
+      "_note": "Sainte-Julie full council — verified Apr 2026 from saintejulie.ca. Mayor + 7 councillors. RTA: J3E.",
+      "action": "inject_all",
+      "postal_prefixes": ["J3E"],
+      "representatives": [
+        {
+          "name": "Mario Lemay",
+          "elected_office": "Maire",
+          "level": "municipal",
+          "party_name": "La voix des citoyens",
+          "district_name": "Sainte-Julie",
+          "email": "clientele@saintejulie.ca",
+          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Sylvain Dubuc",
+          "elected_office": "Conseiller – District 1 (de la Belle-Rivière-Ringuet)",
+          "level": "municipal",
+          "party_name": "La voix des citoyens",
+          "district_name": "Sainte-Julie – District 1",
+          "email": "clientele@saintejulie.ca",
+          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Josée Marc-Aurèle",
+          "elected_office": "Conseillère – District 2 (du Moulin)",
+          "level": "municipal",
+          "party_name": "La voix des citoyens",
+          "district_name": "Sainte-Julie – District 2",
+          "email": "clientele@saintejulie.ca",
+          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Alain Bourdages",
+          "elected_office": "Conseiller – District 3 (de la Vallée)",
+          "level": "municipal",
+          "party_name": "La voix des citoyens",
+          "district_name": "Sainte-Julie – District 3",
+          "email": "clientele@saintejulie.ca",
+          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Christian Huard",
+          "elected_office": "Conseiller – District 5 (du Vieux-Village)",
+          "level": "municipal",
+          "party_name": "La voix des citoyens",
+          "district_name": "Sainte-Julie – District 5",
+          "email": "clientele@saintejulie.ca",
+          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Sylvie Beaulieu",
+          "elected_office": "Conseillère",
+          "level": "municipal",
+          "party_name": "La voix des citoyens",
+          "district_name": "Sainte-Julie",
+          "email": "clientele@saintejulie.ca",
+          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Eric Faucher",
+          "elected_office": "Conseiller",
+          "level": "municipal",
+          "party_name": "La voix des citoyens",
+          "district_name": "Sainte-Julie",
+          "email": "clientele@saintejulie.ca",
+          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Edith Lalanne",
+          "elected_office": "Conseillère",
+          "level": "municipal",
+          "party_name": "La voix des citoyens",
+          "district_name": "Sainte-Julie",
+          "email": "clientele@saintejulie.ca",
+          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "photo_url": ""
+        }
+      ]
+    },
+
+    {
+      "_note": "Granby full council — verified Apr 2026 from granby.ca. Mairesse + 10 conseillers. RTAs: J2G, J2H, J2J.",
+      "action": "inject_all",
+      "postal_prefixes": ["J2G", "J2H", "J2J"],
+      "representatives": [
+        {
+          "name": "Julie Bourdon",
+          "elected_office": "Mairesse",
+          "level": "municipal",
+          "party_name": "Indépendante",
+          "district_name": "Granby",
+          "email": "mairie@granby.ca",
+          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Paul Goulet",
+          "elected_office": "Conseiller – District 2",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Granby – District 2",
+          "email": "cour.municipale@granby.ca",
+          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "François Lemay",
+          "elected_office": "Conseiller – District 3",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Granby – District 3",
+          "email": "cour.municipale@granby.ca",
+          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Denyse Tremblay",
+          "elected_office": "Conseillère – District 6",
+          "level": "municipal",
+          "party_name": "Indépendante",
+          "district_name": "Granby – District 6",
+          "email": "cour.municipale@granby.ca",
+          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Stéphane Giard",
+          "elected_office": "Conseiller",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Granby",
+          "email": "cour.municipale@granby.ca",
+          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Geneviève Rheault",
+          "elected_office": "Conseillère",
+          "level": "municipal",
+          "party_name": "Indépendante",
+          "district_name": "Granby",
+          "email": "cour.municipale@granby.ca",
+          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Alain Lacasse",
+          "elected_office": "Conseiller",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Granby",
+          "email": "cour.municipale@granby.ca",
+          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Sophie Séguin",
+          "elected_office": "Conseillère",
+          "level": "municipal",
+          "party_name": "Indépendante",
+          "district_name": "Granby",
+          "email": "cour.municipale@granby.ca",
+          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Félix Dionne",
+          "elected_office": "Conseiller",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Granby",
+          "email": "cour.municipale@granby.ca",
+          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Cédrick Beauregard",
+          "elected_office": "Conseiller",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Granby",
+          "email": "cour.municipale@granby.ca",
+          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Catherine Baudin",
+          "elected_office": "Conseillère",
+          "level": "municipal",
+          "party_name": "Indépendante",
+          "district_name": "Granby",
+          "email": "cour.municipale@granby.ca",
+          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "photo_url": ""
+        }
+      ]
+    },
+
+    {
+      "_note": "Saint-Jean-sur-Richelieu Mayor — Éric Latour, Coalition Éric Latour. Council data incomplete; only mayor confirmed. RTAs: J2W, J2X, J2Y, J3A, J3B.",
+      "action": "inject_all",
+      "postal_prefixes": ["J2W", "J2X", "J2Y", "J3A", "J3B"],
+      "representatives": [
+        {
+          "name": "Éric Latour",
+          "elected_office": "Maire",
+          "level": "municipal",
+          "party_name": "Coalition Éric Latour",
+          "district_name": "Saint-Jean-sur-Richelieu",
+          "email": "info@sjsr.ca",
+          "url": "https://www.sjsr.ca/mairie-et-administration/conseil-municipal/",
+          "photo_url": ""
+        }
+      ]
+    },
+
+    {
+      "_note": "Châteauguay full council — verified Apr 2026 from ville.chateauguay.qc.ca. Maire + 10 conseillers. RTAs: J6J, J6K.",
+      "action": "inject_all",
+      "postal_prefixes": ["J6J", "J6K"],
+      "representatives": [
+        {
+          "name": "Éric Allard",
+          "elected_office": "Maire",
+          "level": "municipal",
+          "party_name": "Alliance Châteauguay",
+          "district_name": "Châteauguay",
+          "email": "service@ville.chateauguay.qc.ca",
+          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Barry Doyle",
+          "elected_office": "Conseiller – District 1 (de Jack)",
+          "level": "municipal",
+          "party_name": "Alliance Châteauguay",
+          "district_name": "Châteauguay – District 1",
+          "email": "service@ville.chateauguay.qc.ca",
+          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Arlene Bryant",
+          "elected_office": "Conseillère – District 2 (de Primot)",
+          "level": "municipal",
+          "party_name": "Alliance Châteauguay",
+          "district_name": "Châteauguay – District 2",
+          "email": "service@ville.chateauguay.qc.ca",
+          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Eric Corbeil",
+          "elected_office": "Conseiller – District 3 (de Robutel de la Noüe)",
+          "level": "municipal",
+          "party_name": "Alliance Châteauguay",
+          "district_name": "Châteauguay – District 3",
+          "email": "service@ville.chateauguay.qc.ca",
+          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Lucie Laberge",
+          "elected_office": "Conseillère – District 4 (de Bumbray)",
+          "level": "municipal",
+          "party_name": "Alliance Châteauguay",
+          "district_name": "Châteauguay – District 4",
+          "email": "service@ville.chateauguay.qc.ca",
+          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Nathalie Marchand",
+          "elected_office": "Conseillère – District 5 (de Malette)",
+          "level": "municipal",
+          "party_name": "Alliance Châteauguay",
+          "district_name": "Châteauguay – District 5",
+          "email": "service@ville.chateauguay.qc.ca",
+          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Marie-Louise Kerneïs",
+          "elected_office": "Conseillère – District 6 (de Salaberry)",
+          "level": "municipal",
+          "party_name": "Alliance Châteauguay",
+          "district_name": "Châteauguay – District 6",
+          "email": "service@ville.chateauguay.qc.ca",
+          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Mike Gendron",
+          "elected_office": "Conseiller – District 7 (de Lang)",
+          "level": "municipal",
+          "party_name": "Alliance Châteauguay",
+          "district_name": "Châteauguay – District 7",
+          "email": "service@ville.chateauguay.qc.ca",
+          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "François Le Borgne",
+          "elected_office": "Conseiller – District 8 (D'Youville)",
+          "level": "municipal",
+          "party_name": "Alliance Châteauguay",
+          "district_name": "Châteauguay – District 8",
+          "email": "service@ville.chateauguay.qc.ca",
+          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Sylvie Castonguay",
+          "elected_office": "Conseillère – District 9 (de Desparois)",
+          "level": "municipal",
+          "party_name": "Alliance Châteauguay",
+          "district_name": "Châteauguay – District 9",
+          "email": "service@ville.chateauguay.qc.ca",
+          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Luc D'Aoust",
+          "elected_office": "Conseiller – District 10 (de Le Moyne)",
+          "level": "municipal",
+          "party_name": "Alliance Châteauguay",
+          "district_name": "Châteauguay – District 10",
+          "email": "service@ville.chateauguay.qc.ca",
+          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "photo_url": ""
+        }
+      ]
+    },
+
+    {
+      "_note": "Rouyn-Noranda partial council — verified Apr 2026 from rouyn-noranda.ca. Mayor + 3 confirmed councillors (CSV data). RTAs: J9X, J9Y.",
+      "action": "inject_all",
+      "postal_prefixes": ["J9X", "J9Y"],
+      "representatives": [
+        {
+          "name": "Gilles Chapadeau",
+          "elected_office": "Maire",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Rouyn-Noranda",
+          "email": "info@rouyn-noranda.ca",
+          "url": "https://www.rouyn-noranda.ca/ville/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Sylvie Turgeon",
+          "elected_office": "Conseillère",
+          "level": "municipal",
+          "party_name": "Indépendante",
+          "district_name": "Rouyn-Noranda",
+          "email": "info@rouyn-noranda.ca",
+          "url": "https://www.rouyn-noranda.ca/ville/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "François Gagné",
+          "elected_office": "Conseiller",
+          "level": "municipal",
+          "party_name": "Parti Virage",
+          "district_name": "Rouyn-Noranda",
+          "email": "info@rouyn-noranda.ca",
+          "url": "https://www.rouyn-noranda.ca/ville/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Lyne Fortin",
+          "elected_office": "Conseillère",
+          "level": "municipal",
+          "party_name": "Parti Virage",
+          "district_name": "Rouyn-Noranda",
+          "email": "info@rouyn-noranda.ca",
+          "url": "https://www.rouyn-noranda.ca/ville/conseil-municipal/",
+          "photo_url": ""
+        }
+      ]
+    },
+
+    {
+      "_note": "Drummondville full council — verified Apr 2026 from drummondville.ca. Maire + 12 conseillers (Districts 1-12). RTAs: J2B, J2C, J2E.",
+      "action": "inject_all",
+      "postal_prefixes": ["J2B", "J2C", "J2E"],
+      "representatives": [
+        {
+          "name": "Jean-François Houle",
+          "elected_office": "Maire",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Marc-André Lemire",
+          "elected_office": "Conseiller – District 1",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville – District 1",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Alexandre Desbiens",
+          "elected_office": "Conseiller – District 2",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville – District 2",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Catherine Lassonde",
+          "elected_office": "Conseillère – District 3",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville – District 3",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Carole Léger",
+          "elected_office": "Conseillère – District 4",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville – District 4",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Sarah Saint-Cyr Lanoie",
+          "elected_office": "Conseillère – District 5",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville – District 5",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Jean-Philippe Tessier",
+          "elected_office": "Conseiller – District 6",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville – District 6",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Isabelle Duchesne",
+          "elected_office": "Conseillère – District 7",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville – District 7",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Yves Grondin",
+          "elected_office": "Conseiller – District 8",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville – District 8",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Julie Létourneau",
+          "elected_office": "Conseillère – District 9",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville – District 9",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Mario Sévigny",
+          "elected_office": "Conseiller – District 10",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville – District 10",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Daniel Pelletier",
+          "elected_office": "Conseiller – District 11",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville – District 11",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        },
+        {
+          "name": "Cathy Bernier",
+          "elected_office": "Conseillère – District 12",
+          "level": "municipal",
+          "party_name": "Indépendant",
+          "district_name": "Drummondville – District 12",
+          "email": "info@drummondville.ca",
+          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "photo_url": ""
+        }
+      ]
     }
 
   ]

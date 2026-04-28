@@ -672,8 +672,9 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
 
   // Update URL to reflect current search (deep-linkable)
   const cleanCode = postalCode.replace(' ', '');
+  const view = containerId === 'results' ? 'find' : 'triage';
   const newUrl = `${window.location.pathname}?postal=${cleanCode}`;
-  history.replaceState({ view: 'find', postal: cleanCode }, '', newUrl);
+  history.replaceState({ view, postal: cleanCode }, '', newUrl);
 
   showLevels.forEach(level => {
     if (!grouped[level].length) return;
@@ -833,16 +834,15 @@ function buildRepCard(rep, level, showEmailTemplate = false) {
   if (rep.email) {
     // Plain email link — no pre-fill
     contact.appendChild(contactRow(ICONS.mail, rep.email, `mailto:${rep.email}`));
-
-    if (showEmailTemplate) {
-      const copyRow = el('div', 'draft-email-row');
-      const copyBtn = el('button', 'draft-email-btn');
-      copyBtn.type = 'button';
-      copyBtn.innerHTML = `${ICONS.compose}<span data-i18n="copy_template">${t('copy_template')}</span>`;
-      copyBtn.addEventListener('click', () => openEmailModal(rep));
-      copyRow.appendChild(copyBtn);
-      contact.appendChild(copyRow);
-    }
+  }
+  if (showEmailTemplate) {
+    const copyRow = el('div', 'draft-email-row');
+    const copyBtn = el('button', 'draft-email-btn');
+    copyBtn.type = 'button';
+    copyBtn.innerHTML = `${ICONS.compose}<span data-i18n="copy_template">${t('copy_template')}</span>`;
+    copyBtn.addEventListener('click', () => openEmailModal(rep));
+    copyRow.appendChild(copyBtn);
+    contact.appendChild(copyRow);
   }
   if (rep.url) contact.appendChild(contactRow(ICONS.link, t('website'), rep.url, true));
 

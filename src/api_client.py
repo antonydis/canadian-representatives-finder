@@ -12,16 +12,21 @@ from .validators import normalize_postal_code, validate_postal_code
 BASE_URL = "https://represent.opennorth.ca"
 CACHE_DIR = Path(__file__).parent.parent / "data" / "cache"
 CACHE_TTL_HOURS = 24
-OVERRIDES_FILE = Path(__file__).parent.parent / "data" / "overrides.json"
+_DATA_DIR = Path(__file__).parent.parent / "data"
+OVERRIDES_FILE     = _DATA_DIR / "overrides.json"
+MTL_BOROUGH_FILE   = _DATA_DIR / "mtl_borough_overrides.json"
 
 
 def _load_overrides() -> list[dict]:
-    """Load manual override rules from data/overrides.json."""
-    try:
-        with OVERRIDES_FILE.open("r", encoding="utf-8") as f:
-            return json.load(f).get("overrides", [])
-    except (OSError, json.JSONDecodeError):
-        return []
+    """Load manual override rules from data/overrides.json + mtl_borough_overrides.json."""
+    rules: list[dict] = []
+    for path in (OVERRIDES_FILE, MTL_BOROUGH_FILE):
+        try:
+            with path.open("r", encoding="utf-8") as f:
+                rules.extend(json.load(f).get("overrides", []))
+        except (OSError, json.JSONDecodeError):
+            pass
+    return rules
 
 
 OVERRIDES = _load_overrides()
@@ -297,24 +302,40 @@ class RepresentClient:
             if prefix not in rule.get("postal_prefixes", []):
                 continue
 
-            r = rule["representative"]
             action = rule.get("action", "inject")
 
-            new_rep = Representative(
-                name=r["name"],
-                elected_office=r["elected_office"],
-                level=r["level"],
-                party_name=r.get("party_name"),
-                district_name=r.get("district_name", ""),
-                email=r.get("email"),
-                url=r.get("url"),
-                photo_url=r.get("photo_url") or None,
-                offices=[],
-                # fields not in overrides
-                first_name=None, last_name=None,
-                personal_url=None, representative_set_name="",
-                source_url="", boundary_url="",
-            )
+            def _make_rep(r: dict) -> Representative:
+                return Representative(
+                    name=r["name"],
+                    elected_office=r["elected_office"],
+                    level=r["level"],
+                    party_name=r.get("party_name"),
+                    district_name=r.get("district_name", ""),
+                    email=r.get("email"),
+                    url=r.get("url"),
+                    photo_url=r.get("photo_url") or None,
+                    offices=[],
+                    first_name=None, last_name=None,
+                    personal_url=None, representative_set_name="",
+                    source_url="", boundary_url="",
+                )
+
+            if action == "inject_all":
+                # Inject a list of reps (councillors + mayor for a whole city).
+                # Each rep is only added if no rep with same name+office already exists.
+                existing_keys = {
+                    (rep.name.lower(), (rep.elected_office or "").lower())
+                    for rep in reps
+                }
+                for r in rule.get("representatives", []):
+                    key = (r["name"].lower(), r["elected_office"].lower())
+                    if key not in existing_keys:
+                        reps.append(_make_rep(r))
+                        existing_keys.add(key)
+                continue
+
+            r = rule["representative"]
+            new_rep = _make_rep(r)
 
             if action == "replace":
                 reps = [
