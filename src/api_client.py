@@ -319,7 +319,6 @@ class RepresentClient:
                     personal_url=None, representative_set_name="",
                     source_url="", boundary_url="",
                 )
-
             if action == "inject_all":
                 # Inject a list of reps (councillors + mayor for a whole city).
                 # Each rep is only added if no rep with same name+office already exists.
@@ -332,6 +331,34 @@ class RepresentClient:
                     if key not in existing_keys:
                         reps.append(_make_rep(r))
                         existing_keys.add(key)
+                continue
+
+            if action == "enrich_by_district":
+                # Replace OpenNorth reps with our verified data, matched by district name.
+                # OpenNorth routes correctly; we just enrich with updated name/email/phone.
+                import re
+                enrichment_map = {}
+                for r in rule.get("representatives", []):
+                    dn = r.get("district_name", "")
+                    enrichment_map[dn.lower().strip()] = r
+                    m = re.search(r'\(([^)]+)\)', dn)
+                    if m:
+                        enrichment_map[m.group(1).lower().strip()] = r
+
+                new_reps = []
+                for rep in reps:
+                    dn_rep = (rep.district_name or "").lower().strip()
+                    enriched = enrichment_map.get(dn_rep)
+                    if not enriched:
+                        for key, val in enrichment_map.items():
+                            if dn_rep and (dn_rep in key or key in dn_rep):
+                                enriched = val
+                                break
+                    if enriched:
+                        new_reps.append(_make_rep(enriched))
+                    else:
+                        new_reps.append(rep)
+                reps = new_reps
                 continue
 
             r = rule["representative"]
