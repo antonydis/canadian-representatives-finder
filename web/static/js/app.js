@@ -103,6 +103,8 @@ async function init() {
   document.getElementById('postal-input').addEventListener('input', () => clearError('main'));
   document.getElementById('triage-postal-input').addEventListener('input', () => clearError('triage'));
 
+  checkUrlPostal();
+
   // Char counter for triage open input
   const openInput   = document.getElementById('triage-open-input');
   const charCounter = document.getElementById('triage-char-count');
@@ -114,6 +116,54 @@ async function init() {
     });
   }
 
+}
+
+/* ── Share results ───────────────────────────────────────────── */
+async function shareResults(postalCode) {
+  const clean = postalCode.replace(' ', '');
+  const url = `${location.origin}/reps?postal=${clean}`;
+  const text = `Find your Canadian representatives for ${postalCode} 🍁`;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'InfoCivic 🍁', text, url });
+      return;
+    } catch { /* user cancelled */ }
+  }
+  // Fallback: copy to clipboard
+  try {
+    await navigator.clipboard.writeText(url);
+    showShareToast();
+  } catch {
+    prompt('Copy this link:', url);
+  }
+}
+
+function showShareToast() {
+  let toast = document.getElementById('share-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'share-toast';
+    toast.className = 'share-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = '🔗 ' + (translations[currentLang]?.link_copied || 'Link copied!');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+/* ── Auto-fill postal from URL param (?postal=H2X1Y6) ───────── */
+function checkUrlPostal() {
+  const params = new URLSearchParams(window.location.search);
+  const postal = params.get('postal');
+  if (postal && /^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/.test(postal.replace(' ',''))) {
+    const input = document.getElementById('postal-input');
+    if (input) {
+      const formatted = postal.slice(0,3).toUpperCase() + ' ' + postal.slice(3).toUpperCase();
+      input.value = formatted;
+      document.getElementById('search-form').dispatchEvent(new Event('submit', {bubbles:true, cancelable:true}));
+    }
+  }
 }
 
 /* ── Language detection ──────────────────────────────────────── */
@@ -608,8 +658,22 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
   }
 
   const header = el('div', 'results-header');
-  header.innerHTML = `${t('results_title')} <strong>${postalCode}</strong>`;
+  const titleSpan = el('span');
+  titleSpan.innerHTML = `${t('results_title')} <strong>${postalCode}</strong>`;
+
+  // Share button
+  const shareBtn = el('button', 'share-btn');
+  shareBtn.setAttribute('aria-label', t('share_results') || 'Share');
+  shareBtn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> ${t('share_results') || 'Share'}`;
+  shareBtn.addEventListener('click', () => shareResults(postalCode));
+
+  header.append(titleSpan, shareBtn);
   section.appendChild(header);
+
+  // Update URL to reflect current search (deep-linkable)
+  const cleanCode = postalCode.replace(' ', '');
+  const newUrl = `${window.location.pathname}?postal=${cleanCode}`;
+  history.replaceState({ view: 'find', postal: cleanCode }, '', newUrl);
 
   showLevels.forEach(level => {
     if (!grouped[level].length) return;

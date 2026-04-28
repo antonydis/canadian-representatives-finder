@@ -30,10 +30,8 @@
   "contact": "Contato",
   "made_by": "Criado por",
   "contribute": "comentários e contribuições são bem-vindos",
-
   "tab_find": "Encontrar meus representantes",
   "tab_triage": "Quem devo contactar?",
-
   "triage_title": "Não sabe quem contactar?",
   "triage_subtitle": "Selecione sua situação e indicaremos o nível de governo correto.",
   "triage_input_placeholder": "Descreva a situação ou processo pelo qual você precisa contactar um representante...",
@@ -57,36 +55,30 @@
   "level_provincial": "Governo Provincial / Territorial",
   "level_municipal": "Governo Municipal",
   "level_mixed": "Múltiplos Níveis de Governo",
-
   "case_garbage_title": "O lixo não foi coletado na minha rua",
   "case_garbage_services": "311 · Vereador municipal",
   "case_garbage_explanation": "A coleta de lixo é responsabilidade do seu município. Ligue para o 311 para relatar o problema ou contate seu vereador se não for resolvido.",
-
   "case_doctor_title": "Não consigo encontrar um médico de família",
   "case_doctor_services": "811 · Representante provincial",
   "case_doctor_explanation": "A saúde é responsabilidade provincial no Canadá. Ligue para o 811 para aconselhamento e encaminhamentos. Seu representante provincial pode defender melhor acesso aos serviços.",
-
   "case_immigration_title": "Meu processo de residência ou imigração está atrasado",
   "case_immigration_services": "IRCC · Membro do Parlamento",
   "case_immigration_explanation": "Imigração e cidadania são geridas pelo IRCC federal. Seu Membro do Parlamento pode enviar uma consulta ministerial para ajudar a avançar seu caso.",
-
   "case_taxes_title": "Tenho um problema com meus impostos ou a CRA",
   "case_taxes_services": "CRA 1-800-959-8281 · Membro do Parlamento",
   "case_taxes_explanation": "Os impostos federais são administrados pela Canada Revenue Agency (CRA). Se não conseguir resolver diretamente com a CRA, seu MP pode ajudar pelo escritório do Ombudsman do Contribuinte.",
-
   "case_pothole_title": "Há um buraco ou dano na estrada da minha rua",
   "case_pothole_services": "311 · Vereador municipal",
   "case_pothole_explanation": "A manutenção das vias locais é responsabilidade municipal. Ligue para o 311 para relatar ou contate seu vereador se o problema não for resolvido rapidamente.",
-
   "case_ei_title": "Não recebi meus benefícios do Seguro-Desemprego",
   "case_ei_services": "Service Canada 1-800-206-7218 · Membro do Parlamento",
   "case_ei_explanation": "O Seguro-Desemprego (EI) é um programa federal gerido pelo Service Canada. Se seu pedido estiver atrasado ou negado, seu MP pode intervir junto ao departamento responsável.",
-
   "case_housing_title": "Preciso de ajuda com habitação acessível ou social",
   "case_housing_services": "211 · 311 · Todos os níveis",
   "case_housing_explanation": "A habitação envolve os três níveis de governo. As listas de espera para habitação social são municipais, os programas de assistência financeira são provinciais, e a Estratégia Nacional de Habitação fornece financiamento federal. Ligue para o 211.",
-
   "case_school_title": "Tenho uma preocupação sobre a escola do meu filho",
   "case_school_services": "Conselho escolar · Representante provincial",
-  "case_school_explanation": "A educação é responsabilidade provincial. Comece com o diretor ou conselho escolar local. Se o problema for sistêmico ou sem resolução, contate seu representante provincial (MLA, MPP ou MNA)."
+  "case_school_explanation": "A educação é responsabilidade provincial. Comece com o diretor ou conselho escolar local. Se o problema for sistêmico ou sem resolução, contate seu representante provincial (MLA, MPP ou MNA).",
+  "share_results": "Compartilhar",
+  "link_copied": "Link copiado!"
 }

@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 from .models import Office, Representative
+from .parliament_client import ParliamentClient
 from .validators import normalize_postal_code, validate_postal_code
 
 BASE_URL = "https://represent.opennorth.ca"
@@ -72,9 +73,8 @@ class RepresentClient:
         self.cache_ttl = timedelta(hours=cache_ttl_hours)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.session = requests.Session()
-        self.session.headers.update(
-            {"User-Agent": "canadian-representatives-finder/1.0"}
-        )
+        self.session.headers.update({"User-Agent": "infocivic/1.0 (infocivic.ca)"})
+        self._parliament = ParliamentClient()
 
     # ------------------------------------------------------------------
     # Public interface
@@ -93,11 +93,13 @@ class RepresentClient:
 
         cached = self._load_cache(normalized)
         if cached is not None:
-            return self._apply_overrides(self._parse_response(cached), normalized)
+            reps = self._inject_parliament_mp(cached, self._parse_response(cached))
+            return self._apply_overrides(reps, normalized)
 
         raw = self._fetch_from_api(normalized)
         self._save_cache(normalized, raw)
-        return self._apply_overrides(self._parse_response(raw), normalized)
+        reps = self._inject_parliament_mp(raw, self._parse_response(raw))
+        return self._apply_overrides(reps, normalized)
 
     # ------------------------------------------------------------------
     # API communication
@@ -134,6 +136,60 @@ class RepresentClient:
     # ------------------------------------------------------------------
     # Parsing
     # ------------------------------------------------------------------
+
+    def _inject_parliament_mp(self, raw_data: dict, reps: list[Representative]) -> list[Representative]:
+        """
+        Replace any federal MP returned by OpenNorth with the current official data
+        from ourcommons.ca (via ParliamentClient).
+        Uses the federal riding boundary already in the Represent response.
+        """
+        # Find federal riding name from boundary data
+        boundaries = (
+            raw_data.get("boundaries_centroid", []) +
+            raw_data.get("boundaries_concordance", [])
+        )
+        riding_name = None
+        for b in boundaries:
+            if "federal-electoral-districts" in b.get("url", ""):
+                riding_name = b.get("name")
+                break
+
+        if not riding_name:
+            return reps  # no federal boundary found, leave as-is
+
+        try:
+            mp = self._parliament.get_mp_by_riding(riding_name)
+        except Exception:
+            return reps  # parliament API unavailable, keep OpenNorth data
+
+        if mp is None:
+            return reps  # riding not matched, keep OpenNorth data
+
+        # Build a Representative from the Parliament data
+        parliament_rep = Representative(
+            name=mp["name"],
+            first_name=mp.get("first_name"),
+            last_name=mp.get("last_name"),
+            elected_office="MP",
+            level="federal",
+            party_name=mp.get("party"),
+            district_name=mp.get("riding", ""),
+            representative_set_name="House of Commons",
+            email=mp.get("email"),
+            url=mp.get("url"),
+            personal_url=None,
+            photo_url=mp.get("photo_url"),
+            offices=[],
+            source_url="https://www.ourcommons.ca",
+            boundary_url="",
+        )
+
+        # Remove any existing federal MP(s) from OpenNorth, add the official one
+        non_federal_or_senator = [
+            r for r in reps
+            if not (r.level == "federal" and "senator" not in r.elected_office.lower())
+        ]
+        return non_federal_or_senator + [parliament_rep]
 
     def _parse_response(self, data: dict) -> list[Representative]:
         """

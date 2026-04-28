@@ -30,10 +30,8 @@
   "contact": "Contact",
   "made_by": "Made by",
   "contribute": "feedback & contributions welcome",
-
   "tab_find": "Find My Representatives",
   "tab_triage": "Who Do I Contact?",
-
   "triage_title": "Not sure who to contact?",
   "triage_subtitle": "Select your situation and we will point you to the right level of government.",
   "triage_input_placeholder": "Describe the situation or process for which you need to contact a representative...",
@@ -57,36 +55,30 @@
   "level_provincial": "Provincial / Territorial Government",
   "level_municipal": "Municipal Government",
   "level_mixed": "Multiple Levels of Government",
-
   "case_garbage_title": "Garbage was not collected on my street",
   "case_garbage_services": "311 · Municipal Councillor",
   "case_garbage_explanation": "Waste collection is the responsibility of your municipality. Call 311 to report the issue, or contact your city councillor if it remains unresolved.",
-
   "case_doctor_title": "I cannot find a family doctor",
   "case_doctor_services": "811 · Provincial Representative",
   "case_doctor_explanation": "Healthcare is a provincial responsibility in Canada. Call 811 for health advice and referrals. Your MLA, MPP, or MNA can advocate for improved access in your area.",
-
   "case_immigration_title": "My residency or immigration process is delayed",
   "case_immigration_services": "IRCC · Member of Parliament",
   "case_immigration_explanation": "Immigration and citizenship are managed federally by IRCC. Your Member of Parliament can submit a ministerial inquiry to help advance your case.",
-
   "case_taxes_title": "I have a problem with my taxes or the CRA",
   "case_taxes_services": "CRA 1-800-959-8281 · Member of Parliament",
   "case_taxes_explanation": "Federal taxes are managed by the Canada Revenue Agency (CRA). If you cannot resolve your issue directly with the CRA, your MP can assist through the Taxpayer Ombudsperson's office.",
-
   "case_pothole_title": "There is a pothole or road damage on my street",
   "case_pothole_services": "311 · Municipal Councillor",
   "case_pothole_explanation": "Local road maintenance is a municipal responsibility. Report it by calling 311, or contact your city councillor if the issue is not addressed promptly.",
-
   "case_ei_title": "I have not received my Employment Insurance benefits",
   "case_ei_services": "Service Canada 1-800-206-7218 · Member of Parliament",
   "case_ei_explanation": "Employment Insurance (EI) is a federal program managed by Service Canada. If your claim is delayed or denied, your Member of Parliament can contact the relevant department on your behalf.",
-
   "case_housing_title": "I need help with affordable or social housing",
   "case_housing_services": "211 · 311 · All levels",
   "case_housing_explanation": "Housing involves all three levels of government. Social housing waitlists are municipal, financial assistance programs are often provincial, and the National Housing Strategy provides federal funding. Call 211 for social services navigation.",
-
   "case_school_title": "I have a concern about my child's school",
   "case_school_services": "School Board · Provincial Representative",
-  "case_school_explanation": "Education is a provincial responsibility. Start with your school principal or local school board. If the issue is systemic or unresolved, contact your provincial representative (MLA, MPP, or MNA)."
+  "case_school_explanation": "Education is a provincial responsibility. Start with your school principal or local school board. If the issue is systemic or unresolved, contact your provincial representative (MLA, MPP, or MNA).",
+  "share_results": "Share",
+  "link_copied": "Link copied!"
 }
