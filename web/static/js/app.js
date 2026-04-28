@@ -685,6 +685,7 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
     levelSec.appendChild(heading);
 
     grouped[level].forEach(rep => levelSec.appendChild(buildRepCard(rep, level, showEmailTemplate)));
+
     section.appendChild(levelSec);
   });
 

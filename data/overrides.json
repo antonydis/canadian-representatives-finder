@@ -3,19 +3,110 @@
   "_instructions": "postal_prefixes: list of 3-char postal prefixes this override applies to. action: 'inject' adds a missing rep, 'replace' corrects a wrong name, 'inject_all' injects a full city council (uses 'representatives' array instead of 'representative' object).",
   "_last_updated": "2026-04-28",
   "_sources": "Official city websites, Elections Quebec, municipal council pages",
-
   "overrides": [
-
     {
       "_note": "Montreal Mayor — Soraya Martinez Ferrada elected Nov 2025, replacing Valerie Plante. Uses replace_or_inject: replaces Plante where OpenNorth has her, injects alongside borough mayor where OpenNorth only has a Maire d'arrondissement.",
       "action": "replace_or_inject",
       "postal_prefixes": [
-        "H1A","H1B","H1C","H1E","H1G","H1H","H1J","H1K","H1L","H1M","H1N","H1P","H1R","H1S","H1T","H1V","H1W","H1X","H1Y","H1Z",
-        "H2A","H2B","H2C","H2E","H2G","H2H","H2J","H2K","H2L","H2M","H2N","H2P","H2R","H2S","H2T","H2V","H2W","H2X","H2Y","H2Z",
-        "H3A","H3B","H3C","H3E","H3G","H3H","H3J","H3K","H3L","H3M","H3N","H3P","H3R","H3S","H3T","H3V","H3W","H3X","H3Y","H3Z",
-        "H4A","H4B","H4C","H4E","H4G","H4H","H4J","H4K","H4L","H4M","H4N","H4P","H4R","H4S","H4T","H4V","H4W","H4X","H4Y",
-        "H8N","H8P","H8R","H8S","H8T","H8Y","H8Z",
-        "H9A","H9B","H9C","H9E","H9G","H9H","H9J","H9K","H9P","H9R","H9S","H9W","H9X"
+        "H1A",
+        "H1B",
+        "H1C",
+        "H1E",
+        "H1G",
+        "H1H",
+        "H1J",
+        "H1K",
+        "H1L",
+        "H1M",
+        "H1N",
+        "H1P",
+        "H1R",
+        "H1S",
+        "H1T",
+        "H1V",
+        "H1W",
+        "H1X",
+        "H1Y",
+        "H1Z",
+        "H2A",
+        "H2B",
+        "H2C",
+        "H2E",
+        "H2G",
+        "H2H",
+        "H2J",
+        "H2K",
+        "H2L",
+        "H2M",
+        "H2N",
+        "H2P",
+        "H2R",
+        "H2S",
+        "H2T",
+        "H2V",
+        "H2W",
+        "H2X",
+        "H2Y",
+        "H2Z",
+        "H3A",
+        "H3B",
+        "H3C",
+        "H3E",
+        "H3G",
+        "H3H",
+        "H3J",
+        "H3K",
+        "H3L",
+        "H3M",
+        "H3N",
+        "H3P",
+        "H3R",
+        "H3S",
+        "H3T",
+        "H3V",
+        "H3W",
+        "H3X",
+        "H3Y",
+        "H3Z",
+        "H4A",
+        "H4B",
+        "H4C",
+        "H4E",
+        "H4G",
+        "H4H",
+        "H4J",
+        "H4K",
+        "H4L",
+        "H4M",
+        "H4N",
+        "H4P",
+        "H4R",
+        "H4S",
+        "H4T",
+        "H4V",
+        "H4W",
+        "H4X",
+        "H4Y",
+        "H8N",
+        "H8P",
+        "H8R",
+        "H8S",
+        "H8T",
+        "H8Y",
+        "H8Z",
+        "H9A",
+        "H9B",
+        "H9C",
+        "H9E",
+        "H9G",
+        "H9H",
+        "H9J",
+        "H9K",
+        "H9P",
+        "H9R",
+        "H9S",
+        "H9W",
+        "H9X"
       ],
       "representative": {
         "name": "Soraya Martínez Ferrada",
@@ -29,7 +120,6 @@
         "photo_url": ""
       }
     },
-
     {
       "_note": "Quebec City Mayor — Bruno Marchand re-elected Nov 2025. OpenNorth already returns him correctly as 'Maire'. Kept as documentation only.",
       "action": "inject",
@@ -46,12 +136,29 @@
         "photo_url": ""
       }
     },
-
     {
       "_note": "Laval full council — verified Apr 2026 from laval.ca. Maire + 21 conseillers (Districts 01-22). Individual emails and phones. RTAs: H7A-H7Y.",
       "action": "inject_all",
       "postal_prefixes": [
-        "H7A","H7B","H7C","H7E","H7G","H7H","H7J","H7K","H7L","H7M","H7N","H7P","H7R","H7S","H7T","H7V","H7W","H7X","H7Y"
+        "H7A",
+        "H7B",
+        "H7C",
+        "H7E",
+        "H7G",
+        "H7H",
+        "H7J",
+        "H7K",
+        "H7L",
+        "H7M",
+        "H7N",
+        "H7P",
+        "H7R",
+        "H7S",
+        "H7T",
+        "H7V",
+        "H7W",
+        "H7X",
+        "H7Y"
       ],
       "representatives": [
         {
@@ -309,13 +416,22 @@
         }
       ]
     },
-
     {
       "_note": "Gatineau Mayor — Maude Marquis-Bissonnette elected Nov 2025, replacing France Belisle. OpenNorth has France Belisle (stale).",
       "action": "replace",
       "postal_prefixes": [
-        "J8L","J8M","J8P","J8R","J8T","J8V","J8X","J8Y","J8Z",
-        "J9A","J9H","J9J"
+        "J8L",
+        "J8M",
+        "J8P",
+        "J8R",
+        "J8T",
+        "J8V",
+        "J8X",
+        "J8Y",
+        "J8Z",
+        "J9A",
+        "J9H",
+        "J9J"
       ],
       "representative": {
         "name": "Maude Marquis-Bissonnette",
@@ -329,12 +445,21 @@
         "photo_url": ""
       }
     },
-
     {
       "_note": "Sherbrooke Mayor — Évelyne Beaudin re-elected Nov 2025. OpenNorth returns Marie-Claude Bibeau with office='Maire' (stale/wrong).",
       "action": "replace",
       "postal_prefixes": [
-        "J1E","J1G","J1H","J1J","J1K","J1L","J1M","J1N","J1R","J1T","J1X"
+        "J1E",
+        "J1G",
+        "J1H",
+        "J1J",
+        "J1K",
+        "J1L",
+        "J1M",
+        "J1N",
+        "J1R",
+        "J1T",
+        "J1X"
       ],
       "representative": {
         "name": "Évelyne Beaudin",
@@ -348,12 +473,12 @@
         "photo_url": ""
       }
     },
-
     {
       "_note": "Saint-Jérôme Mayor — Marc Bourcier elected Nov 2021. OpenNorth returns Rémi Barbeau with office='Maire' (stale).",
       "action": "replace",
       "postal_prefixes": [
-        "J7Y","J7Z"
+        "J7Y",
+        "J7Z"
       ],
       "representative": {
         "name": "Marc Bourcier",
@@ -367,7 +492,6 @@
         "photo_url": ""
       }
     },
-
     {
       "_note": "Terrebonne Mayor — Mathieu Traversy elected Nov 2021. OpenNorth confirmed correct via audit [CHECK].",
       "action": "inject",
@@ -384,11 +508,12 @@
         "photo_url": ""
       }
     },
-
     {
       "_note": "Saint-Constant full council — verified Apr 2026 from saint-constant.ca. Mayor + 7 councillors (Districts 1-6 + 8; District 7 vacant). RTA: J5A.",
       "action": "inject_all",
-      "postal_prefixes": ["J5A"],
+      "postal_prefixes": [
+        "J5A"
+      ],
       "representatives": [
         {
           "name": "Jean-Claude Boyer",
@@ -397,7 +522,7 @@
           "party_name": "Équipe Jean-Claude Boyer",
           "district_name": "Saint-Constant",
           "email": "conseil@saint-constant.ca",
-          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "url": "https://saint-constant.ca",
           "photo_url": ""
         },
         {
@@ -407,7 +532,7 @@
           "party_name": "Équipe Jean-Claude Boyer",
           "district_name": "Saint-Constant – District 1",
           "email": "mairie@saint-constant.ca",
-          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "url": "https://saint-constant.ca",
           "photo_url": ""
         },
         {
@@ -417,7 +542,7 @@
           "party_name": "Équipe Jean-Claude Boyer",
           "district_name": "Saint-Constant – District 2",
           "email": "mairie@saint-constant.ca",
-          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "url": "https://saint-constant.ca",
           "photo_url": ""
         },
         {
@@ -427,7 +552,7 @@
           "party_name": "Équipe Jean-Claude Boyer",
           "district_name": "Saint-Constant – District 3",
           "email": "mairie@saint-constant.ca",
-          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "url": "https://saint-constant.ca",
           "photo_url": ""
         },
         {
@@ -437,7 +562,7 @@
           "party_name": "Équipe Jean-Claude Boyer",
           "district_name": "Saint-Constant – District 4",
           "email": "mairie@saint-constant.ca",
-          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "url": "https://saint-constant.ca",
           "photo_url": ""
         },
         {
@@ -447,7 +572,7 @@
           "party_name": "Équipe Jean-Claude Boyer",
           "district_name": "Saint-Constant – District 5",
           "email": "mairie@saint-constant.ca",
-          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "url": "https://saint-constant.ca",
           "photo_url": ""
         },
         {
@@ -457,7 +582,7 @@
           "party_name": "Équipe Jean-Claude Boyer",
           "district_name": "Saint-Constant – District 6",
           "email": "mairie@saint-constant.ca",
-          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "url": "https://saint-constant.ca",
           "photo_url": ""
         },
         {
@@ -467,16 +592,17 @@
           "party_name": "Équipe Jean-Claude Boyer",
           "district_name": "Saint-Constant – District 8",
           "email": "mairie@saint-constant.ca",
-          "url": "https://www.saint-constant.ca/administration-municipale/conseil-municipal/",
+          "url": "https://saint-constant.ca",
           "photo_url": ""
         }
       ]
     },
-
     {
       "_note": "Sainte-Julie full council — verified Apr 2026 from saintejulie.ca. Mayor + 7 councillors. RTA: J3E.",
       "action": "inject_all",
-      "postal_prefixes": ["J3E"],
+      "postal_prefixes": [
+        "J3E"
+      ],
       "representatives": [
         {
           "name": "Mario Lemay",
@@ -485,7 +611,7 @@
           "party_name": "La voix des citoyens",
           "district_name": "Sainte-Julie",
           "email": "clientele@saintejulie.ca",
-          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "url": "https://www.saintejulie.ca",
           "photo_url": ""
         },
         {
@@ -495,7 +621,7 @@
           "party_name": "La voix des citoyens",
           "district_name": "Sainte-Julie – District 1",
           "email": "clientele@saintejulie.ca",
-          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "url": "https://www.saintejulie.ca",
           "photo_url": ""
         },
         {
@@ -505,7 +631,7 @@
           "party_name": "La voix des citoyens",
           "district_name": "Sainte-Julie – District 2",
           "email": "clientele@saintejulie.ca",
-          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "url": "https://www.saintejulie.ca",
           "photo_url": ""
         },
         {
@@ -515,7 +641,7 @@
           "party_name": "La voix des citoyens",
           "district_name": "Sainte-Julie – District 3",
           "email": "clientele@saintejulie.ca",
-          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "url": "https://www.saintejulie.ca",
           "photo_url": ""
         },
         {
@@ -525,7 +651,7 @@
           "party_name": "La voix des citoyens",
           "district_name": "Sainte-Julie – District 5",
           "email": "clientele@saintejulie.ca",
-          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "url": "https://www.saintejulie.ca",
           "photo_url": ""
         },
         {
@@ -535,7 +661,7 @@
           "party_name": "La voix des citoyens",
           "district_name": "Sainte-Julie",
           "email": "clientele@saintejulie.ca",
-          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "url": "https://www.saintejulie.ca",
           "photo_url": ""
         },
         {
@@ -545,7 +671,7 @@
           "party_name": "La voix des citoyens",
           "district_name": "Sainte-Julie",
           "email": "clientele@saintejulie.ca",
-          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "url": "https://www.saintejulie.ca",
           "photo_url": ""
         },
         {
@@ -555,16 +681,19 @@
           "party_name": "La voix des citoyens",
           "district_name": "Sainte-Julie",
           "email": "clientele@saintejulie.ca",
-          "url": "https://www.saintejulie.ca/mairie-et-administration/conseil-municipal/",
+          "url": "https://www.saintejulie.ca",
           "photo_url": ""
         }
       ]
     },
-
     {
       "_note": "Granby full council — verified Apr 2026 from granby.ca. Mairesse + 10 conseillers. RTAs: J2G, J2H, J2J.",
       "action": "inject_all",
-      "postal_prefixes": ["J2G", "J2H", "J2J"],
+      "postal_prefixes": [
+        "J2G",
+        "J2H",
+        "J2J"
+      ],
       "representatives": [
         {
           "name": "Julie Bourdon",
@@ -573,7 +702,7 @@
           "party_name": "Indépendante",
           "district_name": "Granby",
           "email": "mairie@granby.ca",
-          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "url": "https://www.granby.ca",
           "photo_url": ""
         },
         {
@@ -583,7 +712,7 @@
           "party_name": "Indépendant",
           "district_name": "Granby – District 2",
           "email": "cour.municipale@granby.ca",
-          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "url": "https://www.granby.ca",
           "photo_url": ""
         },
         {
@@ -593,7 +722,7 @@
           "party_name": "Indépendant",
           "district_name": "Granby – District 3",
           "email": "cour.municipale@granby.ca",
-          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "url": "https://www.granby.ca",
           "photo_url": ""
         },
         {
@@ -603,7 +732,7 @@
           "party_name": "Indépendante",
           "district_name": "Granby – District 6",
           "email": "cour.municipale@granby.ca",
-          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "url": "https://www.granby.ca",
           "photo_url": ""
         },
         {
@@ -613,7 +742,7 @@
           "party_name": "Indépendant",
           "district_name": "Granby",
           "email": "cour.municipale@granby.ca",
-          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "url": "https://www.granby.ca",
           "photo_url": ""
         },
         {
@@ -623,7 +752,7 @@
           "party_name": "Indépendante",
           "district_name": "Granby",
           "email": "cour.municipale@granby.ca",
-          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "url": "https://www.granby.ca",
           "photo_url": ""
         },
         {
@@ -633,7 +762,7 @@
           "party_name": "Indépendant",
           "district_name": "Granby",
           "email": "cour.municipale@granby.ca",
-          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "url": "https://www.granby.ca",
           "photo_url": ""
         },
         {
@@ -643,7 +772,7 @@
           "party_name": "Indépendante",
           "district_name": "Granby",
           "email": "cour.municipale@granby.ca",
-          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "url": "https://www.granby.ca",
           "photo_url": ""
         },
         {
@@ -653,7 +782,7 @@
           "party_name": "Indépendant",
           "district_name": "Granby",
           "email": "cour.municipale@granby.ca",
-          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "url": "https://www.granby.ca",
           "photo_url": ""
         },
         {
@@ -663,7 +792,7 @@
           "party_name": "Indépendant",
           "district_name": "Granby",
           "email": "cour.municipale@granby.ca",
-          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "url": "https://www.granby.ca",
           "photo_url": ""
         },
         {
@@ -673,16 +802,21 @@
           "party_name": "Indépendante",
           "district_name": "Granby",
           "email": "cour.municipale@granby.ca",
-          "url": "https://www.granby.ca/fr/administration/conseil-municipal/",
+          "url": "https://www.granby.ca",
           "photo_url": ""
         }
       ]
     },
-
     {
       "_note": "Saint-Jean-sur-Richelieu Mayor — Éric Latour, Coalition Éric Latour. Council data incomplete; only mayor confirmed. RTAs: J2W, J2X, J2Y, J3A, J3B.",
       "action": "inject_all",
-      "postal_prefixes": ["J2W", "J2X", "J2Y", "J3A", "J3B"],
+      "postal_prefixes": [
+        "J2W",
+        "J2X",
+        "J2Y",
+        "J3A",
+        "J3B"
+      ],
       "representatives": [
         {
           "name": "Éric Latour",
@@ -691,16 +825,18 @@
           "party_name": "Coalition Éric Latour",
           "district_name": "Saint-Jean-sur-Richelieu",
           "email": "info@sjsr.ca",
-          "url": "https://www.sjsr.ca/mairie-et-administration/conseil-municipal/",
+          "url": "https://www.sjsr.ca",
           "photo_url": ""
         }
       ]
     },
-
     {
       "_note": "Châteauguay full council — verified Apr 2026 from ville.chateauguay.qc.ca. Maire + 10 conseillers. RTAs: J6J, J6K.",
       "action": "inject_all",
-      "postal_prefixes": ["J6J", "J6K"],
+      "postal_prefixes": [
+        "J6J",
+        "J6K"
+      ],
       "representatives": [
         {
           "name": "Éric Allard",
@@ -709,7 +845,7 @@
           "party_name": "Alliance Châteauguay",
           "district_name": "Châteauguay",
           "email": "service@ville.chateauguay.qc.ca",
-          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "url": "https://www.ville.chateauguay.qc.ca",
           "photo_url": ""
         },
         {
@@ -719,7 +855,7 @@
           "party_name": "Alliance Châteauguay",
           "district_name": "Châteauguay – District 1",
           "email": "service@ville.chateauguay.qc.ca",
-          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "url": "https://www.ville.chateauguay.qc.ca",
           "photo_url": ""
         },
         {
@@ -729,7 +865,7 @@
           "party_name": "Alliance Châteauguay",
           "district_name": "Châteauguay – District 2",
           "email": "service@ville.chateauguay.qc.ca",
-          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "url": "https://www.ville.chateauguay.qc.ca",
           "photo_url": ""
         },
         {
@@ -739,7 +875,7 @@
           "party_name": "Alliance Châteauguay",
           "district_name": "Châteauguay – District 3",
           "email": "service@ville.chateauguay.qc.ca",
-          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "url": "https://www.ville.chateauguay.qc.ca",
           "photo_url": ""
         },
         {
@@ -749,7 +885,7 @@
           "party_name": "Alliance Châteauguay",
           "district_name": "Châteauguay – District 4",
           "email": "service@ville.chateauguay.qc.ca",
-          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "url": "https://www.ville.chateauguay.qc.ca",
           "photo_url": ""
         },
         {
@@ -759,7 +895,7 @@
           "party_name": "Alliance Châteauguay",
           "district_name": "Châteauguay – District 5",
           "email": "service@ville.chateauguay.qc.ca",
-          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "url": "https://www.ville.chateauguay.qc.ca",
           "photo_url": ""
         },
         {
@@ -769,7 +905,7 @@
           "party_name": "Alliance Châteauguay",
           "district_name": "Châteauguay – District 6",
           "email": "service@ville.chateauguay.qc.ca",
-          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "url": "https://www.ville.chateauguay.qc.ca",
           "photo_url": ""
         },
         {
@@ -779,7 +915,7 @@
           "party_name": "Alliance Châteauguay",
           "district_name": "Châteauguay – District 7",
           "email": "service@ville.chateauguay.qc.ca",
-          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "url": "https://www.ville.chateauguay.qc.ca",
           "photo_url": ""
         },
         {
@@ -789,7 +925,7 @@
           "party_name": "Alliance Châteauguay",
           "district_name": "Châteauguay – District 8",
           "email": "service@ville.chateauguay.qc.ca",
-          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "url": "https://www.ville.chateauguay.qc.ca",
           "photo_url": ""
         },
         {
@@ -799,7 +935,7 @@
           "party_name": "Alliance Châteauguay",
           "district_name": "Châteauguay – District 9",
           "email": "service@ville.chateauguay.qc.ca",
-          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "url": "https://www.ville.chateauguay.qc.ca",
           "photo_url": ""
         },
         {
@@ -809,16 +945,18 @@
           "party_name": "Alliance Châteauguay",
           "district_name": "Châteauguay – District 10",
           "email": "service@ville.chateauguay.qc.ca",
-          "url": "https://www.ville.chateauguay.qc.ca/fr/conseil-municipal/",
+          "url": "https://www.ville.chateauguay.qc.ca",
           "photo_url": ""
         }
       ]
     },
-
     {
       "_note": "Rouyn-Noranda partial council — verified Apr 2026 from rouyn-noranda.ca. Mayor + 3 confirmed councillors (CSV data). RTAs: J9X, J9Y.",
       "action": "inject_all",
-      "postal_prefixes": ["J9X", "J9Y"],
+      "postal_prefixes": [
+        "J9X",
+        "J9Y"
+      ],
       "representatives": [
         {
           "name": "Gilles Chapadeau",
@@ -827,7 +965,7 @@
           "party_name": "Indépendant",
           "district_name": "Rouyn-Noranda",
           "email": "info@rouyn-noranda.ca",
-          "url": "https://www.rouyn-noranda.ca/ville/conseil-municipal/",
+          "url": "https://www.rouyn-noranda.ca",
           "photo_url": ""
         },
         {
@@ -837,7 +975,7 @@
           "party_name": "Indépendante",
           "district_name": "Rouyn-Noranda",
           "email": "info@rouyn-noranda.ca",
-          "url": "https://www.rouyn-noranda.ca/ville/conseil-municipal/",
+          "url": "https://www.rouyn-noranda.ca",
           "photo_url": ""
         },
         {
@@ -847,7 +985,7 @@
           "party_name": "Parti Virage",
           "district_name": "Rouyn-Noranda",
           "email": "info@rouyn-noranda.ca",
-          "url": "https://www.rouyn-noranda.ca/ville/conseil-municipal/",
+          "url": "https://www.rouyn-noranda.ca",
           "photo_url": ""
         },
         {
@@ -857,16 +995,19 @@
           "party_name": "Parti Virage",
           "district_name": "Rouyn-Noranda",
           "email": "info@rouyn-noranda.ca",
-          "url": "https://www.rouyn-noranda.ca/ville/conseil-municipal/",
+          "url": "https://www.rouyn-noranda.ca",
           "photo_url": ""
         }
       ]
     },
-
     {
       "_note": "Drummondville full council — verified Apr 2026 from drummondville.ca. Maire + 12 conseillers (Districts 1-12). RTAs: J2B, J2C, J2E.",
       "action": "inject_all",
-      "postal_prefixes": ["J2B", "J2C", "J2E"],
+      "postal_prefixes": [
+        "J2B",
+        "J2C",
+        "J2E"
+      ],
       "representatives": [
         {
           "name": "Jean-François Houle",
@@ -875,7 +1016,7 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         },
         {
@@ -885,7 +1026,7 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville – District 1",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         },
         {
@@ -895,7 +1036,7 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville – District 2",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         },
         {
@@ -905,7 +1046,7 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville – District 3",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         },
         {
@@ -915,7 +1056,7 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville – District 4",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         },
         {
@@ -925,7 +1066,7 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville – District 5",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         },
         {
@@ -935,7 +1076,7 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville – District 6",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         },
         {
@@ -945,7 +1086,7 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville – District 7",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         },
         {
@@ -955,7 +1096,7 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville – District 8",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         },
         {
@@ -965,7 +1106,7 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville – District 9",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         },
         {
@@ -975,7 +1116,7 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville – District 10",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         },
         {
@@ -985,7 +1126,7 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville – District 11",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         },
         {
@@ -995,11 +1136,10 @@
           "party_name": "Indépendant",
           "district_name": "Drummondville – District 12",
           "email": "info@drummondville.ca",
-          "url": "https://www.drummondville.ca/services/administration-municipale/conseil-municipal/",
+          "url": "https://www.drummondville.ca",
           "photo_url": ""
         }
       ]
     }
-
   ]
 }
