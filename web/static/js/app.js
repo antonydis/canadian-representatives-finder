@@ -36,6 +36,7 @@ const ICONS = {
   mail: `<svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`,
   link: `<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>`,
   compose: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
+  flag: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="14" height="14"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>`,
 };
 
 /* ── Triage case definitions (icons + level, text from translations) ── */
@@ -79,6 +80,9 @@ let activeCaseId = null;
 let activeSituationEn = null;
 let activeSituationFr = null;
 
+/* last postal code searched — used by feedback modal */
+let currentPostalCode = null;
+
 /* ================================================================
    INIT
    ================================================================ */
@@ -94,6 +98,7 @@ async function init() {
   initTabs();
 
   initEmailModal();
+  initFeedbackModal();
 
   document.getElementById('search-form').addEventListener('submit', e => handleSearch(e, 'main'));
   document.getElementById('triage-search-form').addEventListener('submit', e => handleSearch(e, 'triage'));
@@ -635,6 +640,7 @@ function isValidPostalCode(code) {
 
 function renderResults(reps, postalCode, containerId, levelFilter = null, showEmailTemplate = false) {
   hideLoading(containerId === 'results' ? 'main' : 'triage');
+  currentPostalCode = postalCode;
 
   const section = document.getElementById(containerId);
   section.innerHTML = '';
@@ -848,6 +854,16 @@ function buildRepCard(rep, level, showEmailTemplate = false) {
   if (rep.url) contact.appendChild(contactRow(ICONS.link, t('website'), rep.url, true));
 
   card.append(main, contact);
+
+  // Flag / suggest correction button
+  const flagRow = el('div', 'feedback-flag-row');
+  const flagBtn = el('button', 'feedback-flag-btn');
+  flagBtn.type = 'button';
+  flagBtn.innerHTML = `${ICONS.flag}<span data-i18n="feedback_flag_btn">${t('feedback_flag_btn')}</span>`;
+  flagBtn.addEventListener('click', () => openFeedbackModal(rep, currentPostalCode));
+  flagRow.appendChild(flagBtn);
+  card.appendChild(flagRow);
+
   return card;
 }
 
@@ -939,6 +955,124 @@ function openEmailModal(rep) {
 
 function closeEmailModal() {
   document.getElementById('email-modal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+/* ================================================================
+   FEEDBACK MODAL
+   ================================================================ */
+
+let _feedbackRep    = null;
+let _feedbackPostal = null;
+
+function initFeedbackModal() {
+  const overlay  = document.getElementById('feedback-modal');
+  const closeBtn = document.getElementById('feedback-modal-close');
+  const form     = document.getElementById('feedback-form');
+  const textarea = document.getElementById('feedback-message');
+  const counter  = document.getElementById('feedback-char-count');
+
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeFeedbackModal(); });
+  closeBtn.addEventListener('click', closeFeedbackModal);
+
+  textarea.addEventListener('input', () => {
+    counter.textContent = `${textarea.value.length} / 500`;
+  });
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const type    = document.getElementById('feedback-type').value;
+    const message = textarea.value.trim();
+    const email   = document.getElementById('feedback-email').value.trim();
+    const errEl   = document.getElementById('feedback-error');
+    const succEl  = document.getElementById('feedback-success');
+
+    errEl.classList.add('hidden');
+    succEl.classList.add('hidden');
+
+    if (!message || message.length < 5) {
+      errEl.textContent = t('feedback_error_short');
+      errEl.classList.remove('hidden');
+      textarea.focus();
+      return;
+    }
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+
+    try {
+      const resp = await fetch('/api/feedback', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type,
+          message,
+          email,
+          rep_name:    _feedbackRep?.name || '',
+          postal_code: _feedbackPostal || '',
+        }),
+      });
+      const data = await resp.json();
+      if (resp.ok && data.success) {
+        succEl.classList.remove('hidden');
+        document.getElementById('feedback-actions').classList.add('hidden');
+        form.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+        setTimeout(closeFeedbackModal, 2800);
+      } else if (resp.status === 429) {
+        errEl.textContent = t('error_rate_limit');
+        errEl.classList.remove('hidden');
+        submitBtn.disabled = false;
+      } else {
+        errEl.textContent = t('feedback_error_generic');
+        errEl.classList.remove('hidden');
+        submitBtn.disabled = false;
+      }
+    } catch {
+      errEl.textContent = t('feedback_error_generic');
+      errEl.classList.remove('hidden');
+      submitBtn.disabled = false;
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !overlay.classList.contains('hidden')) closeFeedbackModal();
+  });
+}
+
+function openFeedbackModal(rep, postalCode) {
+  _feedbackRep    = rep;
+  _feedbackPostal = postalCode;
+
+  // Reset form state
+  document.getElementById('feedback-form').reset();
+  document.getElementById('feedback-char-count').textContent = '0 / 500';
+  document.getElementById('feedback-error').classList.add('hidden');
+  document.getElementById('feedback-success').classList.add('hidden');
+  document.getElementById('feedback-actions').classList.remove('hidden');
+  document.getElementById('feedback-form').querySelectorAll('input, select, textarea')
+    .forEach(el => { el.disabled = false; });
+  document.querySelector('#feedback-form button[type="submit"]').disabled = false;
+
+  // Show rep name as subtitle
+  const label = document.getElementById('feedback-rep-label');
+  label.textContent = rep.name ? `${rep.elected_office} · ${rep.name}` : '';
+
+  // Re-translate select options and labels
+  document.querySelectorAll('#feedback-modal [data-i18n]').forEach(node => {
+    node.textContent = t(node.dataset.i18n);
+  });
+  document.querySelectorAll('#feedback-modal [data-i18n-placeholder]').forEach(node => {
+    node.placeholder = t(node.dataset.i18nPlaceholder);
+  });
+
+  const overlay = document.getElementById('feedback-modal');
+  overlay.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('feedback-modal-close').focus();
+}
+
+function closeFeedbackModal() {
+  document.getElementById('feedback-modal').classList.add('hidden');
   document.body.style.overflow = '';
 }
 

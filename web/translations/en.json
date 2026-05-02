@@ -80,5 +80,19 @@
   "case_school_services": "School Board · Provincial Representative",
   "case_school_explanation": "Education is a provincial responsibility. Start with your school principal or local school board. If the issue is systemic or unresolved, contact your provincial representative (MLA, MPP, or MNA).",
   "share_results": "Share",
-  "link_copied": "Link copied!"
+  "link_copied": "Link copied!",
+  "feedback_flag_btn": "Suggest a correction",
+  "feedback_title": "Suggest a correction",
+  "feedback_type_label": "Type of feedback",
+  "feedback_type_wrong_rep": "Wrong representative",
+  "feedback_type_outdated": "Outdated information",
+  "feedback_type_suggestion": "Suggestion / other",
+  "feedback_message_label": "Details",
+  "feedback_message_placeholder": "Describe the issue or your suggestion…",
+  "feedback_email_label": "Your email (optional — for follow-up only)",
+  "feedback_email_placeholder": "your@email.com",
+  "feedback_submit": "Send",
+  "feedback_success": "Thank you! Your feedback has been received.",
+  "feedback_error_short": "Please add a few more details (at least 5 characters).",
+  "feedback_error_generic": "Something went wrong. Please try again."
 }

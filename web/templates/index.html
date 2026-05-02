@@ -270,6 +270,63 @@
     </div>
   </div>
 
+  <!-- ── FEEDBACK MODAL ───────────────────────────────────────── -->
+  <div id="feedback-modal" class="email-modal-overlay hidden"
+       role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title">
+    <div class="email-modal feedback-modal-box" role="document">
+
+      <div class="email-modal-header">
+        <h2 id="feedback-modal-title" class="email-modal-title" data-i18n="feedback_title">Suggest a correction</h2>
+        <button class="email-modal-close" id="feedback-modal-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="18" height="18">
+            <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="email-modal-body">
+        <p class="feedback-rep-label" id="feedback-rep-label"></p>
+
+        <form id="feedback-form" novalidate>
+          <div class="feedback-field">
+            <label for="feedback-type" data-i18n="feedback_type_label">Type</label>
+            <select id="feedback-type" class="feedback-select">
+              <option value="wrong_rep"    data-i18n="feedback_type_wrong_rep">Wrong representative</option>
+              <option value="outdated_info" data-i18n="feedback_type_outdated">Outdated information</option>
+              <option value="suggestion"   data-i18n="feedback_type_suggestion">Suggestion</option>
+            </select>
+          </div>
+
+          <div class="feedback-field">
+            <label for="feedback-message" data-i18n="feedback_message_label">Details</label>
+            <textarea id="feedback-message" class="feedback-textarea" maxlength="500" rows="3"
+                      data-i18n-placeholder="feedback_message_placeholder"
+                      placeholder="Describe the issue or your suggestion..."></textarea>
+            <span class="feedback-char-count" id="feedback-char-count">0 / 500</span>
+          </div>
+
+          <div class="feedback-field">
+            <label for="feedback-email" data-i18n="feedback_email_label">Your email (optional)</label>
+            <input type="email" id="feedback-email" class="feedback-email-input"
+                   data-i18n-placeholder="feedback_email_placeholder"
+                   placeholder="For follow-up only" autocomplete="email" />
+          </div>
+
+          <div id="feedback-error" class="error-msg hidden" role="alert" aria-live="polite"></div>
+          <div id="feedback-success" class="feedback-success hidden" data-i18n="feedback_success">
+            Thank you! Your feedback has been submitted.
+          </div>
+
+          <div class="email-modal-actions" id="feedback-actions">
+            <button type="submit" class="search-btn" data-i18n="feedback_submit">Send</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
   <script src="/static/js/app.js"></script>
 </body>
 </html>

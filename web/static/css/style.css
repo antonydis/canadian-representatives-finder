@@ -697,6 +697,75 @@ h1::after {
 }
 .email-action-btn.secondary:hover { background: #eef2f7; }
 
+/* ── FEEDBACK FLAG BUTTON ────────────────────────────────────── */
+.feedback-flag-row {
+  grid-column: 1 / -1;
+  display: flex; justify-content: flex-end;
+  padding: 4px 0 0;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+.feedback-flag-btn {
+  background: none; border: none; padding: 3px 2px;
+  color: var(--text-muted); font-size: .72rem;
+  font-family: inherit; font-weight: 500;
+  cursor: pointer;
+  opacity: .6;
+  display: inline-flex; align-items: center; gap: 4px;
+  transition: opacity var(--transition), color var(--transition);
+}
+.feedback-flag-btn:hover, .feedback-flag-btn:focus-visible {
+  opacity: 1; color: var(--navy);
+}
+.feedback-flag-btn:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; border-radius: 2px; }
+.feedback-flag-btn svg { stroke: currentColor; fill: none; flex-shrink: 0; }
+
+/* ── FEEDBACK MODAL ──────────────────────────────────────────── */
+.feedback-modal-box { max-width: 440px; }
+.feedback-rep-label {
+  font-size: .8rem; color: var(--text-muted); font-weight: 600;
+  margin-bottom: 16px;
+}
+.feedback-field { margin-bottom: 14px; }
+.feedback-field label {
+  display: block;
+  font-size: .72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--text-muted); margin-bottom: 5px;
+}
+.feedback-select {
+  width: 100%; padding: 8px 10px;
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  font-size: .875rem; font-family: inherit; color: var(--text);
+  background: #fff;
+  transition: border-color var(--transition);
+}
+.feedback-select:focus { outline: none; border-color: var(--border-focus); }
+.feedback-textarea {
+  width: 100%; padding: 8px 10px;
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  font-size: .875rem; font-family: inherit; color: var(--text);
+  resize: vertical; min-height: 80px;
+  transition: border-color var(--transition);
+}
+.feedback-textarea:focus { outline: none; border-color: var(--border-focus); }
+.feedback-char-count {
+  display: block; text-align: right;
+  font-size: .72rem; color: var(--text-muted); margin-top: 3px;
+}
+.feedback-email-input {
+  width: 100%; padding: 8px 10px;
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  font-size: .875rem; font-family: inherit; color: var(--text);
+  transition: border-color var(--transition);
+}
+.feedback-email-input:focus { outline: none; border-color: var(--border-focus); }
+.feedback-success {
+  padding: 12px 14px; margin-bottom: 12px;
+  background: #e8f5e9; border: 1px solid #a5d6a7;
+  border-radius: var(--radius);
+  font-size: .875rem; color: #2e7d32; font-weight: 600;
+}
+
 /* ── DISCLAIMER ──────────────────────────────────────────────── */
 .disclaimer-box {
   margin-top: 36px; padding: 12px 16px;

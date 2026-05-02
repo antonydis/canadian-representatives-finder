@@ -80,5 +80,19 @@
   "case_school_services": "School Board · Kinatawang Panlalawigan",
   "case_school_explanation": "Ang edukasyon ay responsibilidad ng lalawigan. Magsimula sa punong-guro o lokal na school board. Kung ang isyu ay sistematiko o hindi nalutas, makipag-ugnayan sa inyong kinatawang panlalawigan (MLA, MPP, o MNA).",
   "share_results": "Ibahagi",
-  "link_copied": "Nakopya ang link!"
+  "link_copied": "Nakopya ang link!",
+  "feedback_flag_btn": "Magmungkahi ng pagwawasto",
+  "feedback_title": "Magmungkahi ng pagwawasto",
+  "feedback_type_label": "Uri ng feedback",
+  "feedback_type_wrong_rep": "Maling kinatawan",
+  "feedback_type_outdated": "Luma nang impormasyon",
+  "feedback_type_suggestion": "Mungkahi / iba pa",
+  "feedback_message_label": "Mga detalye",
+  "feedback_message_placeholder": "Ilarawan ang problema o ang iyong mungkahi…",
+  "feedback_email_label": "Iyong email (opsyonal — para sa follow-up lamang)",
+  "feedback_email_placeholder": "iyong@email.com",
+  "feedback_submit": "Ipadala",
+  "feedback_success": "Salamat! Natanggap na ang iyong feedback.",
+  "feedback_error_short": "Mangyaring magdagdag ng higit pang detalye (hindi bababa sa 5 character).",
+  "feedback_error_generic": "May naganap na error. Mangyaring subukan muli."
 }

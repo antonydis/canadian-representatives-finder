@@ -80,5 +80,19 @@
   "case_school_services": "Conseil scolaire · Député provincial",
   "case_school_explanation": "L'éducation est une compétence provinciale. Commencez par le directeur d'école ou le conseil scolaire local. Si le problème est systémique ou non résolu, contactez votre député provincial (MLA, MPP ou MNA).",
   "share_results": "Partager",
-  "link_copied": "Lien copié !"
+  "link_copied": "Lien copié !",
+  "feedback_flag_btn": "Proposer une correction",
+  "feedback_title": "Proposer une correction",
+  "feedback_type_label": "Type de commentaire",
+  "feedback_type_wrong_rep": "Mauvais représentant",
+  "feedback_type_outdated": "Information périmée",
+  "feedback_type_suggestion": "Suggestion / autre",
+  "feedback_message_label": "Détails",
+  "feedback_message_placeholder": "Décrivez le problème ou votre suggestion…",
+  "feedback_email_label": "Votre courriel (facultatif — pour suivi uniquement)",
+  "feedback_email_placeholder": "votre@courriel.com",
+  "feedback_submit": "Envoyer",
+  "feedback_success": "Merci ! Votre commentaire a bien été reçu.",
+  "feedback_error_short": "Veuillez ajouter quelques détails supplémentaires (au moins 5 caractères).",
+  "feedback_error_generic": "Une erreur s'est produite. Veuillez réessayer."
 }

@@ -80,5 +80,19 @@
   "case_school_services": "学区董事会 · 省级代表",
   "case_school_explanation": "教育是省级责任。从校长或当地学区董事会开始。如果问题是系统性的或未能解决，联系您的省级代表（MLA、MPP或MNA）。",
   "share_results": "分享",
-  "link_copied": "链接已复制！"
+  "link_copied": "链接已复制！",
+  "feedback_flag_btn": "建议更正",
+  "feedback_title": "建议更正",
+  "feedback_type_label": "反馈类型",
+  "feedback_type_wrong_rep": "代表信息有误",
+  "feedback_type_outdated": "信息已过时",
+  "feedback_type_suggestion": "建议 / 其他",
+  "feedback_message_label": "详情",
+  "feedback_message_placeholder": "请描述问题或您的建议…",
+  "feedback_email_label": "您的邮箱（可选 — 仅用于跟进）",
+  "feedback_email_placeholder": "您的邮箱",
+  "feedback_submit": "发送",
+  "feedback_success": "感谢您的反馈！",
+  "feedback_error_short": "请提供更多详情（至少5个字符）。",
+  "feedback_error_generic": "出现错误，请重试。"
 }

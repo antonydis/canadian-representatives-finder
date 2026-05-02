@@ -5,6 +5,8 @@ import re
 import sys
 import time
 from collections import defaultdict
+from datetime import datetime, timezone
+from pathlib import Path
 
 from dotenv import load_dotenv
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -230,6 +232,56 @@ def classify_situation():
     except Exception:
         logger.exception("Unexpected error in classify_situation")
         return jsonify({"success": False, "error": "ai_error"}), 502
+
+
+_FEEDBACK_FILE = Path(__file__).parent.parent / "data" / "feedback.jsonl"
+_VALID_FEEDBACK_TYPES = {"wrong_rep", "outdated_info", "suggestion"}
+
+
+@app.route("/api/feedback", methods=["POST"])
+def feedback():
+    if not _allow_request(_client_ip()):
+        return jsonify({"success": False, "error": "rate_limit"}), 429
+
+    data = request.get_json(silent=True) or {}
+    feedback_type = data.get("type", "").strip()
+    message       = data.get("message", "").strip()
+    email         = data.get("email", "").strip()
+    rep_name      = data.get("rep_name", "").strip()
+    postal_code   = data.get("postal_code", "").strip().upper().replace(" ", "")
+
+    if feedback_type not in _VALID_FEEDBACK_TYPES:
+        return jsonify({"success": False, "error": "invalid_type"}), 400
+    if not message or len(message) < 5:
+        return jsonify({"success": False, "error": "message_too_short"}), 400
+    if len(message) > 500:
+        return jsonify({"success": False, "error": "message_too_long"}), 400
+    if email and len(email) > 200:
+        return jsonify({"success": False, "error": "invalid_email"}), 400
+
+    entry = {
+        "ts":         datetime.now(timezone.utc).isoformat(),
+        "type":       feedback_type,
+        "message":    message,
+        "rep_name":   rep_name or None,
+        "postal":     postal_code or None,
+        "email":      email or None,
+        "ip":         _client_ip(),
+    }
+    try:
+        _FEEDBACK_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with _FEEDBACK_FILE.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except OSError:
+        logger.exception("Failed to write feedback")
+        return jsonify({"success": False, "error": "server_error"}), 500
+
+    logger.info("feedback_received", extra={"custom_dimensions": {
+        "feedback_type": feedback_type,
+        "rep_name": rep_name,
+        "postal": postal_code,
+    }})
+    return jsonify({"success": True})
 
 
 @app.route("/api/health")

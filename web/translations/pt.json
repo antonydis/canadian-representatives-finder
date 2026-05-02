@@ -80,5 +80,19 @@
   "case_school_services": "Conselho escolar · Representante provincial",
   "case_school_explanation": "A educação é responsabilidade provincial. Comece com o diretor ou conselho escolar local. Se o problema for sistêmico ou sem resolução, contate seu representante provincial (MLA, MPP ou MNA).",
   "share_results": "Compartilhar",
-  "link_copied": "Link copiado!"
+  "link_copied": "Link copiado!",
+  "feedback_flag_btn": "Sugerir uma correção",
+  "feedback_title": "Sugerir uma correção",
+  "feedback_type_label": "Tipo de comentário",
+  "feedback_type_wrong_rep": "Representante incorreto",
+  "feedback_type_outdated": "Informação desatualizada",
+  "feedback_type_suggestion": "Sugestão / outro",
+  "feedback_message_label": "Detalhes",
+  "feedback_message_placeholder": "Descreva o problema ou sua sugestão…",
+  "feedback_email_label": "Seu e-mail (opcional — apenas para acompanhamento)",
+  "feedback_email_placeholder": "seu@email.com",
+  "feedback_submit": "Enviar",
+  "feedback_success": "Obrigado! Seu comentário foi recebido.",
+  "feedback_error_short": "Por favor, adicione mais detalhes (pelo menos 5 caracteres).",
+  "feedback_error_generic": "Algo deu errado. Por favor, tente novamente."
 }
