@@ -36,25 +36,12 @@ function applyLang(lang, save = true) {
 
   // Re-render dynamic JS content if results are currently shown
   if (currentPostal && !document.getElementById('laval-results').classList.contains('hidden')) {
+    renderDistrict(currentPostal, _lastCouncillor);
     renderMeeting();
     renderDecisions();
     renderParticipation();
-    // Re-wire ccard toggle after re-render
-    const toggle = document.getElementById('ccard-toggle');
-    const details = document.getElementById('ccard-details');
-    if (toggle && details) {
-      toggle.textContent = '';
-      toggle.innerHTML = `${t('laval_councillor_card_toggle')} <span class="ccard-chevron">▾</span>`;
-      toggle.onclick = () => {
-        const open = !details.classList.contains('hidden');
-        details.classList.toggle('hidden', open);
-        toggle.setAttribute('aria-expanded', String(!open));
-        toggle.querySelector('.ccard-chevron').textContent = open ? '▾' : '▴';
-      };
-    }
-    // Update results label
     const label = document.getElementById('laval-results-label');
-    if (label && currentPostal) label.textContent = currentPostal.slice(0,3) + ' ' + currentPostal.slice(3);
+    if (label) label.textContent = currentPostal.slice(0,3) + ' ' + currentPostal.slice(3);
   }
 }
 
@@ -266,6 +253,7 @@ const results     = document.getElementById('laval-results');
 const subForm     = document.getElementById('subscribe-form');
 
 let currentPostal = '';
+let _lastCouncillor = null;
 
 /* ── Postal search — uses /api/search for verified data ─────── */
 async function doSearch(raw) {
@@ -305,6 +293,8 @@ async function doSearch(raw) {
       }
     }
   } catch { /* non-fatal */ }
+
+  _lastCouncillor = councillor;
 
   // Update URL without reloading
   const display = raw.slice(0,3) + ' ' + raw.slice(3);
