@@ -820,3 +820,59 @@ footer a:hover { text-decoration: underline; }
 @media (max-width: 380px) {
   .triage-grid { grid-template-columns: 1fr; }
 }
+
+/* ── LAVAL PROMO BANNER ──────────────────────────────────────── */
+.laval-promo-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: #e8f0fe;
+  border: 1px solid #b3c9f9;
+  border-radius: var(--radius-lg);
+  padding: .85rem 1.1rem;
+  margin-bottom: 1rem;
+  font-size: .88rem;
+}
+
+.laval-banner-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+}
+
+.laval-banner-body strong {
+  color: var(--navy);
+  font-size: .9rem;
+}
+
+.laval-banner-body span {
+  color: var(--text-muted);
+}
+
+.laval-banner-link {
+  flex-shrink: 0;
+  background: var(--navy);
+  color: #fff;
+  text-decoration: none;
+  font-size: .82rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  transition: background var(--transition);
+  white-space: nowrap;
+}
+.laval-banner-link:hover { background: var(--navy-light); }
+
+.laval-banner-close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.laval-banner-close:hover { color: var(--text); }

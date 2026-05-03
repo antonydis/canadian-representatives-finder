@@ -125,6 +125,11 @@ def index():
     return render_template("index.html", translations=TRANSLATIONS, langs=SUPPORTED_LANGS)
 
 
+@app.route("/laval")
+def laval():
+    return render_template("laval.html")
+
+
 @app.route("/api/search", methods=["POST"])
 def search():
     # Fix #4: rate limit on search too
@@ -280,6 +285,84 @@ def feedback():
         "feedback_type": feedback_type,
         "rep_name": rep_name,
         "postal": postal_code,
+    }})
+    return jsonify({"success": True})
+
+
+_LAVAL_SUBSCRIBERS_FILE = Path(__file__).parent.parent / "data" / "laval_subscribers.jsonl"
+_VALID_PHONE = re.compile(r"^\+?1?\d{10,11}$")
+_VALID_NAME  = re.compile(r"^[\w\s\'\-\.À-ÿ]{2,80}$")
+
+# Stricter rate limit for subscribe endpoint: 3 req / 60 s per IP
+_rl_subscribe: dict[str, list[float]] = defaultdict(list)
+_RL_SUB_MAX = 3
+
+
+def _allow_subscribe(ip: str) -> bool:
+    now = time.monotonic()
+    bucket = _rl_subscribe[ip]
+    bucket[:] = [t for t in bucket if now - t < _RL_WINDOW]
+    if len(bucket) >= _RL_SUB_MAX:
+        return False
+    bucket.append(now)
+    return True
+
+
+@app.route("/api/laval/subscribe", methods=["POST"])
+def laval_subscribe():
+    if not _allow_subscribe(_client_ip()):
+        return jsonify({"success": False, "error": "rate_limit"}), 429
+
+    data        = request.get_json(silent=True) or {}
+    name        = data.get("name", "").strip()
+    postal_code = data.get("postal_code", "").strip().upper().replace(" ", "")
+    phone       = data.get("phone", "").strip().replace(" ", "").replace("-", "").replace("(", "").replace(")", "").replace(".", "")
+
+    if not name or not _VALID_NAME.match(name):
+        return jsonify({"success": False, "error": "invalid_name"}), 400
+    if not _VALID_POSTAL.match(postal_code):
+        return jsonify({"success": False, "error": "invalid_postal"}), 400
+    if not phone or not _VALID_PHONE.match(phone):
+        return jsonify({"success": False, "error": "invalid_phone"}), 400
+
+    # Normalise to E.164 (assume Canada +1 if no country code)
+    if not phone.startswith("+"):
+        phone = "+1" + phone.lstrip("1") if len(phone) == 11 else "+1" + phone
+
+    # Duplicate check (same phone number)
+    try:
+        if _LAVAL_SUBSCRIBERS_FILE.exists():
+            with _LAVAL_SUBSCRIBERS_FILE.open(encoding="utf-8") as f:
+                for line in f:
+                    try:
+                        entry = json.loads(line)
+                        if entry.get("phone") == phone:
+                            return jsonify({"success": False, "error": "already_subscribed"}), 409
+                    except json.JSONDecodeError:
+                        continue
+    except OSError:
+        pass
+
+    entry = {
+        "ts":          datetime.now(timezone.utc).isoformat(),
+        "name":        name,
+        "postal_code": postal_code,
+        "phone":       phone,
+        "city":        "laval",
+        "ip":          _client_ip(),
+    }
+
+    try:
+        _LAVAL_SUBSCRIBERS_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with _LAVAL_SUBSCRIBERS_FILE.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except OSError:
+        logger.exception("Failed to write Laval subscriber")
+        return jsonify({"success": False, "error": "server_error"}), 500
+
+    logger.info("laval_subscribe", extra={"custom_dimensions": {
+        "postal_code": postal_code,
+        "city": "laval",
     }})
     return jsonify({"success": True})
 

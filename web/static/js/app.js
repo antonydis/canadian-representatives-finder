@@ -617,6 +617,12 @@ async function handleSearch(e, source) {
     }
 
     renderResults(data.representatives, displayCode, resultsId, levelFilter, source === 'triage');
+
+    // Laval banner: suggest /laval when postal code is in Laval
+    if (source === 'main' && isLavalPostal(rawCode)) {
+      showLavalBanner(resultsId);
+    }
+
     // GA4: track postal code search
     gtag('event', 'search_representatives', {
       postal_code: displayCode,
@@ -694,6 +700,15 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
 
     section.appendChild(levelSec);
   });
+
+  // Single "suggest a correction" line at the bottom of all results
+  const feedbackBar = el('div', 'results-feedback-bar');
+  const feedbackBtn = el('button', 'results-feedback-btn');
+  feedbackBtn.type = 'button';
+  feedbackBtn.innerHTML = `${ICONS.flag}<span data-i18n="feedback_results_cta">${t('feedback_results_cta')}</span>`;
+  feedbackBtn.addEventListener('click', () => openFeedbackModal(null, currentPostalCode));
+  feedbackBar.appendChild(feedbackBtn);
+  section.appendChild(feedbackBar);
 
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -854,16 +869,6 @@ function buildRepCard(rep, level, showEmailTemplate = false) {
   if (rep.url) contact.appendChild(contactRow(ICONS.link, t('website'), rep.url, true));
 
   card.append(main, contact);
-
-  // Flag / suggest correction button
-  const flagRow = el('div', 'feedback-flag-row');
-  const flagBtn = el('button', 'feedback-flag-btn');
-  flagBtn.type = 'button';
-  flagBtn.innerHTML = `${ICONS.flag}<span data-i18n="feedback_flag_btn">${t('feedback_flag_btn')}</span>`;
-  flagBtn.addEventListener('click', () => openFeedbackModal(rep, currentPostalCode));
-  flagRow.appendChild(flagBtn);
-  card.appendChild(flagRow);
-
   return card;
 }
 
@@ -1053,9 +1058,9 @@ function openFeedbackModal(rep, postalCode) {
     .forEach(el => { el.disabled = false; });
   document.querySelector('#feedback-form button[type="submit"]').disabled = false;
 
-  // Show rep name as subtitle
+  // Show rep name as subtitle (optional — null when called from results footer)
   const label = document.getElementById('feedback-rep-label');
-  label.textContent = rep.name ? `${rep.elected_office} · ${rep.name}` : '';
+  label.textContent = rep?.name ? `${rep.elected_office} · ${rep.name}` : '';
 
   // Re-translate select options and labels
   document.querySelectorAll('#feedback-modal [data-i18n]').forEach(node => {
@@ -1112,6 +1117,39 @@ function showError(source, msg) {
 function clearError(source) {
   const errId = source === 'main' ? 'error-msg' : 'triage-error-msg';
   document.getElementById(errId).classList.add('hidden');
+}
+
+/* ================================================================
+   LAVAL BANNER
+   ================================================================ */
+
+const _LAVAL_FSA = new Set([
+  'H7A','H7B','H7C','H7E','H7G','H7H','H7J','H7K','H7L','H7M',
+  'H7N','H7P','H7R','H7S','H7T','H7V','H7W','H7X','H7Y',
+]);
+
+function isLavalPostal(raw) {
+  return _LAVAL_FSA.has(raw.slice(0, 3));
+}
+
+function showLavalBanner(containerId) {
+  // Remove any existing banner first
+  document.getElementById('laval-promo-banner')?.remove();
+
+  const section = document.getElementById(containerId);
+  const banner  = el('div', 'laval-promo-banner');
+  banner.id     = 'laval-promo-banner';
+  banner.innerHTML = `
+    <div class="laval-banner-body">
+      <strong>Vous habitez Laval&nbsp;?</strong>
+      <span>Consultez les dates du conseil municipal, les décisions récentes et les subventions disponibles dans votre district.</span>
+    </div>
+    <a href="/laval" class="laval-banner-link">InfoCivic Laval</a>
+    <button class="laval-banner-close" aria-label="Fermer">&times;</button>
+  `;
+  banner.querySelector('.laval-banner-close').addEventListener('click', () => banner.remove());
+  // Insert before the results section
+  section.parentNode.insertBefore(banner, section);
 }
 
 /* ================================================================

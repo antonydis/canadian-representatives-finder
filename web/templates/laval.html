@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Restez informé sur les séances du conseil municipal de Laval, les décisions récentes et les opportunités de participation citoyenne dans votre district." />
+  <meta name="robots" content="index, follow" />
+  <title>Conseil municipal de Laval — InfoCivic</title>
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://infocivic.ca/laval" />
+  <meta property="og:title" content="Conseil municipal de Laval — InfoCivic" />
+  <meta property="og:description" content="Prochaine séance du conseil, décisions récentes et opportunités de participation citoyenne à Laval." />
+  <meta property="og:locale" content="fr_CA" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="/static/css/laval.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍁</text></svg>" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-12Q5H9M7GX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-12Q5H9M7GX');
+  </script>
+</head>
+<body>
+
+  <div class="top-stripe" role="presentation"></div>
+
+  <header role="banner">
+    <div class="header-inner">
+      <a href="/laval" class="site-brand" aria-label="InfoCivic Laval — Accueil">
+        <span class="maple-icon" aria-hidden="true">🍁</span>
+        <div class="site-name">
+          <span class="primary">InfoCivic — Laval</span>
+          <span class="secondary">Conseil municipal et participation citoyenne</span>
+        </div>
+      </a>
+      <div id="lang-switcher"></div>
+      <a href="/" class="laval-back-link">infocivic.ca</a>
+    </div>
+  </header>
+
+  <div class="nav-bar" role="presentation"></div>
+
+  <main role="main">
+    <div class="container">
+
+      <!-- Hero + search -->
+      <div class="laval-hero">
+        <h1 data-i18n="laval_hero_title">Restez informé sur votre conseil municipal</h1>
+        <p class="lead" data-i18n="laval_hero_lead">
+          Entrez votre code postal pour voir la prochaine séance du conseil dans votre district,
+          les décisions récentes et les occasions de participer à la vie de votre ville.
+        </p>
+
+        <div class="search-card">
+          <form id="laval-search-form" novalidate>
+            <label for="laval-postal-input" class="form-label" data-i18n="laval_search_label">Votre code postal (Laval)</label>
+            <div class="input-row">
+              <input
+                type="text"
+                id="laval-postal-input"
+                class="postal-input"
+                maxlength="7"
+                autocomplete="postal-code"
+                spellcheck="false"
+                placeholder="ex. H7V 1B6"
+                data-i18n-placeholder="input_placeholder"
+                aria-required="true"
+                aria-describedby="laval-error-msg"
+              />
+              <button type="submit" class="search-btn" data-i18n="laval_search_btn">Rechercher</button>
+            </div>
+            <div id="laval-error-msg" class="error-msg hidden" role="alert" aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="laval-loading" class="loading-state hidden" aria-live="polite">
+        <div class="spinner" role="status"></div>
+        <p data-i18n="laval_loading">Recherche en cours…</p>
+      </div>
+
+      <!-- Results -->
+      <div id="laval-results" class="hidden" aria-live="polite">
+
+        <!-- District + councillor -->
+        <div class="laval-district-bar" id="laval-district-bar">
+          <!-- Filled by JS -->
+        </div>
+
+        <!-- Next meeting -->
+        <section class="laval-card" aria-labelledby="meeting-heading">
+          <h2 id="meeting-heading" class="laval-card-title" data-i18n="laval_section_meeting">Prochaine séance du conseil</h2>
+          <div id="meeting-content">
+            <!-- Filled by JS -->
+          </div>
+        </section>
+
+        <!-- Recent decisions -->
+        <section class="laval-card" aria-labelledby="decisions-heading">
+          <h2 id="decisions-heading" class="laval-card-title" data-i18n="laval_section_decisions">Décisions récentes</h2>
+          <p class="laval-card-subtitle" data-i18n="laval_decisions_subtitle">Résumé des résolutions adoptées lors des dernières séances.</p>
+          <div id="decisions-content">
+            <!-- Filled by JS -->
+          </div>
+          <a
+            href="https://www.laval.ca/en/democratic-life/town-hall-elected-officials/executive-summaries-agendas-minutes/"
+            class="laval-source-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-i18n="laval_minutes_link"
+          >Voir les procès-verbaux officiels sur laval.ca</a>
+        </section>
+
+        <!-- Participation opportunities -->
+        <section class="laval-card" aria-labelledby="participation-heading">
+          <h2 id="participation-heading" class="laval-card-title" data-i18n="laval_section_participation">Participer et obtenir des aides</h2>
+          <p class="laval-card-subtitle" data-i18n="laval_participation_subtitle">Consultations publiques, subventions et occasions de vous impliquer.</p>
+          <div id="participation-content">
+            <!-- Filled by JS -->
+          </div>
+        </section>
+
+        <!-- Suggest a correction -->
+        <div class="laval-correction-bar">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="14" height="14"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          <span data-i18n="laval_correction_bar">Une information est incorrecte ou manquante&nbsp;?</span>
+          <button type="button" class="laval-correction-btn" id="laval-correction-btn" data-i18n="laval_correction_btn">Signaler une correction</button>
+        </div>
+
+        <!-- Subscribe form -->
+        <section class="laval-card laval-subscribe-card" aria-labelledby="subscribe-heading">
+          <h2 id="subscribe-heading" class="laval-card-title" data-i18n="laval_section_sms">Recevoir des alertes par SMS</h2>
+          <p class="laval-subscribe-desc" data-i18n="laval_sms_desc">
+            Inscrivez-vous pour recevoir un rappel avant chaque séance du conseil et des alertes
+            sur les décisions importantes pour votre quartier. Aucuns frais — répondez
+            STOP en tout temps pour vous désabonner.
+          </p>
+
+          <form id="subscribe-form" novalidate>
+            <div class="subscribe-fields">
+
+              <div class="subscribe-field">
+                <label for="sub-name" class="form-label" data-i18n="laval_label_name">Prénom et nom</label>
+                <input
+                  type="text"
+                  id="sub-name"
+                  class="postal-input"
+                  maxlength="80"
+                  autocomplete="name"
+                  placeholder="Marie Tremblay"
+                  data-i18n-placeholder="laval_placeholder_name"
+                  aria-required="true"
+                />
+              </div>
+
+              <div class="subscribe-field">
+                <label for="sub-postal" class="form-label" data-i18n="laval_label_postal">Code postal</label>
+                <input
+                  type="text"
+                  id="sub-postal"
+                  class="postal-input"
+                  maxlength="7"
+                  autocomplete="postal-code"
+                  placeholder="H7V 1B6"
+                  aria-required="true"
+                />
+              </div>
+
+              <div class="subscribe-field">
+                <label for="sub-phone" class="form-label" data-i18n="laval_label_phone">Numéro de téléphone</label>
+                <input
+                  type="tel"
+                  id="sub-phone"
+                  class="postal-input"
+                  maxlength="20"
+                  autocomplete="tel"
+                  placeholder="+1 (450) 555-1234"
+                  data-i18n-placeholder="laval_placeholder_phone"
+                  aria-required="true"
+                  aria-describedby="sub-error-msg"
+                />
+              </div>
+
+            </div>
+
+            <div class="subscribe-consent">
+              <input type="checkbox" id="sub-consent" name="consent" />
+              <label for="sub-consent" data-i18n="laval_consent">
+                J'accepte de recevoir des messages SMS d'InfoCivic au numéro fourni. Aucune donnée n'est
+                partagée avec des tiers.
+              </label>
+            </div>
+
+            <div id="sub-error-msg" class="error-msg hidden" role="alert" aria-live="polite"></div>
+            <div id="sub-success" class="laval-success hidden" role="status" aria-live="polite"></div>
+
+            <button type="submit" class="search-btn" id="sub-btn" data-i18n="laval_btn_subscribe">S'inscrire aux alertes</button>
+          </form>
+        </section>
+
+      </div><!-- /laval-results -->
+
+    </div>
+  </main>
+
+  <footer role="contentinfo">
+    <div class="footer-inner">
+      <span data-i18n="footer_note">Projet civique indépendant — Pas un site officiel du gouvernement</span>
+      <span><span data-i18n="laval_footer_data">Données</span>: <a href="https://www.laval.ca" target="_blank" rel="noopener noreferrer">Ville de Laval</a></span>
+    </div>
+    <div class="footer-author">
+      <span data-i18n="made_by">Développé par</span> <a href="https://github.com/antonydis" target="_blank" rel="noopener noreferrer">Antony</a>
+    </div>
+  </footer>
+
+  <!-- Correction modal -->
+  <div id="laval-correction-modal" class="email-modal-overlay hidden"
+       role="dialog" aria-modal="true" aria-labelledby="laval-corr-title">
+    <div class="email-modal" role="document">
+      <div class="email-modal-header">
+        <h2 id="laval-corr-title" class="email-modal-title" data-i18n="laval_correction_modal_title">Signaler une correction</h2>
+        <button class="email-modal-close laval-modal-close" aria-label="Fermer">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="18" height="18">
+            <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="email-modal-body">
+        <p style="font-size:.9rem;color:var(--text-muted);margin-bottom:1rem;" data-i18n="laval_correction_modal_desc">
+          Une information sur cette page est incorrecte ou manquante&nbsp;? Décrivez le problème et nous ferons les corrections.
+        </p>
+        <form id="laval-corr-form" novalidate>
+          <div class="feedback-field">
+            <label for="laval-corr-message" style="font-size:.88rem;font-weight:600;" data-i18n="laval_correction_label_msg">Description</label>
+            <textarea id="laval-corr-message" class="feedback-textarea" maxlength="500" rows="4"
+                      placeholder="Ex. Le nom du conseiller du district X est incorrect, il devrait être..."
+                      data-i18n-placeholder="laval_correction_placeholder_msg"></textarea>
+          </div>
+          <div class="feedback-field" style="margin-top:.75rem;">
+            <label for="laval-corr-email" style="font-size:.88rem;font-weight:600;" data-i18n="laval_correction_label_email">Votre courriel (optionnel)</label>
+            <input type="email" id="laval-corr-email" class="feedback-email-input"
+                   placeholder="Pour suivi seulement" autocomplete="email" />
+          </div>
+          <div id="laval-corr-error" class="error-msg hidden" role="alert" aria-live="polite"></div>
+          <div id="laval-corr-success" class="feedback-success hidden"></div>
+          <div class="email-modal-actions" style="margin-top:1rem;">
+            <button type="submit" class="search-btn" data-i18n="laval_correction_btn_send">Envoyer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/laval.js"></script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+/* ============================================================
+   InfoCivic Laval — Page styles
+   Extends style.css (variables, base, header, footer already defined)
+   ============================================================ */
+
+/* ── Hero ──────────────────────────────────────────────────── */
+.laval-hero {
+  margin-bottom: 2rem;
+}
+
+.laval-hero h1 {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: .5rem;
+}
+
+.laval-hero .lead {
+  max-width: 640px;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Header back link ──────────────────────────────────────── */
+.laval-back-link {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--navy);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 5px 12px;
+  white-space: nowrap;
+  transition: background var(--transition), border-color var(--transition);
+}
+.laval-back-link:hover {
+  background: var(--bg);
+  border-color: var(--navy);
+}
+
+/* ── District bar ──────────────────────────────────────────── */
+.laval-district-bar {
+  background: var(--navy);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: .9rem 1.25rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.laval-district-bar .district-label {
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  opacity: .75;
+}
+
+.laval-district-bar .district-name {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.laval-district-bar .district-councillor {
+  font-size: .88rem;
+  opacity: .85;
+}
+
+.district-divider {
+  width: 1px;
+  height: 2rem;
+  background: rgba(255,255,255,.25);
+}
+
+/* ── Cards ─────────────────────────────────────────────────── */
+.laval-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.laval-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: .25rem;
+  padding-bottom: .75rem;
+  border-bottom: 2px solid var(--red);
+  display: inline-block;
+}
+
+.laval-card-subtitle {
+  font-size: .88rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  margin-top: .5rem;
+}
+
+.laval-source-link {
+  display: inline-block;
+  font-size: .8rem;
+  color: var(--navy-light);
+  margin-top: 1rem;
+  text-decoration: underline;
+}
+
+/* ── Meeting block ─────────────────────────────────────────── */
+.meeting-block {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-top: .75rem;
+}
+
+.meeting-date-badge {
+  background: var(--red);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: .9rem 1.4rem;
+  text-align: center;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+.meeting-date-badge .mdb-day   { font-size: 2rem; font-weight: 700; line-height: 1; }
+.meeting-date-badge .mdb-month { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
+.meeting-date-badge .mdb-year  { font-size: .72rem; opacity: .8; margin-top: 1px; }
+
+.meeting-info { flex: 1; min-width: 220px; }
+.meeting-info h3 { font-size: .95rem; font-weight: 700; margin-bottom: .4rem; color: var(--text); }
+
+.meeting-meta {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 .6rem;
+}
+.meeting-meta li {
+  font-size: .88rem;
+  color: var(--text-muted);
+  margin-bottom: .2rem;
+}
+.meeting-meta .meta-label {
+  font-weight: 600;
+  color: var(--text);
+  margin-right: .25rem;
+}
+
+.meeting-countdown {
+  display: inline-block;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: .78rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: .02em;
+}
+.meeting-countdown.today {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.meeting-all-dates {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.meeting-all-dates h4 {
+  font-size: .82rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-muted);
+  margin-bottom: .6rem;
+}
+.dates-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+.date-chip {
+  font-size: .8rem;
+  color: var(--navy);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+/* ── Decisions ─────────────────────────────────────────────── */
+.decisions-list {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+
+.decision-row {
+  display: flex;
+  align-items: baseline;
+  gap: .75rem;
+  padding: .65rem .85rem;
+  border-left: 3px solid var(--municipal-color);
+  background: #faf8fc;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.decision-row .dr-status {
+  flex-shrink: 0;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.dr-status.approved { background: #e8f5e9; color: #2e7d32; }
+.dr-status.pending  { background: #fff3e0; color: #e65100; }
+.dr-status.rejected { background: #fce4ec; color: #c62828; }
+
+.decision-row .dr-title {
+  font-size: .88rem;
+  color: var(--text);
+  flex: 1;
+}
+
+.decision-row .dr-date {
+  font-size: .75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Participation ──────────────────────────────────────────── */
+.participation-list {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+
+.participation-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: .75rem;
+  padding: .75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: box-shadow var(--transition);
+}
+.participation-row:hover { box-shadow: var(--shadow-hover); }
+
+.pr-tag {
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.pr-tag.grant        { background: #e8f5e9; color: #2e7d32; }
+.pr-tag.consultation { background: #e3f2fd; color: #1565c0; }
+.pr-tag.volunteer    { background: #fff3e0; color: #e65100; }
+
+.pr-body {}
+.pr-title {
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: .15rem;
+}
+.pr-desc  { font-size: .82rem; color: var(--text-muted); }
+.pr-deadline { font-size: .75rem; color: var(--text-muted); white-space: nowrap; margin-top: 2px; }
+
+/* ── Subscribe card ─────────────────────────────────────────── */
+.laval-subscribe-card {
+  border-color: var(--navy);
+  border-width: 1px;
+}
+
+.laval-subscribe-desc {
+  font-size: .9rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+  margin-top: .5rem;
+  max-width: 580px;
+}
+
+.subscribe-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.subscribe-field { display: flex; flex-direction: column; gap: .35rem; }
+.subscribe-field .form-label { margin-bottom: 0; }
+
+/* ── Consent checkbox ───────────────────────────────────────── */
+.subscribe-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+  margin-bottom: 1rem;
+  padding: .75rem .9rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.subscribe-consent input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: var(--navy);
+  cursor: pointer;
+}
+
+.subscribe-consent label {
+  font-size: .82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.subscribe-consent label strong {
+  color: var(--text);
+}
+
+/* ── Success ────────────────────────────────────────────────── */
+.laval-success {
+  margin-bottom: .75rem;
+  padding: .75rem 1rem;
+  background: #e8f5e9;
+  border-radius: var(--radius);
+  color: #2e7d32;
+  font-size: .9rem;
+  font-weight: 600;
+}
+
+/* ── Correction bar ─────────────────────────────────────────── */
+.laval-correction-bar {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .82rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+  padding: .6rem .85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+
+.laval-correction-bar svg { flex-shrink: 0; opacity: .6; }
+
+.laval-correction-btn {
+  background: none;
+  border: none;
+  color: var(--navy-light);
+  font-size: .82rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  margin-left: auto;
+  white-space: nowrap;
+}
+.laval-correction-btn:hover { color: var(--navy); }
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .laval-hero h1 { font-size: 1.3rem; }
+
+  .subscribe-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .meeting-block { flex-direction: column; }
+
+  .decision-row {
+    flex-direction: column;
+    gap: .35rem;
+  }
+
+  .participation-row {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+  }
+  .pr-deadline { grid-column: 2; }
+}
