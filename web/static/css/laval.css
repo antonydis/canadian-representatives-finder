@@ -371,6 +371,83 @@
 }
 .laval-correction-btn:hover { color: var(--navy); }
 
+/* ── Councillor contact card (in district bar) ──────────────── */
+.councillor-block { display: flex; flex-direction: column; gap: .2rem; }
+.councillor-party { font-size: .75rem; opacity: .7; }
+
+.ccard-toggle {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: var(--radius);
+  color: #fff;
+  font-size: .75rem;
+  font-family: inherit;
+  font-weight: 600;
+  padding: 3px 10px;
+  cursor: pointer;
+  margin-top: .35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  transition: background .15s;
+  width: fit-content;
+}
+.ccard-toggle:hover { background: rgba(255,255,255,.22); }
+.ccard-chevron { font-size: .7rem; }
+
+.ccard-details {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  margin-top: .4rem;
+  padding: .5rem .75rem;
+  background: rgba(255,255,255,.1);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,.2);
+}
+.ccard-details.hidden { display: none; }
+
+.ccard-row {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  font-size: .8rem;
+  color: rgba(255,255,255,.9);
+}
+.ccard-row svg { flex-shrink: 0; opacity: .8; }
+
+/* ── Ask council CTA ────────────────────────────────────────── */
+.ask-council-cta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  padding: .75rem 1rem;
+  background: #e8f5e9;
+  border-radius: var(--radius);
+  border-left: 3px solid #2e7d32;
+}
+
+.ask-council-btn {
+  display: inline-block;
+  background: var(--navy);
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity .15s;
+}
+.ask-council-btn:hover { opacity: .85; }
+
+.ask-council-deadline {
+  font-size: .78rem;
+  color: #2e7d32;
+}
+
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 700px) {
   .laval-hero h1 { font-size: 1.3rem; }
@@ -391,4 +468,82 @@
     grid-template-rows: auto auto;
   }
   .pr-deadline { grid-column: 2; }
+
+  .laval-sms-popup { width: calc(100% - 2rem); max-width: none; bottom: 0; top: auto; left: 1rem; right: 1rem; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .popup-fields { grid-template-columns: 1fr; }
 }
+
+/* ── SMS popup ───────────────────────────────────────────────── */
+.laval-sms-popup-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.35);
+  z-index: 1099;
+}
+.laval-sms-popup-backdrop.hidden { display: none; }
+
+.laval-sms-popup {
+  position: fixed;
+  bottom: 2rem; right: 2rem;
+  width: 420px; max-width: calc(100vw - 2rem);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 40px rgba(0,0,0,.18);
+  padding: 1.5rem;
+  z-index: 1100;
+  animation: sms-popup-in .25s ease;
+}
+.laval-sms-popup.hidden { display: none; }
+
+@keyframes sms-popup-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.laval-sms-popup h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: .4rem;
+}
+.laval-sms-popup p {
+  font-size: .85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.laval-sms-popup-close {
+  position: absolute;
+  top: .75rem; right: .75rem;
+  background: none; border: none;
+  font-size: 1.3rem; line-height: 1;
+  color: var(--text-muted); cursor: pointer;
+  padding: 2px 6px; border-radius: var(--radius);
+}
+.laval-sms-popup-close:hover { background: var(--bg); color: var(--navy); }
+
+.popup-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .6rem;
+  margin-bottom: .75rem;
+}
+.popup-fields input:last-child { grid-column: 1 / -1; }
+
+.popup-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: .75rem;
+}
+.popup-actions .search-btn { flex-shrink: 0; }
+
+.laval-sms-popup-later {
+  background: none; border: none;
+  color: var(--text-muted); font-size: .82rem;
+  font-family: inherit; cursor: pointer; padding: 0;
+  text-decoration: underline;
+}
+.laval-sms-popup-later:hover { color: var(--navy); }

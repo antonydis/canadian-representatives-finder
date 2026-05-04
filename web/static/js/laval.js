@@ -33,6 +33,29 @@ function applyLang(lang, save = true) {
     el.placeholder = t(el.dataset.i18nPlaceholder);
   });
   document.querySelector('.lang-dropdown-wrapper')?._updateCurrent?.();
+
+  // Re-render dynamic JS content if results are currently shown
+  if (currentPostal && !document.getElementById('laval-results').classList.contains('hidden')) {
+    renderMeeting();
+    renderDecisions();
+    renderParticipation();
+    // Re-wire ccard toggle after re-render
+    const toggle = document.getElementById('ccard-toggle');
+    const details = document.getElementById('ccard-details');
+    if (toggle && details) {
+      toggle.textContent = '';
+      toggle.innerHTML = `${t('laval_councillor_card_toggle')} <span class="ccard-chevron">▾</span>`;
+      toggle.onclick = () => {
+        const open = !details.classList.contains('hidden');
+        details.classList.toggle('hidden', open);
+        toggle.setAttribute('aria-expanded', String(!open));
+        toggle.querySelector('.ccard-chevron').textContent = open ? '▾' : '▴';
+      };
+    }
+    // Update results label
+    const label = document.getElementById('laval-results-label');
+    if (label && currentPostal) label.textContent = currentPostal.slice(0,3) + ' ' + currentPostal.slice(3);
+  }
 }
 
 function buildLangSwitcher() {
@@ -242,12 +265,12 @@ const loading     = document.getElementById('laval-loading');
 const results     = document.getElementById('laval-results');
 const subForm     = document.getElementById('subscribe-form');
 
+let currentPostal = '';
+
 /* ── Postal search — uses /api/search for verified data ─────── */
-searchForm.addEventListener('submit', async e => {
-  e.preventDefault();
+async function doSearch(raw) {
   clearError();
 
-  const raw = postalInput.value.trim().toUpperCase().replace(/\s/g, '');
   if (!/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(raw)) {
     showError(t('laval_error_invalid'));
     return;
@@ -257,6 +280,7 @@ searchForm.addEventListener('submit', async e => {
     return;
   }
 
+  currentPostal = raw;
   loading.classList.remove('hidden');
   results.classList.add('hidden');
 
@@ -282,6 +306,14 @@ searchForm.addEventListener('submit', async e => {
     }
   } catch { /* non-fatal */ }
 
+  // Update URL without reloading
+  const display = raw.slice(0,3) + ' ' + raw.slice(3);
+  history.replaceState(null, '', `?postal=${raw}`);
+
+  // Update results label
+  const label = document.getElementById('laval-results-label');
+  if (label) label.textContent = display;
+
   renderDistrict(raw, councillor);
   renderMeeting();
   renderDecisions();
@@ -289,7 +321,21 @@ searchForm.addEventListener('submit', async e => {
   prefillSubscribePostal(raw);
   loading.classList.add('hidden');
   results.classList.remove('hidden');
+  // Apply translations to newly rendered data-i18n elements in the header
+  applyLang(currentLang, false);
   results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Show SMS popup after 10 seconds (only once per session)
+  if (!_popupShown) {
+    clearTimeout(_popupTimer);
+    _popupTimer = setTimeout(showSmsPopup, 10000);
+  }
+}
+
+searchForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const raw = postalInput.value.trim().toUpperCase().replace(/\s/g, '');
+  await doSearch(raw);
 });
 
 function showError(msg) {
@@ -303,25 +349,60 @@ function clearError() {
 
 /* ── Render: district bar ───────────────────────────────────── */
 function renderDistrict(raw, councillor) {
-  const districtHtml = councillor
-    ? `<div>
-        <div class="district-label">${t('laval_district_label')}</div>
-        <div class="district-name">${esc(councillor.district || councillor.district_name)}</div>
-       </div>
-       <div class="district-divider" aria-hidden="true"></div>
-       <div>
-        <div class="district-label">${t('laval_councillor_label')}</div>
-        <div class="district-councillor">${esc(councillor.name)}</div>
-       </div>`
-    : `<div>
+  const bar = document.getElementById('laval-district-bar');
+
+  if (!councillor) {
+    bar.innerHTML = `
+      <div>
         <div class="district-label">${t('laval_district_label')}</div>
         <div class="district-name">${esc(raw.slice(0,3) + ' ' + raw.slice(3))}</div>
-       </div>
-       <div class="district-divider" aria-hidden="true"></div>
-       <div>
+      </div>
+      <div class="district-divider" aria-hidden="true"></div>
+      <div>
         <div class="district-councillor">District exact non disponible — <a href="https://www.laval.ca/vie-democratique/hotel-de-ville-personnes-elues/membres-conseil-municipal/" target="_blank" rel="noopener noreferrer" style="color:rgba(255,255,255,.85)">voir laval.ca</a></div>
-       </div>`;
-  document.getElementById('laval-district-bar').innerHTML = districtHtml;
+      </div>`;
+    return;
+  }
+
+  const party = councillor.party_name || councillor.party || '';
+  const phone = councillor.phone || '';
+  const email = councillor.email || '';
+
+  // Contact detail rows
+  const phoneRow = phone
+    ? `<div class="ccard-row"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><a href="tel:${esc(phone.replace(/\s/g,''))}" style="color:rgba(255,255,255,.9)">${esc(phone)}</a></div>`
+    : '';
+  const emailRow = email
+    ? `<div class="ccard-row"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><a href="mailto:${esc(email)}" style="color:rgba(255,255,255,.9)">${esc(email)}</a></div>`
+    : '';
+
+  bar.innerHTML = `
+    <div>
+      <div class="district-label">${t('laval_district_label')}</div>
+      <div class="district-name">${esc(councillor.district || councillor.district_name)}</div>
+    </div>
+    <div class="district-divider" aria-hidden="true"></div>
+    <div class="councillor-block">
+      <div class="district-label">${t('laval_councillor_label')}</div>
+      <div class="district-councillor">${esc(councillor.name)}</div>
+      ${party ? `<div class="councillor-party">${esc(party)}</div>` : ''}
+      <button type="button" class="ccard-toggle" id="ccard-toggle" aria-expanded="false">
+        ${t('laval_councillor_card_toggle')} <span class="ccard-chevron">▾</span>
+      </button>
+      <div class="ccard-details hidden" id="ccard-details">
+        ${phoneRow}${emailRow}
+      </div>
+    </div>`;
+
+  // Wire toggle
+  const toggle = bar.querySelector('#ccard-toggle');
+  const details = bar.querySelector('#ccard-details');
+  toggle?.addEventListener('click', () => {
+    const open = !details.classList.contains('hidden');
+    details.classList.toggle('hidden', open);
+    toggle.setAttribute('aria-expanded', String(!open));
+    toggle.querySelector('.ccard-chevron').textContent = open ? '▾' : '▴';
+  });
 }
 
 /* ── Render: next meeting ───────────────────────────────────── */
@@ -554,6 +635,94 @@ if (corrModal) {
   });
 }
 
+/* ── SMS popup (shown 10s after search results appear) ─────── */
+let _popupTimer = null;
+let _popupShown = false;
+
+function showSmsPopup() {
+  if (_popupShown) return;
+  _popupShown = true;
+  const popup   = document.getElementById('laval-sms-popup');
+  const backdrop = document.getElementById('laval-sms-popup-backdrop');
+  if (!popup) return;
+  // Pre-fill postal if known
+  const popPostal = document.getElementById('pop-postal');
+  if (popPostal && currentPostal) popPostal.value = currentPostal.slice(0,3) + ' ' + currentPostal.slice(3);
+  popup.classList.remove('hidden');
+  backdrop.classList.remove('hidden');
+}
+
+function closeSmsPopup() {
+  document.getElementById('laval-sms-popup')?.classList.add('hidden');
+  document.getElementById('laval-sms-popup-backdrop')?.classList.add('hidden');
+}
+
+document.getElementById('laval-sms-popup-close')?.addEventListener('click', closeSmsPopup);
+document.getElementById('laval-sms-popup-later')?.addEventListener('click', closeSmsPopup);
+document.getElementById('laval-sms-popup-backdrop')?.addEventListener('click', closeSmsPopup);
+
+document.getElementById('pop-postal')?.addEventListener('input', function () {
+  let v = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (v.length > 3) v = v.slice(0, 3) + ' ' + v.slice(3);
+  this.value = v.slice(0, 7);
+});
+
+document.getElementById('popup-subscribe-form')?.addEventListener('submit', async e => {
+  e.preventDefault();
+  const errEl  = document.getElementById('pop-error');
+  const okEl   = document.getElementById('pop-success');
+  const btn    = document.getElementById('pop-btn');
+  errEl.classList.add('hidden');
+  okEl.classList.add('hidden');
+
+  const name    = document.getElementById('pop-name').value.trim();
+  const postal  = document.getElementById('pop-postal').value.trim().toUpperCase().replace(/\s/g,'');
+  const phone   = document.getElementById('pop-phone').value.trim().replace(/[\s\-\(\)\.]/g,'');
+  const consent = document.getElementById('pop-consent').checked;
+
+  if (!name || name.length < 2) { errEl.textContent = t('laval_err_name'); errEl.classList.remove('hidden'); return; }
+  if (!/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(postal)) { errEl.textContent = t('laval_err_postal'); errEl.classList.remove('hidden'); return; }
+  if (!/^\+?1?\d{10,11}$/.test(phone)) { errEl.textContent = t('laval_err_phone'); errEl.classList.remove('hidden'); return; }
+  if (!consent) { errEl.textContent = t('laval_err_consent'); errEl.classList.remove('hidden'); return; }
+
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const res  = await fetch('/api/laval/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, postal_code: postal, phone }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      okEl.textContent = t('laval_success_subscribe');
+      okEl.classList.remove('hidden');
+      document.getElementById('popup-subscribe-form').reset();
+      setTimeout(closeSmsPopup, 3000);
+    } else {
+      const key = { rate_limit:'laval_err_ratelimit', already_subscribed:'laval_err_already', invalid_phone:'laval_err_phone', invalid_postal:'laval_err_postal', invalid_name:'laval_err_name' }[data.error] || 'laval_err_generic';
+      errEl.textContent = t(key); errEl.classList.remove('hidden');
+    }
+  } catch {
+    errEl.textContent = t('laval_err_generic'); errEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false; btn.textContent = t('laval_btn_subscribe');
+  }
+});
+
+/* ── Share button ───────────────────────────────────────────── */
+document.getElementById('laval-share-btn')?.addEventListener('click', () => {
+  const url = currentPostal
+    ? `${location.origin}/laval?postal=${currentPostal}`
+    : location.href;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('laval-share-btn');
+    const span = btn.querySelector('span');
+    const orig = span.textContent;
+    span.textContent = t('laval_link_copied');
+    setTimeout(() => { span.textContent = orig; }, 2000);
+  }).catch(() => {});
+});
+
 /* ── Boot ───────────────────────────────────────────────────── */
 (async () => {
   await loadTranslations();
@@ -566,4 +735,12 @@ if (corrModal) {
 
   applyLang(currentLang, false);
   buildLangSwitcher();
+
+  // Auto-search from URL param (e.g. /laval?postal=H7R4X5)
+  const urlPostal = new URLSearchParams(location.search).get('postal');
+  if (urlPostal) {
+    const raw = urlPostal.toUpperCase().replace(/\s/g, '');
+    postalInput.value = raw.slice(0,3) + ' ' + raw.slice(3);
+    await doSearch(raw);
+  }
 })();

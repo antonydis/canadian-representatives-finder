@@ -620,7 +620,7 @@ async function handleSearch(e, source) {
 
     // Laval banner: suggest /laval when postal code is in Laval
     if (source === 'main' && isLavalPostal(rawCode)) {
-      showLavalBanner(resultsId);
+      showLavalBanner(resultsId, rawCode);
     }
 
     // GA4: track postal code search
@@ -1130,19 +1130,20 @@ function isLavalPostal(raw) {
   return _LAVAL_FSA.has(raw.slice(0, 3));
 }
 
-function showLavalBanner(containerId) {
+function showLavalBanner(containerId, rawPostal) {
   // Remove any existing banner first
   document.getElementById('laval-promo-banner')?.remove();
 
   const section = document.getElementById(containerId);
   const banner  = el('div', 'laval-promo-banner');
   banner.id     = 'laval-promo-banner';
+  const lavalUrl = rawPostal ? `/laval?postal=${rawPostal}` : '/laval';
   banner.innerHTML = `
     <div class="laval-banner-body">
       <strong>Vous habitez Laval&nbsp;?</strong>
       <span>Consultez les dates du conseil municipal, les décisions récentes et les subventions disponibles dans votre district.</span>
     </div>
-    <a href="/laval" class="laval-banner-link">InfoCivic Laval</a>
+    <a href="${lavalUrl}" class="laval-banner-link">InfoCivic Laval</a>
     <button class="laval-banner-close" aria-label="Fermer">&times;</button>
   `;
   banner.querySelector('.laval-banner-close').addEventListener('click', () => banner.remove());

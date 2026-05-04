@@ -90,6 +90,15 @@
       <!-- Results -->
       <div id="laval-results" class="hidden" aria-live="polite">
 
+        <!-- Results header: postal label + share -->
+        <div class="results-header" id="laval-results-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+          <span id="laval-results-label" style="font-size:.95rem;color:var(--text-muted);"></span>
+          <button type="button" id="laval-share-btn" class="share-btn" aria-label="Share">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span data-i18n="laval_share">Partager</span>
+          </button>
+        </div>
+
         <!-- District + councillor -->
         <div class="laval-district-bar" id="laval-district-bar">
           <!-- Filled by JS -->
@@ -259,6 +268,40 @@
       </div>
     </div>
   </div>
+
+  <!-- SMS popup -->
+  <div id="laval-sms-popup" class="laval-sms-popup hidden" role="dialog" aria-modal="true" aria-labelledby="sms-popup-title">
+    <div class="laval-sms-popup-inner">
+      <button type="button" class="laval-sms-popup-close" id="laval-sms-popup-close" aria-label="Fermer">&times;</button>
+      <h3 id="sms-popup-title" data-i18n="laval_popup_title">Restez informé sur votre district</h3>
+      <p data-i18n="laval_popup_desc">Recevez un rappel avant chaque séance du conseil et des alertes sur les décisions importantes dans votre district.</p>
+
+      <form id="popup-subscribe-form" novalidate>
+        <div class="popup-fields">
+          <input type="text" id="pop-name" class="postal-input" maxlength="80" autocomplete="name"
+                 placeholder="Marie Tremblay" data-i18n-placeholder="laval_placeholder_name" aria-required="true" />
+          <input type="text" id="pop-postal" class="postal-input" maxlength="7" autocomplete="postal-code"
+                 placeholder="H7V 1B6" aria-required="true" />
+          <input type="tel" id="pop-phone" class="postal-input" maxlength="20" autocomplete="tel"
+                 placeholder="+1 (450) 555-1234" data-i18n-placeholder="laval_placeholder_phone" aria-required="true" />
+        </div>
+
+        <div class="subscribe-consent" style="margin-bottom:.75rem;">
+          <input type="checkbox" id="pop-consent" name="consent" />
+          <label for="pop-consent" data-i18n="laval_consent">J'accepte de recevoir des messages SMS d'InfoCivic au numéro fourni.</label>
+        </div>
+
+        <div id="pop-error" class="error-msg hidden" role="alert" aria-live="polite"></div>
+        <div id="pop-success" class="laval-success hidden" role="status" aria-live="polite"></div>
+
+        <div class="popup-actions">
+          <button type="submit" class="search-btn" id="pop-btn" data-i18n="laval_btn_subscribe">S'inscrire aux alertes</button>
+          <button type="button" class="laval-sms-popup-later" id="laval-sms-popup-later" data-i18n="laval_popup_close">Peut-être plus tard</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div id="laval-sms-popup-backdrop" class="laval-sms-popup-backdrop hidden"></div>
 
   <script src="/static/js/laval.js"></script>
 </body>

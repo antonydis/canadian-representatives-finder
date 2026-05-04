@@ -141,5 +141,13 @@
   "laval_correction_btn_send": "Ipadala",
   "laval_correction_success": "Salamat sa iyong pakikilahok! Susuriin namin ang iyong pagwawasto sa lalong madaling panahon.",
   "laval_footer_data": "Data",
-  "laval_loading": "Naghahanap…"
+  "laval_loading": "Naghahanap…",
+  "laval_share": "Ibahagi",
+  "laval_link_copied": "Nakopya ang link!",
+  "laval_councillor_card_toggle": "Impormasyon sa pakikipag-ugnayan",
+  "laval_ask_council": "Magtanong sa konseho →",
+  "laval_ask_deadline": "Tinatanggap ang mga tanong hanggang {date} ng tanghali",
+  "laval_popup_title": "Manatiling may kaalaman sa iyong distrito",
+  "laval_popup_desc": "Makatanggap ng paalala bago ang bawat sesyon ng konseho at mga alerto tungkol sa mahahalagang desisyon sa iyong distrito. Libre — sumagot ng STOP anumang oras upang mag-unsubscribe.",
+  "laval_popup_close": "Marahil mamaya"
 }

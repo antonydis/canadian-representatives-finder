@@ -141,5 +141,13 @@
   "laval_correction_btn_send": "Enviar",
   "laval_correction_success": "¡Gracias por tu compromiso! Revisaremos tu corrección a la brevedad posible.",
   "laval_footer_data": "Datos",
-  "laval_loading": "Buscando…"
+  "laval_loading": "Buscando…",
+  "laval_share": "Compartir",
+  "laval_link_copied": "¡Enlace copiado!",
+  "laval_councillor_card_toggle": "Información de contacto",
+  "laval_ask_council": "Hacer una pregunta al consejo →",
+  "laval_ask_deadline": "Preguntas aceptadas hasta el {date} al mediodía",
+  "laval_popup_title": "Mantente informado sobre tu distrito",
+  "laval_popup_desc": "Recibe un recordatorio antes de cada sesión del consejo y alertas sobre decisiones importantes en tu distrito. Gratis — responde STOP en cualquier momento para cancelar.",
+  "laval_popup_close": "Quizás más tarde"
 }

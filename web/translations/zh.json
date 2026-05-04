@@ -141,5 +141,13 @@
   "laval_correction_btn_send": "发送",
   "laval_correction_success": "感谢您的参与！我们将尽快审核您的更正。",
   "laval_footer_data": "数据",
-  "laval_loading": "搜索中…"
+  "laval_loading": "搜索中…",
+  "laval_share": "分享",
+  "laval_link_copied": "链接已复制！",
+  "laval_councillor_card_toggle": "联系方式",
+  "laval_ask_council": "向议会提问 →",
+  "laval_ask_deadline": "提问截止时间：{date} 中午",
+  "laval_popup_title": "了解您所在选区的最新动态",
+  "laval_popup_desc": "在每次议会会议前收到提醒，并获取有关您选区重要决策的通知。免费 — 随时回复 STOP 取消订阅。",
+  "laval_popup_close": "也许以后再说"
 }

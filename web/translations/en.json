@@ -141,5 +141,13 @@
   "laval_correction_btn_send": "Send",
   "laval_correction_success": "Thank you for your commitment! We will review your correction as soon as possible.",
   "laval_footer_data": "Data",
-  "laval_loading": "Searching…"
+  "laval_loading": "Searching…",
+  "laval_share": "Share",
+  "laval_link_copied": "Link copied!",
+  "laval_councillor_card_toggle": "Contact info",
+  "laval_ask_council": "Submit a question to council →",
+  "laval_ask_deadline": "Questions accepted until {date} at noon",
+  "laval_popup_title": "Stay informed about your district",
+  "laval_popup_desc": "Receive a reminder before each council session and alerts about important decisions in your district. Free — reply STOP anytime to unsubscribe.",
+  "laval_popup_close": "Maybe later"
 }
