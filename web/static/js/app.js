@@ -701,15 +701,6 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
     section.appendChild(levelSec);
   });
 
-  // Single "suggest a correction" line at the bottom of all results
-  const feedbackBar = el('div', 'results-feedback-bar');
-  const feedbackBtn = el('button', 'results-feedback-btn');
-  feedbackBtn.type = 'button';
-  feedbackBtn.innerHTML = `${ICONS.flag}<span data-i18n="feedback_results_cta">${t('feedback_results_cta')}</span>`;
-  feedbackBtn.addEventListener('click', () => openFeedbackModal(null, currentPostalCode));
-  feedbackBar.appendChild(feedbackBtn);
-  section.appendChild(feedbackBar);
-
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -868,7 +859,14 @@ function buildRepCard(rep, level, showEmailTemplate = false) {
   }
   if (rep.url) contact.appendChild(contactRow(ICONS.link, t('website'), rep.url, true));
 
-  card.append(main, contact);
+  const footer = el('div', 'rep-card-footer');
+  const flagBtn = el('button', 'rep-card-flag-btn');
+  flagBtn.type = 'button';
+  flagBtn.innerHTML = `${ICONS.flag}<span data-i18n="feedback_flag_btn">${t('feedback_flag_btn')}</span>`;
+  flagBtn.addEventListener('click', () => openFeedbackModal(rep, currentPostalCode));
+  footer.appendChild(flagBtn);
+
+  card.append(main, contact, footer);
   return card;
 }
 

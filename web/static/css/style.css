@@ -330,6 +330,23 @@ h1::after {
 .contact-icon { width: 16px; text-align: center; color: var(--text-muted); flex-shrink: 0; }
 .contact-icon svg { width: 14px; height: 14px; stroke: currentColor; fill: none; vertical-align: middle; }
 
+.rep-card-footer {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+}
+.rep-card-flag-btn {
+  background: none; border: none;
+  color: var(--text-muted); font-size: .78rem;
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+  padding: 0; font-family: inherit;
+}
+.rep-card-flag-btn:hover { color: var(--navy); }
+.rep-card-flag-btn svg { stroke: currentColor; fill: none; }
+
 /* ── TRIAGE PHASE 1 · Input + Chips ──────────────────────────── */
 .triage-input-wrapper {
   position: relative;
