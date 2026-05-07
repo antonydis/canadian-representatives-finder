@@ -8,6 +8,8 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
+import requests as _http
+
 from dotenv import load_dotenv
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(_ROOT, ".env"), override=True)
@@ -365,6 +367,102 @@ def laval_subscribe():
         "city": "laval",
     }})
     return jsonify({"success": True})
+
+
+_NOMINATIM_UA  = "infocivic/1.0 (infocivic.ca contact@infocivic.ca)"
+_NOMINATIM_URL = "https://nominatim.openstreetmap.org/reverse"
+_COUNCILLOR_OFFICES = {
+    "councillor", "councilor", "conseiller", "conseillère",
+    "alderman", "alderperson",
+}
+
+
+def _is_councillor(rep) -> bool:
+    office = (rep.elected_office or "").lower()
+    return rep.level == "municipal" and any(kw in office for kw in _COUNCILLOR_OFFICES)
+
+
+def _reverse_geocode(lat: float, lng: float) -> str | None:
+    """Return a normalized 6-char Canadian postal code for the given coords, or None."""
+    try:
+        resp = _http.get(
+            _NOMINATIM_URL,
+            params={"lat": lat, "lon": lng, "format": "json", "addressdetails": 1},
+            headers={"User-Agent": _NOMINATIM_UA},
+            timeout=8,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        raw = data.get("address", {}).get("postcode", "")
+        # Canadian postal codes: "A1A 1A1" or "A1A1A1"
+        cleaned = raw.upper().replace(" ", "")
+        if re.fullmatch(r"[A-Z]\d[A-Z]\d[A-Z]\d", cleaned):
+            return cleaned
+    except Exception:
+        pass
+    return None
+
+
+@app.route("/api/councillor", methods=["GET"])
+def councillor_by_coords():
+    if not _allow_request(_client_ip()):
+        return jsonify({"success": False, "error": "rate_limit"}), 429
+
+    # --- validate query params ---
+    try:
+        lat = float(request.args["lat"])
+        lng = float(request.args["lng"])
+    except (KeyError, ValueError):
+        return jsonify({"success": False, "error": "lat and lng query parameters are required and must be numbers"}), 400
+
+    # Rough bounding box for Canada
+    if not (41.0 <= lat <= 83.0 and -141.0 <= lng <= -52.0):
+        return jsonify({"success": False, "error": "coordinates outside Canada"}), 400
+
+    # --- reverse geocode ---
+    postal = _reverse_geocode(lat, lng)
+    if not postal:
+        return jsonify({"success": False, "error": "could not resolve coordinates to a Canadian postal code"}), 404
+
+    # --- look up representatives ---
+    try:
+        reps = client.get_representatives_by_postal_code(postal)
+    except RepresentRateLimitError:
+        return jsonify({"success": False, "error": "rate_limit"}), 429
+    except RepresentAPIError:
+        logger.exception("Represent API error in /api/councillor")
+        return jsonify({"success": False, "error": "api_error"}), 502
+    except ValueError:
+        return jsonify({"success": False, "error": "invalid postal code derived from coordinates"}), 400
+
+    # --- find municipal councillor ---
+    councillors = [r for r in reps if _is_councillor(r)]
+    if not councillors:
+        return jsonify({
+            "success": False,
+            "error": "no municipal councillor found for this location",
+            "postal_code": postal,
+        }), 404
+
+    # If multiple (e.g. borough + city), prefer the one with an email
+    councillors.sort(key=lambda r: (r.email is None, r.name))
+    rep = councillors[0]
+
+    # Derive city from district or representative_set_name
+    city = (rep.representative_set_name or rep.district_name or "").strip()
+
+    logger.info("councillor_lookup", extra={"custom_dimensions": {
+        "lat": lat, "lng": lng, "postal": postal, "councillor": rep.name,
+    }})
+    return jsonify({
+        "success":          True,
+        "postal_code":      postal,
+        "city":             city,
+        "district_name":    rep.district_name or None,
+        "councillor_name":  rep.name,
+        "councillor_email": rep.email or None,
+        "councillor_phone": rep.get_phone() or None,
+    })
 
 
 @app.route("/api/health")
