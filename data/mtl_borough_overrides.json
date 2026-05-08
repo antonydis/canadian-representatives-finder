@@ -24,8 +24,9 @@
           "party_name": "Ensemble Montréal",
           "district_name": "Ahuntsic-Cartierville",
           "email": "maude.theroux-seguin@montreal.ca",
-          "url": "https://montreal.ca/conseils-decisionnels/conseil-municipal",
-          "photo_url": ""
+          "url": "https://montreal.ca/en/elected-officials/maude-theroux-seguin-100441",
+          "photo_url": "",
+          "phone": "514-872-2246"
         },
         {
           "name": "Nathalie Goulet",
@@ -645,7 +646,8 @@
       "action": "enrich_by_district",
       "postal_prefixes": [
         "H1G",
-        "H1H"
+        "H1H",
+        "H1R"
       ],
       "representatives": [
         {
