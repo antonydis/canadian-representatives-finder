@@ -177,28 +177,35 @@ const MEETING_STREAM =
 
 /* ── Static civic data (updated manually each cycle) ────────── */
 const DECISIONS = [
+    // Ordre du jour
+    {
+        title: "Séance ordinaire du 2 juin 2026",
+        date: "2026-06-02",
+        status: "agenda",
+        url: "https://vdldocgreffecmspc01sa.blob.core.windows.net/cms/CM_ODJ_ORD_18h30_2026_06_02_2.0.pdf",
+    },
     // Juin 2026
     {
         title: "Subvention de 250 000 $ à Soccer Laval pour ses activités en 2026",
-        date: "2026-06-03",
+        date: "2026-06-02",
         status: "approved",
         url: "https://vdldocgreffecmspc01sa.blob.core.windows.net/cms/SD-2026-1250_1.0.pdf",
     },
     {
         title: "Emprunt de 18,3 M$ pour chalet et jeux d'eau au parc Capitaine-Molly-Kool",
-        date: "2026-06-03",
+        date: "2026-06-02",
         status: "approved",
         url: "https://vdldocgreffecmspc01sa.blob.core.windows.net/cms/SD-2026-2139_1.0.pdf",
     },
     {
         title: "Contrat de 5,1 M$ pour la décarbonation des garages municipaux",
-        date: "2026-06-03",
+        date: "2026-06-02",
         status: "approved",
         url: "https://vdldocgreffecmspc01sa.blob.core.windows.net/cms/SD-2026-2386_1.0.pdf",
     },
     {
         title: "Programme de revitalisation des bâtiments patrimoniaux de Laval",
-        date: "2026-06-03",
+        date: "2026-06-02",
         status: "pending",
         url: "https://vdldocgreffecmspc01sa.blob.core.windows.net/cms/SD-2026-2392_1.0.pdf",
     },
@@ -227,45 +234,45 @@ const DECISIONS = [
 const PARTICIPATION = [
     {
         tag: "consultation",
-        title: "Consultation publique — Révision du code d'urbanisme",
-        desc: "Le conseil a adopté un projet de code d'urbanisme le 22 avril 2026. Donnez votre avis avant son adoption finale.",
+        title: "Consultations publiques en cours",
+        desc: "6 consultations actives : Golf Ste-Rose, Carré Laval, corridor vert Chomedey, mobilité durable, Plan Climat 2035, berge du Commodore.",
         deadline: null,
-        url: "https://www.laval.ca/en/democratic-life/citizen-participation/public-consultations/",
+        url: "https://www.laval.ca/vie-democratique/participation-citoyenne/contribuer/consultations-publiques/",
     },
     {
         tag: "grant",
         title: "Programmes de subventions — Aides financières aux résidents",
         desc: "Subventions pour rénovations écoénergétiques, remplacement de foyer au bois, logement et plus encore.",
         deadline: null,
-        url: "https://www.laval.ca/en/support-funding/grant-programs/",
+        url: "https://www.laval.ca/aides-subventions/programmes-subventions/",
     },
     {
         tag: "grant",
         title: "Budget participatif de Laval — 2e édition",
-        desc: "3 M$ pour des projets conçus et votés par les citoyens. Au moins un projet réalisé par secteur.",
+        desc: "3 M$ pour des projets conçus et votés par les citoyens. La collecte d'idées est terminée — priorisation en cours.",
         deadline: null,
-        url: "https://www.laval.ca/en/democratic-life/citizen-participation/budget-participatif/",
+        url: "https://www.laval.ca/vie-democratique/participation-citoyenne/contribuer/budget-participatif/",
     },
     {
         tag: "consultation",
         title: "Comité consultatif d'urbanisme (CCU)",
         desc: "Siégez au CCU en tant que citoyen et participez aux décisions sur l'aménagement du territoire.",
         deadline: null,
-        url: "https://www.laval.ca/en/democratic-life/citizen-participation/advisory-committee/urban-advisory-committee/",
+        url: "https://www.laval.ca/vie-democratique/participation-citoyenne/contribuer/comites-consultatifs/urbanisme/",
     },
     {
         tag: "volunteer",
         title: "Poser une question lors d'une séance du conseil",
         desc: "Formulaire en ligne disponible de 9h la veille jusqu'à midi le jour de la séance.",
         deadline: null,
-        url: "https://www.laval.ca/en/democratic-life/town-hall-elected-officials/city-council/poser-question/",
+        url: "https://www.laval.ca/vie-democratique/hotel-de-ville-personnes-elues/conseil-municipal/poser-question/",
     },
     {
         tag: "consultation",
         title: "Assemblées de quartier — Projets pilotes",
         desc: "Laval lance des assemblées de quartier dans Duvernay et Auteuil. Participez aux décisions locales.",
         deadline: null,
-        url: "https://www.laval.ca/en/democratic-life/citizen-participation/",
+        url: "https://www.laval.ca/vie-democratique/participation-citoyenne/",
     },
 ];
 
@@ -335,6 +342,7 @@ function statusLabel(s) {
         approved: "Adopté",
         pending: "En examen",
         rejected: "Rejeté",
+        agenda: "Ordre du jour",
     };
     return labels[s] || s;
 }
