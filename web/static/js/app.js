@@ -104,6 +104,7 @@ async function init() {
   document.getElementById('triage-search-form').addEventListener('submit', e => handleSearch(e, 'triage'));
   document.getElementById('triage-open-form').addEventListener('submit', handleOpenFormSubmit);
   document.getElementById('triage-back-btn').addEventListener('click', resetTriageToPhase1);
+  document.getElementById('civic-edit-question').addEventListener('click', editCivicQuestion);
 
   document.getElementById('postal-input').addEventListener('input', () => clearError('main'));
   document.getElementById('triage-postal-input').addEventListener('input', () => clearError('triage'));
@@ -196,6 +197,7 @@ function applyLang(lang) {
     gtag('event', 'change_language', { language: lang });
   }
   document.documentElement.lang = lang;
+  refreshCivicLabels();
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.dataset.i18n);
@@ -494,6 +496,46 @@ async function handleOpenFormSubmit(e) {
   }
 }
 
+/* ── Civic journey: meaning first, then agency, representative, action ── */
+const CIVIC_COPY = {
+  en: ['Your situation','Responsible agency','Find representative','Prepare message','What we understood','See your original question','Edit','Who can help','Suggested organization','Visit official website','Find your representative','Enter your postal code to find elected representatives for your area.','Prepare your message','Choose a representative below to prepare a message you can review and send yourself.','Prepare a message','No specific organization identified yet. The government level below is a starting point.'],
+  fr: ['Votre situation','Service compétent','Trouver un élu','Préparer un message','Ce que nous avons compris','Voir votre question initiale','Modifier','Qui peut vous aider','Organisme conseillé','Visiter le site officiel','Trouver votre représentant','Entrez votre code postal pour trouver les élus de votre secteur.','Préparer votre message','Choisissez un élu pour préparer un message que vous pourrez vérifier et envoyer.','Préparer un message','Aucun organisme précis identifié. Le palier de gouvernement est un point de départ.'],
+  es: ['Tu situación','Organismo responsable','Encontrar representante','Preparar mensaje','Lo que entendimos','Ver tu pregunta original','Editar','Quién puede ayudarte','Organismo recomendado','Visitar sitio oficial','Encuentra tu representante','Introduce tu código postal para encontrar representantes de tu zona.','Prepara tu mensaje','Selecciona un representante para preparar un mensaje que podrás revisar y enviar.','Preparar mensaje','Todavía no identificamos un organismo específico. El nivel de gobierno es un punto de partida.'],
+  pt: ['Sua situação','Órgão responsável','Encontrar representante','Preparar mensagem','O que entendemos','Ver sua pergunta original','Editar','Quem pode ajudar','Órgão recomendado','Visitar site oficial','Encontre seu representante','Digite seu código postal para encontrar seus representantes.','Prepare sua mensagem','Escolha um representante para preparar uma mensagem que poderá revisar e enviar.','Preparar mensagem','Ainda não identificamos um órgão específico. O nível de governo é um ponto de partida.'],
+  zh: ['您的问题','负责机构','查找代表','准备邮件','我们的理解','查看原始问题','编辑','谁能帮助您','建议机构','访问官方网站','查找您的代表','输入邮政编码以查找本地区民选代表。','准备邮件','选择一位代表，准备可审阅后自行发送的邮件。','准备邮件','尚未确定具体机构。政府层级仅供参考。'],
+  tl: ['Iyong sitwasyon','Tamang tanggapan','Hanapin ang kinatawan','Ihanda ang mensahe','Ang aming pagkaunawa','Tingnan ang orihinal na tanong','Baguhin','Sino ang makakatulong','Iminungkahing ahensiya','Bisitahin ang opisyal na site','Hanapin ang kinatawan','Ilagay ang postal code upang makita ang iyong mga kinatawan.','Ihanda ang mensahe','Pumili ng kinatawan upang gumawa ng mensaheng maaari mong suriin at ipadala.','Maghanda ng mensahe','Wala pang natukoy na partikular na ahensiya. Panimulang gabay lamang ang antas ng pamahalaan.']
+};
+function civicCopy(index){return (CIVIC_COPY[currentLang]||CIVIC_COPY.en)[index];}
+function updateCivicProgress(step){
+  document.querySelectorAll('[data-progress-step]').forEach(item=>{
+    const n=Number(item.dataset.progressStep);
+    item.classList.toggle('completed',n<step);
+    item.classList.toggle('current',n===step);
+    if(n===step)item.setAttribute('aria-current','step');
+    else item.removeAttribute('aria-current');
+  });
+}
+function refreshCivicLabels(){
+  const map=[
+    ['progress-understand',0],['progress-agency',1],['progress-postal',2],['progress-contact',3],
+    ['civic-understanding-title',4],['civic-original-label',5],['civic-edit-question',6],
+    ['civic-agency-title',7],['triage-services-label',8],['civic-postal-title',10],
+    ['triage-next-step',11],['civic-contact-title',12],['civic-contact-help',13]
+  ];
+  for(const [id,i] of map){const target=document.getElementById(id);if(target)target.textContent=civicCopy(i);}
+  const edit=document.getElementById('civic-edit-question');
+  if(edit)edit.setAttribute('aria-label',civicCopy(6));
+}
+function editCivicQuestion(){
+  const input=document.getElementById('triage-open-input');
+  const original=activeCaseId ? t('case_'+activeCaseId+'_title') : activeTriageSituation||'';
+  document.getElementById('triage-phase-2').hidden=true;
+  document.getElementById('triage-phase-1').hidden=false;
+  input.value=original;
+  input.dispatchEvent(new Event('input',{bubbles:true}));
+  input.focus();
+}
+
 /* ── Phase 1 → Phase 2 transition ───────────────────────────── */
 function activateTriage(caseId, freeText = null, aiData = null) {
   const caseData = caseId ? TRIAGE_CASES.find(c => c.id === caseId) : null;
@@ -505,6 +547,17 @@ function activateTriage(caseId, freeText = null, aiData = null) {
   activeCaseId          = caseId || null;
   activeTriageSituation = freeText || (caseId ? t(`case_${caseId}_title`) : null);
 
+  refreshCivicLabels();
+  document.getElementById('civic-understanding-summary').textContent =
+    caseData ? t('case_'+caseId+'_title')
+    : (currentLang === 'fr' ? activeSituationFr : currentLang === 'en' ? activeSituationEn : null)
+      || (freeText.length > 115 ? freeText.slice(0,115)+'…' : freeText);
+  document.getElementById('civic-original-question').textContent =
+    freeText || (caseData ? t('case_'+caseId+'_title') : '');
+  document.getElementById('civic-original-details').open=false;
+  document.getElementById('civic-contact-stage').classList.add('hidden');
+  updateCivicProgress(2);
+
   // Switch phases
   document.getElementById('triage-phase-1').hidden = true;
   document.getElementById('triage-phase-2').hidden = false;
@@ -515,55 +568,46 @@ function activateTriage(caseId, freeText = null, aiData = null) {
   const explanation = document.getElementById('triage-explanation');
   const services    = document.getElementById('triage-services-value');
 
-  if (caseData) {
-    // Chip-selected path
-    const levelClass = LEVEL_CLASS[caseData.level];
-    header.className  = `triage-result-header ${levelClass}`;
-    badge.className   = `triage-level-badge ${levelClass}`;
-    badge.textContent = t(LEVEL_KEY[caseData.level]);
-    explanation.textContent = t(`case_${caseId}_explanation`);
-    services.textContent    = t(`case_${caseId}_services`);
-    document.querySelector('.triage-services').hidden = false;
-  } else if (aiData) {
-    // AI classification path — map jurisdiction to level and apply same styling as chip path
-    // Ensure aiData.level is valid (federal, provincial, municipal)
-    const validLevel = ['federal', 'provincial', 'municipal'].includes(aiData.level)
-      ? aiData.level
-      : 'mixed';
-    
-    const levelClass = LEVEL_CLASS[validLevel];
-    const levelKey = LEVEL_KEY[validLevel];
-    
-    // Apply the exact same styling as the chip-selected path
-    header.className  = `triage-result-header ${levelClass}`;
-    badge.className   = `triage-level-badge ${levelClass}`;
-    badge.textContent = t(levelKey);
-    explanation.textContent = aiData.explanation || '';
-    
-    // Handle services: show only if a valid service is provided
-    const hasService = aiData.service && aiData.service !== 'null' && aiData.service.trim();
-    services.textContent = hasService ? aiData.service : '';
-    document.querySelector('.triage-services').hidden = !hasService;
-    // Only trusted, server-curated agency links are rendered; no model URLs.
-    const oldLink = document.querySelector('.triage-official-link');
-    if (oldLink) oldLink.remove();
-    if (aiData.agency?.url && /^https:\/\//.test(aiData.agency.url)) {
-      const link = el('a', 'triage-official-link');
-      link.href = aiData.agency.url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.textContent = currentLang === 'fr' ? 'Site officiel du service'
-        : currentLang === 'es' ? 'Sitio oficial del organismo'
-        : 'Official agency website';
-      document.querySelector('.triage-result-header')?.after(link);
-    }
-  } else {
-    // Bare fallback (chip path without a match — should not normally occur)
-    header.className  = 'triage-result-header mixed';
-    badge.className   = 'triage-level-badge mixed';
-    badge.textContent = t('level_mixed');
-    explanation.textContent = freeText ? `"${freeText}"` : '';
-    document.querySelector('.triage-services').hidden = true;
+  const officialContainer=document.getElementById('triage-agency-link-container');
+  officialContainer.replaceChildren();
+  let agency=null, description='';
+  if(caseData){
+    const levelClass=LEVEL_CLASS[caseData.level];
+    header.className='triage-result-header '+levelClass;
+    badge.className='triage-level-badge '+levelClass;
+    badge.textContent=t(LEVEL_KEY[caseData.level]);
+    description=t('case_'+caseId+'_explanation');
+    services.textContent=t('case_'+caseId+'_services');
+    document.getElementById('triage-services').hidden=false;
+  }else if(aiData){
+    const level=['federal','provincial','municipal'].includes(aiData.level)?aiData.level:'mixed';
+    header.className='triage-result-header '+LEVEL_CLASS[level];
+    badge.className='triage-level-badge '+LEVEL_CLASS[level];
+    badge.textContent=t(LEVEL_KEY[level]);
+    description=aiData.explanation||'';
+    agency=aiData.agency||null;
+    const service=agency?.name||aiData.service||'';
+    services.textContent=service;
+    document.getElementById('triage-services').hidden=!service;
+  }else{
+    header.className='triage-result-header mixed';
+    badge.className='triage-level-badge mixed';
+    badge.textContent=t('level_mixed');
+    document.getElementById('triage-services').hidden=true;
+  }
+  explanation.textContent=description;
+  if(agency?.url && /^https:\/\//.test(agency.url)){
+    const link=el('a','civic-official-action');
+    link.href=agency.url;
+    link.target='_blank';
+    link.rel='noopener noreferrer';
+    link.textContent=civicCopy(9)+' ↗';
+    officialContainer.append(link);
+  }
+  // Do not repeat generic contact labels where no approved agency is known.
+  if(!agency && !services.textContent.trim() && aiData){
+    services.textContent=civicCopy(15);
+    document.getElementById('triage-services').hidden=false;
   }
 
   // Reset postal search
@@ -583,6 +627,7 @@ function resetTriageToPhase1() {
   activeCaseId          = null;
   activeSituationEn     = null;
   activeSituationFr     = null;
+  document.getElementById('civic-contact-stage').classList.add('hidden');
   document.getElementById('triage-phase-1').hidden = false;
   document.getElementById('triage-phase-2').hidden = true;
   document.getElementById('triage-open-input').value = '';
@@ -733,7 +778,13 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
     section.appendChild(levelSec);
   });
 
-  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if(containerId==='triage-results'){
+    document.getElementById('civic-contact-stage').classList.remove('hidden');
+    updateCivicProgress(4);
+    document.getElementById('civic-contact-stage').scrollIntoView({behavior:'smooth',block:'start'});
+  }else{
+    section.scrollIntoView({behavior:'smooth',block:'start'});
+  }
 }
 
 function levelSvg(level) {
@@ -898,18 +949,17 @@ function buildRepCard(rep, level, showEmailTemplate = false) {
     // Plain email link — no pre-fill
     contact.appendChild(contactRow(ICONS.mail, rep.email, `mailto:${rep.email}`));
   }
-  if (showEmailTemplate) {
-    const copyRow = el('div', 'draft-email-row');
-    const copyBtn = el('button', 'draft-email-btn');
-    copyBtn.type = 'button';
-    copyBtn.innerHTML = `${ICONS.compose}<span data-i18n="copy_template">${t('copy_template')}</span>`;
-    copyBtn.addEventListener('click', () => openEmailModal(rep));
-    copyRow.appendChild(copyBtn);
-    contact.appendChild(copyRow);
-  }
   if (rep.url) contact.appendChild(contactRow(ICONS.link, t('website'), rep.url, true));
 
   const footer = el('div', 'rep-card-footer');
+  if(showEmailTemplate && rep.email){
+    const messageButton=el('button','civic-compose-btn');
+    messageButton.type='button';
+    messageButton.innerHTML=ICONS.compose+'<span></span>';
+    messageButton.querySelector('span').textContent=civicCopy(14);
+    messageButton.addEventListener('click',()=>openEmailModal(rep));
+    footer.appendChild(messageButton);
+  }
   const flagBtn = el('button', 'rep-card-flag-btn');
   flagBtn.type = 'button';
   flagBtn.innerHTML = `${ICONS.flag}<span data-i18n="feedback_flag_btn">${t('feedback_flag_btn')}</span>`;
