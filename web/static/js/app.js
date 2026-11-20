@@ -118,6 +118,77 @@ function closeInlineComposer(context) {
  else if(context==='triage')updateCivicProgress(3);
  currentComposition=null;
 }
+const CONTACT_CHECK_COPY={
+en:['Before you write','Do you know why you want to contact this representative?','Yes, I know why','Not sure this is the right person','What do you need help with?','Check who can help','Back','Checking…','Government level','This representative belongs to the suggested level.','This looks like a different government level. Consider choosing someone else.','The issue may involve several government levels.','Continue with this representative','Choose another representative','Could not check the issue. Try again or continue.','Describe the issue in more detail.','We need more details to identify the correct office.','This question is outside InfoCivic’s civic guidance scope.'],
+fr:['Avant de rédiger','Savez-vous pourquoi vous voulez contacter cet élu ?','Oui, je sais pourquoi','Je ne suis pas sûr que ce soit le bon élu','Quel est votre problème ?','Trouver le bon interlocuteur','Retour','Vérification…','Palier de gouvernement','Cet élu appartient au palier suggéré.','Le problème semble relever d’un autre palier. Pensez à choisir un autre élu.','Plusieurs paliers peuvent être concernés.','Poursuivre avec cet élu','Choisir un autre élu','Impossible de vérifier. Réessayez ou poursuivez.','Décrivez davantage votre problème.','Plus de détails sont nécessaires pour trouver le bon service.','Cette demande est en dehors du champ d’InfoCivic.'],
+es:['Antes de redactar','¿Sabes por qué quieres contactar a este representante?','Sí, sé por qué','No sé si es la persona adecuada','¿Cuál es el problema?','Comprobar quién puede ayudar','Volver','Consultando…','Nivel de gobierno','Este representante pertenece al nivel sugerido.','Este asunto parece corresponder a otro nivel de gobierno. Considera elegir otro representante.','El asunto puede involucrar varios niveles de gobierno.','Continuar con este representante','Elegir otro representante','No pudimos comprobarlo. Intenta nuevamente o continúa.','Describe el problema con más detalle.','Necesitamos más detalles para identificar el organismo correcto.','Esta consulta está fuera del alcance de InfoCivic.'],
+pt:['Antes de escrever','Você sabe por que deseja contatar este representante?','Sim, sei por quê','Não sei se é a pessoa certa','Qual é o problema?','Verificar quem pode ajudar','Voltar','Verificando…','Nível de governo','Este representante pertence ao nível sugerido.','O problema parece ser de outro nível. Considere outro representante.','O assunto pode envolver vários níveis.','Continuar com este representante','Escolher outro representante','Não foi possível verificar. Tente novamente.','Descreva o problema com mais detalhes.','Precisamos de mais detalhes para identificar o serviço.','Esta pergunta está fora do escopo do InfoCivic.'],
+zh:['写信之前','您知道为什么要联系这位代表吗？','是的，我知道','不确定是否找对人','您需要什么帮助？','查询负责部门','返回','正在查询…','政府层级','该代表属于建议的政府层级。','此问题似乎属于另一政府层级，请考虑其他代表。','问题可能涉及多个政府层级。','继续联系这位代表','选择其他代表','暂时无法查询，可重试或继续。','请更详细地描述问题。','需要更多信息才能确定负责部门。','此问题超出 InfoCivic 的服务范围。'],
+tl:['Bago sumulat','Alam mo ba kung bakit mo gustong kontakin ang kinatawang ito?','Oo, alam ko','Hindi sigurado kung tamang tao','Ano ang kailangan mong tulong?','Alamin kung sino ang makakatulong','Bumalik','Sinusuri…','Antas ng pamahalaan','Nasa iminungkahing antas ang kinatawang ito.','Mukhang ibang antas ito. Isaalang-alang ang ibang kinatawan.','Maaaring maraming antas ang may saklaw.','Magpatuloy sa kinatawang ito','Pumili ng ibang kinatawan','Hindi masuri. Subukan muli o magpatuloy.','Ilarawan pa ang problema.','Kailangan ng dagdag na detalye upang mahanap ang opisina.','Hindi saklaw ng InfoCivic ang tanong na ito.']
+};
+const checkText=i=>(CONTACT_CHECK_COPY[currentLang]||CONTACT_CHECK_COPY.en)[i];
+function buildContactDecisionGate({rep,context,box,form,template,subjectInput,messageInput,updateLink}){
+ const section=el('section','contact-decision-gate');
+ const title=el('h3');title.tabIndex=-1;title.textContent=checkText(0);
+ const intro=el('p');intro.textContent=checkText(1);
+ const choices=el('div','contact-decision-options');
+ const yes=el('button','civic-compose-btn');yes.type='button';yes.textContent=checkText(2);
+ const unsure=el('button','civic-secondary-action');unsure.type='button';unsure.textContent=checkText(3);
+ const detail=el('div','contact-decision-detail hidden');
+ const label=el('label');label.textContent=checkText(4);
+ const input=el('textarea');input.id=context+'-civic-check';input.rows=3;input.maxLength=200;label.htmlFor=input.id;
+ const check=el('button','civic-compose-btn');check.type='button';check.textContent=checkText(5);
+ const back=el('button','civic-secondary-action');back.type='button';back.textContent=checkText(6);
+ const actions=el('div','civic-compose-actions');actions.append(back,check);
+ const result=el('div','contact-check-result');result.setAttribute('role','status');result.setAttribute('aria-live','polite');
+ detail.append(label,input,actions,result);
+ const continueToDraft=()=>{
+   section.classList.add('hidden');
+   form.classList.remove('hidden');
+   window.InfoCivicScar?.mount({box,editor:form,rep,context,template,
+     subjectInput,messageInput,updateLink,postal:currentPostalCode,uiLanguage:currentLang,
+     priorIssue:input.value.trim()||(context==='triage'?activeTriageSituation:null)});
+ };
+ yes.addEventListener('click',continueToDraft);
+ unsure.addEventListener('click',()=>{choices.classList.add('hidden');detail.classList.remove('hidden');input.focus();});
+ back.addEventListener('click',()=>{detail.classList.add('hidden');choices.classList.remove('hidden');result.replaceChildren();yes.focus();});
+ function option(text,fn,secondary=false){const b=el('button',secondary?'civic-secondary-action':'civic-compose-btn');b.type='button';b.textContent=text;b.addEventListener('click',fn);return b;}
+ check.addEventListener('click',async()=>{
+  const issue=input.value.trim();result.replaceChildren();
+  if(issue.length<10){result.textContent=checkText(15);return;}
+  check.disabled=true;result.textContent=checkText(7);
+  try{
+   const response=await fetch('/api/classify-situation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:issue,lang:currentLang})});
+   const data=await response.json();result.replaceChildren();
+   if(!response.ok||!data.success)throw Error('unavailable');
+   if(data.requires_clarification||!data.jurisdiction){result.textContent=data.out_of_scope?checkText(17):checkText(16);return;}
+   const levels=['federal','provincial','municipal','mixed'];
+   const level=levels.includes(data.jurisdiction)?data.jurisdiction:'mixed';
+   const labelNames={en:['Federal','Provincial','Municipal','Multiple levels'],fr:['Fédéral','Provincial','Municipal','Plusieurs paliers'],
+     es:['Federal','Provincial','Municipal','Varios niveles'],pt:['Federal','Provincial','Municipal','Vários níveis'],
+     zh:['联邦','省级','市级','多个层级'],tl:['Pederal','Panlalawigan','Munisipal','Maraming antas']};
+   const title=el('strong');title.textContent=checkText(8)+': '+(labelNames[currentLang]||labelNames.en)[levels.indexOf(level)];
+   const explanation=el('p');explanation.textContent=data.explanation||'';
+   result.append(title,explanation);
+   if(data.agency?.url&&/^https:\/\//.test(data.agency.url)){const a=el('a','civic-agency-name-link');
+     a.href=data.agency.url;a.textContent=data.agency.name;a.target='_blank';a.rel='noopener noreferrer';result.append(a);}
+   const guidance=el('p');const same=level===rep.level;
+   guidance.textContent=level==='mixed'?checkText(11):same?checkText(9):checkText(10);result.append(guidance);
+   const controls=el('div','civic-compose-actions');
+   if(!same&&level!=='mixed')controls.append(option(checkText(13),()=>{
+      const container=document.getElementById(context==='main'?'results':'triage-results');
+      const match=[...container.querySelectorAll('.rep-card')].find(x=>x.dataset.level===level);
+      closeInlineComposer(context);
+      (match||container).scrollIntoView({behavior:'smooth',block:'center'});
+      match?.querySelector('.civic-compose-btn')?.focus({preventScroll:true});
+    },true));
+   controls.append(option(checkText(12),continueToDraft));result.append(controls);
+  }catch{result.textContent=checkText(14);}
+  finally{check.disabled=false;}
+ });
+ choices.append(yes,unsure);section.append(title,intro,choices,detail);return section;
+}
+
 function openInlineComposer(rep,context){
  if(!rep.email)return;
  const box=document.getElementById(context==='main'?'find-composer':'triage-composer');
@@ -201,17 +272,14 @@ function openInlineComposer(rep,context){
  form.addEventListener('submit',e=>e.preventDefault());
  form.append(recipient,subject.wrap,message.wrap,actions,note);
  box.append(heading,form);
- // Optional guided SCAR answers; keep the existing editable draft for visitors who skip.
- window.InfoCivicScar?.mount({
-   box,editor:form,rep,context,template,
-   subjectInput:subject.input,messageInput:message.input,updateLink,
-   postal:currentPostalCode,uiLanguage:currentLang,
-   priorIssue:context==='triage'?activeTriageSituation:null
- });
+ const gate=buildContactDecisionGate({rep,context,box,form,template,
+    subjectInput:subject.input,messageInput:message.input,updateLink});
+ box.insertBefore(gate,form);
+ form.classList.add('hidden');
  if(context==='main')updateFindJourney(3,currentPostalCode);
  else updateCivicProgress(4);
  box.scrollIntoView({behavior:'smooth',block:'start'});
- title.focus({preventScroll:true});
+ gate.querySelector('h3')?.focus({preventScroll:true});
 }
 
 /* ================================================================
@@ -1122,6 +1190,7 @@ function buildRepCard(rep, level, showEmailTemplate = false, activeCardContext =
   flagBtn.addEventListener('click', () => openFeedbackModal(rep, currentPostalCode));
   footer.appendChild(flagBtn);
 
+  card.dataset.level=level;
   card.append(main, contact, footer);
   return card;
 }
