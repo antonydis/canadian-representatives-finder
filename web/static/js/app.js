@@ -457,7 +457,7 @@ async function handleOpenFormSubmit(e) {
     });
     const data = await resp.json();
 
-    const validLevels = ['federal', 'provincial', 'municipal'];
+    const validLevels = ['federal', 'provincial', 'municipal', 'mixed'];
     if (resp.ok && data.success && validLevels.includes(data.jurisdiction)) {
       activeSituationEn = data.situation_en || null;
       activeSituationFr = data.situation_fr || null;
@@ -465,6 +465,7 @@ async function handleOpenFormSubmit(e) {
         level:       data.jurisdiction,
         explanation: data.explanation,
         service:     data.service,
+        agency:      data.agency || null,
       });
       // GA4: track AI situation classification
       gtag('event', 'classify_situation', {
@@ -475,7 +476,11 @@ async function handleOpenFormSubmit(e) {
     } else if (resp.status === 429) {
       showErr(t('error_rate_limit'));
     } else {
-      showErr(data.requires_clarification
+      showErr(data.out_of_scope
+        ? (currentLang === 'fr' ? 'InfoCivic répond uniquement aux questions sur les services publics et la vie civique au Canada.'
+          : currentLang === 'es' ? 'InfoCivic solo responde preguntas sobre servicios públicos y asuntos cívicos de Canadá.'
+          : 'InfoCivic only helps with Canadian civic and government-service questions.')
+        : data.requires_clarification
         ? (currentLang === 'fr' ? 'Précisez la situation ou choisissez un des exemples ci-dessous.'
           : currentLang === 'es' ? 'Describe el problema con más detalle o elige uno de los ejemplos.'
           : 'Please describe the issue more precisely or choose an example below.')
@@ -539,6 +544,19 @@ function activateTriage(caseId, freeText = null, aiData = null) {
     const hasService = aiData.service && aiData.service !== 'null' && aiData.service.trim();
     services.textContent = hasService ? aiData.service : '';
     document.querySelector('.triage-services').hidden = !hasService;
+    // Only trusted, server-curated agency links are rendered; no model URLs.
+    const oldLink = document.querySelector('.triage-official-link');
+    if (oldLink) oldLink.remove();
+    if (aiData.agency?.url && /^https:\/\//.test(aiData.agency.url)) {
+      const link = el('a', 'triage-official-link');
+      link.href = aiData.agency.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = currentLang === 'fr' ? 'Site officiel du service'
+        : currentLang === 'es' ? 'Sitio oficial del organismo'
+        : 'Official agency website';
+      document.querySelector('.triage-result-header')?.after(link);
+    }
   } else {
     // Bare fallback (chip path without a match — should not normally occur)
     header.className  = 'triage-result-header mixed';
