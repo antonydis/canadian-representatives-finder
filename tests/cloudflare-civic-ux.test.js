@@ -80,3 +80,14 @@ test('Mobile composer header has two-column layout and accessible action below',
  assert.match(css,/overflow-wrap:anywhere/);
  assert.match(html,/viewport-fit=cover/);
 });
+
+test('Small-screen layout protects titles and contact details',()=>{
+ const css=readFileSync('web/static/css/style.css','utf8');
+ assert.match(css,/@media\(max-width:640px\)/);
+ assert.match(css,/@media\(max-width:360px\)/);
+ assert.match(css,/\.civic-compose-heading>\.civic-edit-btn\s*\{\s*grid-column:1\/-1/);
+ assert.match(css,/\.contact-item a\{overflow-wrap:anywhere/);
+ assert.match(css,/\.tab-btn\{min-width:0;margin:0/);
+ assert.match(css,/min-height:44px/);
+ assert.match(css,/prefers-reduced-motion:reduce/);
+});
