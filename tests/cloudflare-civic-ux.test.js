@@ -91,3 +91,19 @@ test('Small-screen layout protects titles and contact details',()=>{
  assert.match(css,/min-height:44px/);
  assert.match(css,/prefers-reduced-motion:reduce/);
 });
+
+test('Direct service recommendation is embedded in both orientation flows',()=>{
+ assert.match(js,/function buildDirectServiceCard\(contact,agency\)/);
+ assert.match(js,/result\.append\(buildDirectServiceCard\(data\.contact,data\.agency\)\)/);
+ assert.match(js,/officialContainer\.append\(direct\)/);
+ assert.match(js,/aiData\?\.contact/);
+ assert.match(js,/directServiceText\(5\)/);
+ assert.match(js,/phone\.href='tel:'/);
+ assert.match(js,/site\.target='_blank'/);
+ assert.match(js,/section\.append\(title,intro,choices,detail\)/);
+});
+test('Direct contact rendering never executes user supplied HTML',()=>{
+ const block=js.slice(js.indexOf('function buildDirectServiceCard'),js.indexOf('function buildContactDecisionGate'));
+ assert.doesNotMatch(block,/innerHTML/);
+ assert.match(block,/textContent=contact\.phone/);
+});
