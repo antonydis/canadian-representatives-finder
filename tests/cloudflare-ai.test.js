@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {policyInput,sanitizeClassification,officialContactFor} from "../src-worker/civic-ai.js";
+import {policyInput,sanitizeClassification,officialContactFor,resolveAgencyContact,verifiedMunicipality,AGENCIES,MUNICIPAL_CONTACTS} from "../src-worker/civic-ai.js";
 
 test("AI input accepts a Canadian civic issue and rejects explicitly unrelated prompts",()=>{
  assert.equal(policyInput("My garbage collection was skipped again").ok,true);
@@ -39,7 +39,8 @@ test("Official phone numbers are selected by verified service and jurisdiction, 
  assert.equal(c.contact.phone,"1-888-242-2100");
  assert.equal(officialContactFor("federal",null,"H7R4X5").phone,"1-800-622-6232");
  assert.equal(officialContactFor("provincial",null,"H7R4X5").phone,"1-877-644-4545");
- assert.equal(officialContactFor("municipal",null,"H7R4X5").phone,"311");
+ assert.equal(officialContactFor("municipal",null,"H7R4X5"),null);
+ assert.equal(officialContactFor("municipal",null,"H7R4X5","Laval").phone,"311");
  assert.equal(officialContactFor("municipal",null,"M5V1A1"),null);
  assert.equal(officialContactFor("provincial",null,"M5V1A1"),null);
 });
@@ -47,7 +48,41 @@ test("Official phone numbers are selected by verified service and jurisdiction, 
 test("Mismatched jurisdiction never attaches an unrelated official agency",()=>{
  const x=sanitizeClassification({scope:"civic",jurisdiction:"municipal",agency_id:"ircc",
    explanation:"Municipal issue",situation_user:"Garbage collection issue",
-   situation_en:"Garbage issue",situation_fr:"Collecte des déchets"},"en","H7R4X5");
+   situation_en:"Garbage issue",situation_fr:"Collecte des déchets"},"en","H7R4X5","Laval");
  assert.equal(x.agency,null);
- assert.equal(x.contact.name,"Ville de Laval · municipal services");
+ assert.equal(x.contact.name,"Ville de Laval — municipal services");
+});
+
+test("Directory covers 19 sourced federal and Québec-specific services",()=>{
+ assert.ok(Object.keys(AGENCIES).length>=19);
+ for(const [id,agency] of Object.entries(AGENCIES)){
+  assert.match(agency.url,/^https:\/\//,id);
+  assert.equal(agency.verified_at,"2026-11-20");
+  assert.ok(["federal","provincial"].includes(agency.level));
+  assert.ok(agency.topics.length>12,id);
+ }
+ assert.equal(Object.keys(MUNICIPAL_CONTACTS).length,4);
+});
+test("Municipality must match BOTH the supplied city and postal region",()=>{
+ assert.equal(verifiedMunicipality("Laval","H7R 4X5"),"laval");
+ assert.equal(verifiedMunicipality("Montréal","H3A 1A1"),"montreal");
+ assert.equal(verifiedMunicipality("Ville de Québec","G1R 2L2"),"quebec");
+ assert.equal(verifiedMunicipality("Longueuil","J4K 1A1"),"longueuil");
+ assert.equal(verifiedMunicipality("Montreal","H7R4X5"),null);
+ assert.equal(verifiedMunicipality("Laval","H3A1A1"),null);
+ assert.equal(verifiedMunicipality("Montreal",""),null);
+ assert.equal(verifiedMunicipality("Dorval","H4A1A1"),null);
+});
+test("Postal-aware resolution never shares a Quebec agency outside Quebec",()=>{
+ const bc=resolveAgencyContact("provincial","qc_saaq","V6B 1A1","Vancouver");
+ assert.equal(bc.agency,null);
+ assert.equal(bc.contact,null);
+ const qc=resolveAgencyContact("provincial","qc_saaq","H7R 4X5","Laval");
+ assert.ok(qc.agency.name.includes("SAAQ"));
+ assert.equal(qc.contact.phone,"1-800-361-7620");
+ assert.equal(resolveAgencyContact("municipal",null,"H7R 4X5","Montreal").contact,null);
+ const m=resolveAgencyContact("municipal",null,"H7R 4X5","Laval");
+ assert.equal(m.contact.phone,"311");
+ const e=resolveAgencyContact("federal","passport","V6B 1A1","Vancouver");
+ assert.equal(e.contact.phone,"1-800-567-6868");
 });
