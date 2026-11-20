@@ -14,7 +14,7 @@ export function validateDraftRequest(data){
  const lang=OUTPUT_LANGS.includes(data.language)?data.language:null;
  if(!senderName||!reason)return {ok:false,code:'missing_details'};
  const fields=[[senderName,110],[address,180],[reason,800],[context,550],[name,110],[office,110]];
- if(!lang||!name||!office||fields.some(([s,max])=>s.length>max||/[\\u0000-\\u001f]/.test(s)))
+ if(!lang||!name||!office||fields.some(([s,max])=>s.length>max||/[\u0000-\u001f]/.test(s)))
    return {ok:false,code:'invalid_request'};
  return {ok:true,language:lang,name,office,details:{sender_name:senderName,sender_address:address,reason,context}};
 }
