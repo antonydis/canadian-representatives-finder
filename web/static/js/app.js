@@ -1024,7 +1024,7 @@ function initFeedbackModal() {
 
   overlay.addEventListener('click', e => { if (e.target === overlay) closeFeedbackModal(); });
   closeBtn.addEventListener('click', closeFeedbackModal);
-  textarea.addEventListener('input', () => { counter.textContent = \`\${textarea.value.length} / 500\`; });
+  textarea.addEventListener('input', () => { counter.textContent = `${textarea.value.length} / 500`; });
   nextBack.addEventListener('click', () => {
     nextStep.classList.add('hidden');
     form.classList.remove('hidden');
@@ -1106,7 +1106,7 @@ function openFeedbackModal(rep, postalCode) {
   document.getElementById('feedback-char-count').textContent = '0 / 500';
   document.getElementById('feedback-error').classList.add('hidden');
   document.getElementById('feedback-message').required = false;
-  document.getElementById('feedback-rep-label').textContent = rep?.name ? \`\${rep.elected_office} · \${rep.name}\` : '';
+  document.getElementById('feedback-rep-label').textContent = rep?.name ? `${rep.elected_office} · ${rep.name}` : '';
   document.querySelectorAll('#feedback-modal [data-i18n]').forEach(node => {
     node.textContent = t(node.dataset.i18n);
   });
