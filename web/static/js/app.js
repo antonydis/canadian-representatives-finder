@@ -82,6 +82,9 @@ let activeSituationFr = null;
 
 /* last postal code searched — used by feedback modal */
 let currentPostalCode = null;
+// Municipality is only trusted if returned with a postal-code search, never guessed from an FSA.
+let currentMunicipality = '';
+let activeTriageRouting = null;
 
 /* Shared guided experience on both search pages. */
 const FIND_TEXT = {
@@ -207,7 +210,7 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
   if(issue.length<10){result.textContent=checkText(15);return;}
   check.disabled=true;result.textContent=checkText(7);
   try{
-   const response=await fetch('/api/classify-situation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:issue,lang:currentLang,postal_code:currentPostalCode||''})});
+   const response=await fetch('/api/classify-situation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:issue,lang:currentLang,postal_code:currentPostalCode||'',municipality:currentMunicipality})});
    const data=await response.json();result.replaceChildren();
    if(!response.ok||!data.success)throw Error('unavailable');
    if(data.requires_clarification||!data.jurisdiction){result.textContent=data.out_of_scope?checkText(17):checkText(16);return;}
@@ -742,6 +745,7 @@ async function handleOpenFormSubmit(e) {
         service:     data.service,
         agency:      data.agency || null,
         contact:     data.contact || null,
+        agency_id:   data.agency_id || null,
         summary:     data.situation_user || null,
       });
       // GA4: track AI situation classification
@@ -812,6 +816,29 @@ function editCivicQuestion(){
 }
 
 /* ── Phase 1 → Phase 2 transition ───────────────────────────── */
+async function updateTriageLocalContact(postal,municipality,routing){
+ const box=document.getElementById('triage-agency-link-container');
+ if(!box||!routing)return;
+ const searchPostal=postal;
+ try{
+   const response=await fetch('/api/resolve-civic-contact',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({postal_code:searchPostal,municipality,jurisdiction:routing.level,agency_id:routing.agency_id||null})});
+   const data=await response.json();
+   // Ignore stale responses if a different postal code or case has been selected.
+   if(!response.ok||!data.success||currentPostalCode!==searchPostal||activeTriageRouting!==routing)return;
+   box.replaceChildren();
+   if(data.contact||data.agency){
+     box.append(buildDirectServiceCard(data.contact,data.agency));
+     document.getElementById('triage-services').hidden=true;
+   }else{
+     const notice=el('p','direct-service-qualifier');notice.textContent=directServiceText(6);
+     box.append(notice);
+   }
+ }catch{
+   // Keep the previously displayed verified contact instead of inventing a fallback.
+ }
+}
+
 function activateTriage(caseId, freeText = null, aiData = null) {
   const caseData = caseId ? TRIAGE_CASES.find(c => c.id === caseId) : null;
 
@@ -821,6 +848,9 @@ function activateTriage(caseId, freeText = null, aiData = null) {
   // Store case id + situation text for language-aware email templates
   activeCaseId          = caseId || null;
   activeTriageSituation = freeText || (caseId ? t(`case_${caseId}_title`) : null);
+  // The routing ID is a server allowlist key; the selected issue is never persisted.
+  const issueAgencies={doctor:'qc_health',immigration:'ircc',taxes:'cra',ei:'service_canada'};
+  activeTriageRouting={level:activeTriageLevel,agency_id:caseId?(issueAgencies[caseId]||null):(aiData?.agency_id||null)};
 
   refreshCivicLabels();
   document.getElementById('civic-understanding-summary').textContent =
@@ -913,6 +943,7 @@ function activateTriage(caseId, freeText = null, aiData = null) {
 function resetTriageToPhase1() {
   activeTriageLevel     = null;
   activeTriageSituation = null;
+  activeTriageRouting = null;
   activeCaseId          = null;
   activeSituationEn     = null;
   activeSituationFr     = null;
@@ -948,7 +979,7 @@ async function handleSearch(e, source) {
   const displayCode = `${rawCode.slice(0, 3)} ${rawCode.slice(3)}`;
   if(source==='main'){
     // The direct postal search should not inherit a previous triage issue.
-    activeTriageLevel=null;activeCaseId=null;activeTriageSituation=null;
+    activeTriageLevel=null;activeCaseId=null;activeTriageSituation=null;activeTriageRouting=null;
     activeSituationEn=null;activeSituationFr=null;
   }
   showLoading(source);
@@ -967,10 +998,16 @@ async function handleSearch(e, source) {
       return;
     }
 
+    currentMunicipality=typeof data.municipality==='string'?data.municipality:'';
     // A new search invalidates any previously selected representative.
     closeInlineComposer(source);
     renderResults(data.representatives, displayCode, resultsId, levelFilter, true, data);
     if(source==='main')updateFindJourney(2,displayCode);
+    if(source==='triage'&&activeTriageRouting?.level){
+      // Resolve the current agency against the newly known province and municipality.
+      // This is a lightweight allowlist lookup, not a second AI classification.
+      updateTriageLocalContact(displayCode,currentMunicipality,activeTriageRouting);
+    }
 
     // GA4: track postal code search
     gtag('event', 'search_representatives', {
