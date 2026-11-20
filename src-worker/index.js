@@ -1,12 +1,13 @@
 import translations from "./translations.generated.json";
 import overridesA from "../data/overrides.json";
 import overridesB from "../data/mtl_borough_overrides.json";
+import {normalizePostal, isPostalCode, boundaryAmbiguity} from "./quality.js";
 
 const headers={"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff"};
 const respond=(payload,status=200)=>new Response(JSON.stringify(payload),{status,headers});
 const fail=(error,status=400)=>respond({success:false,error},status);
-const normalize=s=>String(s||"").toUpperCase().replace(/\s/g,"");
-const valid=s=>/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(s);
+const normalize=normalizePostal;
+const valid=isPostalCode;
 const body=async request=>{try{if(Number(request.headers.get("content-length")||0)>12000)return {};return await request.json();}catch{return {};}};
 function level(raw) {
  const office=String(raw.elected_office||"").toLowerCase(),set=String(raw.representative_set_name||"").toLowerCase();
@@ -53,11 +54,7 @@ async function search(request){
   const reps=[...new Map(all.map(x=>[String(x.name)+"|"+String(x.elected_office),mapRep(x)])).values()];
   // A postal code may cover several electoral boundaries. Never silently
   // represent a geographic match as an officially verified identity.
-  const disagreement=["federal","provincial","municipal"].filter(lvl=>{
-    const from=(items)=>new Set(items.map(mapRep).filter(r=>r.level===lvl).map(r=>r.district.toLowerCase().trim()).filter(Boolean));
-    const a=from(centroid),z=from(concordance);
-    return a.size>0&&z.size>0&&([...a].some(x=>!z.has(x))||[...z].some(x=>!a.has(x)));
-  });
+  const disagreement=boundaryAmbiguity(raw,mapRep);
   const candidateReps=applyOverrides(reps,postal);
   const issues=[];
   if(disagreement.length)issues.push("postal_boundary_ambiguity");
