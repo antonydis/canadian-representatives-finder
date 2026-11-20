@@ -892,33 +892,11 @@ function buildRepCard(rep, level, showEmailTemplate = false) {
   if (rep.url) contact.appendChild(contactRow(ICONS.link, t('website'), rep.url, true));
 
   const footer = el('div', 'rep-card-footer');
-  const officialLink = officialDirectoryFor(rep, level);
-  if (officialLink) {
-    const verifyLink = el('a', 'rep-card-flag-btn');
-    verifyLink.href = officialLink;
-    verifyLink.target = '_blank';
-    verifyLink.rel = 'noopener noreferrer';
-    verifyLink.textContent = currentLang === 'fr'
-      ? 'Ce n’est pas mon représentant ? Vérifier la source officielle'
-      : currentLang === 'es'
-        ? '¿No es mi representante? Consultar la fuente oficial'
-        : currentLang === 'pt'
-          ? 'Não é meu representante? Verificar na fonte oficial'
-          : 'Not my representative? Check official source';
-    footer.appendChild(verifyLink);
-  }
-  // The correction form requires D1 and is not accepting submissions yet.
-  // Show a working official verification path instead of a broken form.
-  if (!officialLink && rep.url && /^https:\/\//.test(rep.url)) {
-    const sourceLink = el('a', 'rep-card-flag-btn');
-    sourceLink.href = rep.url;
-    sourceLink.target = '_blank';
-    sourceLink.rel = 'noopener noreferrer';
-    sourceLink.textContent = currentLang === 'fr' ? 'Vérifier les coordonnées'
-      : currentLang === 'es' ? 'Comprobar los datos de contacto'
-      : 'Check contact details';
-    footer.appendChild(sourceLink);
-  }
+  const flagBtn = el('button', 'rep-card-flag-btn');
+  flagBtn.type = 'button';
+  flagBtn.innerHTML = `${ICONS.flag}<span data-i18n="feedback_flag_btn">${t('feedback_flag_btn')}</span>`;
+  flagBtn.addEventListener('click', () => openFeedbackModal(rep, currentPostalCode));
+  footer.appendChild(flagBtn);
 
   card.append(main, contact, footer);
   return card;
@@ -1022,115 +1000,127 @@ function closeEmailModal() {
 let _feedbackRep    = null;
 let _feedbackPostal = null;
 
+const correctionCopy = {
+  en: { verifyTitle:"Check the official source",verifyText:"We haven't submitted a correction. Please confirm the current representative and contact information in the official directory.",verifyButton:"Open official directory",fallback:"No official directory is configured for this area. Check the representative's official website.",back:"Back to form",emailHelp:"Your email app will open with a prepared message. Review it and press Send there.",emailError:"Unable to open your email application. You can write to contact@infocivic.ca.",missingDetails:"Please describe your suggestion (at least 5 characters).",emailSubject:"InfoCivic suggestion" },
+  fr: { verifyTitle:"Vérifier à la source officielle",verifyText:"Aucune correction n'a été envoyée. Confirmez les coordonnées dans le répertoire officiel.",verifyButton:"Ouvrir le répertoire officiel",fallback:"Aucun répertoire officiel n'est configuré pour cette région. Consultez le site officiel de l'élu.",back:"Retour au formulaire",emailHelp:"Votre messagerie s'ouvrira avec un message préparé. Vérifiez-le et envoyez-le.",emailError:"Impossible d'ouvrir votre messagerie. Écrivez à contact@infocivic.ca.",missingDetails:"Décrivez votre suggestion (au moins 5 caractères).",emailSubject:"Suggestion pour InfoCivic" },
+  es: { verifyTitle:"Comprobar la fuente oficial",verifyText:"No se ha enviado ninguna corrección. Confirma el representante y sus datos en el directorio oficial.",verifyButton:"Abrir directorio oficial",fallback:"No tenemos configurado un directorio oficial para esta zona. Consulta el sitio oficial del representante.",back:"Volver al formulario",emailHelp:"Se abrirá tu aplicación de correo con un mensaje preparado. Revísalo y pulsa Enviar.",emailError:"No se pudo abrir el correo. Puedes escribir a contact@infocivic.ca.",missingDetails:"Describe tu sugerencia (al menos 5 caracteres).",emailSubject:"Sugerencia para InfoCivic" },
+  pt: { verifyTitle:"Verificar na fonte oficial",verifyText:"Nenhuma correção foi enviada. Confirme os dados no diretório oficial.",verifyButton:"Abrir diretório oficial",fallback:"Não há diretório oficial configurado para essa região. Consulte o site oficial do representante.",back:"Voltar ao formulário",emailHelp:"Seu aplicativo de e-mail abrirá com uma mensagem preparada. Revise e envie.",emailError:"Não foi possível abrir seu e-mail. Escreva para contact@infocivic.ca.",missingDetails:"Descreva sua sugestão (ao menos 5 caracteres).",emailSubject:"Sugestão para InfoCivic" },
+  zh: { verifyTitle:"查询官方信息",verifyText:"尚未提交更正。请在官方名录中确认代表及联系方式。",verifyButton:"打开官方名录",fallback:"此地区暂未配置官方名录。请查看代表官方网站。",back:"返回表单",emailHelp:"将打开邮件应用并填入内容。请检查后自行发送。",emailError:"无法打开邮件应用。请发送至 contact@infocivic.ca。",missingDetails:"请描述建议（至少5个字符）。",emailSubject:"InfoCivic 建议" },
+  tl: { verifyTitle:"Tingnan ang opisyal na sanggunian",verifyText:"Wala pang naipadalang pagwawasto. Kumpirmahin ang kinatawan at mga detalye sa opisyal na direktoryo.",verifyButton:"Buksan ang opisyal na direktoryo",fallback:"Walang nakatalagang opisyal na direktoryo para rito. Tingnan ang opisyal na website ng kinatawan.",back:"Bumalik sa form",emailHelp:"Bubuksan ang iyong email app na may nakahandang mensahe. Suriin at ipadala.",emailError:"Hindi mabuksan ang email app. Sumulat sa contact@infocivic.ca.",missingDetails:"Ilarawan ang mungkahi (hindi bababa sa 5 karakter).",emailSubject:"Mungkahi para sa InfoCivic" }
+};
+let _feedbackOrigin = null;
+function feedbackMessage(key) {
+  return (correctionCopy[currentLang] || correctionCopy.en)[key];
+}
 function initFeedbackModal() {
-  const overlay  = document.getElementById('feedback-modal');
+  const overlay = document.getElementById('feedback-modal');
   const closeBtn = document.getElementById('feedback-modal-close');
-  const form     = document.getElementById('feedback-form');
+  const form = document.getElementById('feedback-form');
   const textarea = document.getElementById('feedback-message');
-  const counter  = document.getElementById('feedback-char-count');
+  const counter = document.getElementById('feedback-char-count');
+  const typeInput = document.getElementById('feedback-type');
+  const nextStep = document.getElementById('feedback-next-step');
+  const nextBack = document.getElementById('feedback-next-back');
 
   overlay.addEventListener('click', e => { if (e.target === overlay) closeFeedbackModal(); });
   closeBtn.addEventListener('click', closeFeedbackModal);
-
-  textarea.addEventListener('input', () => {
-    counter.textContent = `${textarea.value.length} / 500`;
+  textarea.addEventListener('input', () => { counter.textContent = \`\${textarea.value.length} / 500\`; });
+  nextBack.addEventListener('click', () => {
+    nextStep.classList.add('hidden');
+    form.classList.remove('hidden');
+    typeInput.focus();
   });
 
-  form.addEventListener('submit', async e => {
+  // Details are optional for official verification, required for other suggestions.
+  const syncForm = () => {
+    textarea.required = typeInput.value === 'suggestion';
+    textarea.setAttribute('aria-required', String(textarea.required));
+  };
+  typeInput.addEventListener('change', syncForm);
+  syncForm();
+
+  form.addEventListener('submit', e => {
     e.preventDefault();
-    const type    = document.getElementById('feedback-type').value;
+    const type = typeInput.value;
     const message = textarea.value.trim();
-    const email   = document.getElementById('feedback-email').value.trim();
-    const errEl   = document.getElementById('feedback-error');
-    const succEl  = document.getElementById('feedback-success');
+    const email = document.getElementById('feedback-email').value.trim();
+    const err = document.getElementById('feedback-error');
+    err.classList.add('hidden');
 
-    errEl.classList.add('hidden');
-    succEl.classList.add('hidden');
-
-    if (!message || message.length < 5) {
-      errEl.textContent = t('feedback_error_short');
-      errEl.classList.remove('hidden');
+    if (type === 'wrong_rep' || type === 'outdated_info') {
+      const official = officialDirectoryFor(_feedbackRep, _feedbackRep?.level);
+      const fallback = _feedbackRep?.url && /^https:\/\//.test(_feedbackRep.url) ? _feedbackRep.url : '';
+      const link = document.getElementById('feedback-official-link');
+      const explanation = document.getElementById('feedback-next-explanation');
+      document.getElementById('feedback-next-title').textContent = feedbackMessage('verifyTitle');
+      explanation.textContent = official ? feedbackMessage('verifyText') : feedbackMessage('fallback');
+      link.textContent = feedbackMessage('verifyButton');
+      link.href = official || fallback || '#';
+      link.classList.toggle('hidden', !official && !fallback);
+      document.getElementById('feedback-next-back').textContent = feedbackMessage('back');
+      form.classList.add('hidden');
+      nextStep.classList.remove('hidden');
+      document.getElementById('feedback-next-title').focus();
+      return;
+    }
+    if (message.length < 5) {
+      err.textContent = feedbackMessage('missingDetails');
+      err.classList.remove('hidden');
       textarea.focus();
       return;
     }
-
-    const submitBtn = form.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-
-    try {
-      const resp = await fetch('/api/feedback', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type,
-          message,
-          email,
-          rep_name:    _feedbackRep?.name || '',
-          postal_code: _feedbackPostal || '',
-        }),
-      });
-      const data = await resp.json();
-      if (resp.ok && data.success) {
-        succEl.classList.remove('hidden');
-        document.getElementById('feedback-actions').classList.add('hidden');
-        form.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
-        setTimeout(closeFeedbackModal, 2800);
-      } else if (resp.status === 429) {
-        errEl.textContent = t('error_rate_limit');
-        errEl.classList.remove('hidden');
-        submitBtn.disabled = false;
-      } else {
-        errEl.textContent = t('feedback_error_generic');
-        errEl.classList.remove('hidden');
-        submitBtn.disabled = false;
-      }
-    } catch {
-      errEl.textContent = t('feedback_error_generic');
-      errEl.classList.remove('hidden');
-      submitBtn.disabled = false;
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      err.textContent = t('feedback_error_generic');
+      err.classList.remove('hidden');
+      return;
     }
+    const subject = feedbackMessage('emailSubject');
+    const text = [
+      'Representative: ' + (_feedbackRep?.name || ''),
+      'Office: ' + (_feedbackRep?.elected_office || ''),
+      'Postal code: ' + (_feedbackPostal || ''),
+      'Suggestion: ' + message,
+      email ? 'Reply to: ' + email : ''
+    ].filter(Boolean).join('\n');
+    const mailto = 'mailto:contact@infocivic.ca?subject=' + encodeURIComponent(subject) +
+      '&body=' + encodeURIComponent(text);
+    // Opens the visitor's mail app; it does NOT claim that feedback was sent.
+    window.location.href = mailto;
+    document.getElementById('feedback-email-note').textContent = feedbackMessage('emailHelp');
+    document.getElementById('feedback-email-note').classList.remove('hidden');
   });
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !overlay.classList.contains('hidden')) closeFeedbackModal();
   });
 }
-
 function openFeedbackModal(rep, postalCode) {
-  _feedbackRep    = rep;
+  _feedbackRep = rep;
   _feedbackPostal = postalCode;
-
-  // Reset form state
-  document.getElementById('feedback-form').reset();
+  _feedbackOrigin = document.activeElement;
+  const form = document.getElementById('feedback-form');
+  form.reset();
+  form.classList.remove('hidden');
+  document.getElementById('feedback-next-step').classList.add('hidden');
+  document.getElementById('feedback-email-note').classList.add('hidden');
   document.getElementById('feedback-char-count').textContent = '0 / 500';
   document.getElementById('feedback-error').classList.add('hidden');
-  document.getElementById('feedback-success').classList.add('hidden');
-  document.getElementById('feedback-actions').classList.remove('hidden');
-  document.getElementById('feedback-form').querySelectorAll('input, select, textarea')
-    .forEach(el => { el.disabled = false; });
-  document.querySelector('#feedback-form button[type="submit"]').disabled = false;
-
-  // Show rep name as subtitle (optional — null when called from results footer)
-  const label = document.getElementById('feedback-rep-label');
-  label.textContent = rep?.name ? `${rep.elected_office} · ${rep.name}` : '';
-
-  // Re-translate select options and labels
+  document.getElementById('feedback-message').required = false;
+  document.getElementById('feedback-rep-label').textContent = rep?.name ? \`\${rep.elected_office} · \${rep.name}\` : '';
   document.querySelectorAll('#feedback-modal [data-i18n]').forEach(node => {
     node.textContent = t(node.dataset.i18n);
   });
   document.querySelectorAll('#feedback-modal [data-i18n-placeholder]').forEach(node => {
     node.placeholder = t(node.dataset.i18nPlaceholder);
   });
-
-  const overlay = document.getElementById('feedback-modal');
-  overlay.classList.remove('hidden');
+  document.getElementById('feedback-modal').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
   document.getElementById('feedback-modal-close').focus();
 }
-
 function closeFeedbackModal() {
   document.getElementById('feedback-modal').classList.add('hidden');
   document.body.style.overflow = '';
+  if (_feedbackOrigin && typeof _feedbackOrigin.focus === 'function') _feedbackOrigin.focus();
 }
 
 /* ================================================================
