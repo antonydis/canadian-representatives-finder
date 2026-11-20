@@ -1,7 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "infocivic",
-  "main": "worker.py",
+  "main": "src-worker/index.js",
   "compatibility_date": "2026-11-20",
-  "compatibility_flags": ["python_workers"]
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/reps", "/triage", "/laval"]
+  },
+  "observability": { "enabled": true }
 }
