@@ -1096,55 +1096,30 @@ function buildContextualGuide(useFr) {
 }
 
 function buildEmailTemplate(rep) {
-  const useFr     = isQuebecRep(rep);
-  const emailLang = useFr ? 'fr' : 'en';
-
-  // Resolve situation in the EMAIL language
-  let situation;
-  if (activeCaseId) {
-    situation = translations[emailLang]?.[`case_${activeCaseId}_title`] || activeTriageSituation || '';
-  } else if (useFr && activeSituationFr) {
-    situation = activeSituationFr;
-  } else if (!useFr && activeSituationEn) {
-    situation = activeSituationEn;
-  } else {
-    situation = activeTriageSituation || '';
-  }
-
-  const title   = resolveTitle(rep, useFr);
-  const snippet = situation.length > 60 ? situation.substring(0, 60) + '…' : situation;
-  const guide   = buildContextualGuide(useFr);
-
-  let subject, body;
-  if (useFr) {
-    subject = `Demande citoyenne${snippet ? ' — ' + snippet : ''}`;
-    body =
-      `${title},\n\n` +
-      (situation
-        ? `Je me permets de vous contacter au sujet de la situation suivante dans votre circonscription :\n\n` +
-          `${situation}\n\n`
-        : `Je me permets de vous contacter en tant que citoyen(ne) de votre circonscription.\n\n`) +
-      `Afin de vous permettre de traiter cette demande efficacement, voici les informations pertinentes :\n\n` +
-      `${guide}\n\n` +
-      `Je vous serais très reconnaissant(e) de bien vouloir examiner cette situation et m'informer des démarches possibles.\n\n` +
-      `Dans l'attente de votre réponse, je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.\n\n` +
-      `[Votre prénom et nom]\n[Votre adresse]\n[Votre courriel / téléphone]`;
-  } else {
-    subject = `Constituent Inquiry${snippet ? ' — ' + snippet : ''}`;
-    body =
-      `Dear ${title},\n\n` +
-      `I am writing to bring to your attention the following matter in your constituency:\n\n` +
-      (situation ? `${situation}\n\n` : '') +
-      `To help you address this efficiently, here are the relevant details:\n\n` +
-      `${guide}\n\n` +
-      `I would greatly appreciate your attention to this matter and any guidance on next steps or available resources.\n\n` +
-      `Thank you for your service to our community.\n\n` +
-      `Sincerely,\n[Your Full Name]\n[Your Address]\n[Your Email / Phone]`;
-  }
-
-  return { subject, body, to: rep.email };
+  // Plain English default. Personalized AI drafts may be converted to French.
+  // This ready-made option stays usable without any paid API call.
+  let situation=activeTriageSituation||activeSituationEn||'';
+  if(activeCaseId)situation=translations.en?.['case_'+activeCaseId+'_title']||situation;
+  const clipped=situation.slice(0,85);
+  const postal=String(currentPostalCode||'').trim();
+  const subject=clipped?'Request for assistance: '+clipped:'Request for assistance from a constituent';
+  const title=resolveTitle(rep,false);
+  const body=[
+    'Dear '+title+',',
+    '',
+    'I am reaching out to request your guidance about the following matter'+(postal?' in my area ('+postal+')':'')+'.',
+    '',
+    situation||'I would like to discuss a concern affecting me and learn what assistance your office may be able to provide.',
+    '',
+    'Could your office please advise me on the appropriate next step or direct me to the responsible service?',
+    '',
+    'Thank you for your time and consideration.',
+    '',
+    'Sincerely,',
+    '[Your name]'
+  ].join('\n');
+  return {subject,body,to:rep.email};
 }
-
 
 function fallbackCopy(text, onSuccess) {
   const ta = document.createElement('textarea');
