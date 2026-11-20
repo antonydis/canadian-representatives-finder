@@ -80,3 +80,14 @@ test('Generated draft uses concise subject, greeting and citizen signature',()=>
 test('Six language strings omit the provider name from visible intake',()=>{
  assert.doesNotMatch(browser,/OpenAI/);
 });
+
+test('All six website languages explicitly request a full name',()=>{
+ const sandbox={window:{}};
+ runInNewContext(browser,sandbox);
+ const expected={en:'full name',fr:'nom complet',es:'nombre completo',pt:'nome completo',zh:'全名',tl:'Buong pangalan'};
+ for(const [language,label] of Object.entries(expected)){
+   assert.match(sandbox.window.InfoCivicScar.labels[language][4],new RegExp(label,'i'),language);
+ }
+ assert.match(browser,/autocomplete='name'/);
+ assert.match(browser,/lastData=\{sender_name:name\.input\.value\.trim\(\)/);
+});
