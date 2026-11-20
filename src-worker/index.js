@@ -150,7 +150,7 @@ async function subscribe(request,env){
 }
 export default {async fetch(request,env){
  const url=new URL(request.url),path=url.pathname;
- if(path==="/api/health")return respond({status:"ok",platform:"cloudflare",ai_configured:!!(env.OPENAI_API_KEY&&env.AI_USER_LIMIT&&env.AI_GLOBAL_LIMIT),storage_configured:!!env.DB});
+ if(path==="/api/health")return respond({status:"ok",platform:"cloudflare",ai_configured:!!(env.OPENAI_API_KEY&&env.AI_USER_LIMIT&&env.AI_GLOBAL_LIMIT),email_configured:!!(env.OPENAI_API_KEY&&env.EMAIL_USER_LIMIT&&env.EMAIL_GLOBAL_LIMIT),storage_configured:!!env.DB});
  if(path==="/api/translations"&&request.method==="GET")return respond(translations);
  if(path==="/api/councillor")return fail("not_implemented",501);
  if(path.startsWith("/api/")){
