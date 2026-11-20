@@ -1065,3 +1065,23 @@ footer a:hover { text-decoration: underline; }
 .scar-simple>.civic-secondary-action{margin:10px 0}
 .civic-compose-form.hidden{display:none}
 @media(max-width:560px){.scar-simple .scar-step>.civic-compose-btn{width:100%}.scar-simple .scar-step .civic-compose-actions>*{flex:1 1 100%}}
+
+
+/* Contact checkpoint: reduce friction, do not redirect away from the representative. */
+.contact-decision-gate{padding:18px 4px 10px;max-width:710px;margin-inline:auto}
+.contact-decision-gate h3{font-size:1.16rem;color:var(--navy);margin:0 0 9px;line-height:1.4}
+.contact-decision-gate .contact-decision-options{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:18px}
+.contact-decision-gate .contact-decision-options .civic-compose-btn,
+.contact-decision-gate .contact-decision-options .civic-secondary-action{min-height:46px}
+.contact-decision-detail{margin-top:18px;padding:16px;border:1px solid #d0ddeb;border-radius:14px;background:#f6f9fd}
+.contact-decision-detail label{font-weight:700;display:block;color:var(--navy);margin-bottom:8px}
+.contact-decision-detail textarea{width:100%;box-sizing:border-box;border-radius:12px;border:1.5px solid #b9c8da;padding:12px;font:inherit;line-height:1.5;resize:vertical;min-height:92px}
+.contact-decision-detail textarea:focus-visible,.contact-decision-options button:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+.contact-decision-detail .civic-compose-actions{margin-top:12px}
+.contact-check-result{margin-top:14px;line-height:1.55}
+.contact-check-result:empty{display:none}
+.contact-check-result>p{margin:8px 0}
+.contact-check-result>.civic-compose-actions{margin-top:16px}
+.contact-check-result .civic-agency-name-link{display:inline-block;margin:4px 0}
+.scar-postal-info{padding:10px 12px;margin:2px 0;background:#edf4fa;border-radius:10px;font-size:.89rem;font-weight:650;color:var(--navy)}
+@media(max-width:560px){.contact-decision-gate{padding:12px 0}.contact-decision-options>*{flex:1 1 100%}.contact-check-result .civic-compose-actions>*{flex:1 1 100%}}
