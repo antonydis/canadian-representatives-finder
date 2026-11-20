@@ -1,0 +1,23 @@
+name: Validate InfoCivic Cloudflare build
+on:
+  push:
+    branches: [cloudflare-migration]
+  pull_request:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
+      - run: |
+          test -s dist/index.html
+          test -s dist/laval.html
+          test -s dist/static/js/app.js
+          test -s src-worker/translations.generated.json

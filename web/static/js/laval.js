@@ -688,7 +688,7 @@ subForm.addEventListener("submit", async (e) => {
         const res = await fetch("/api/laval/subscribe", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, postal_code: postal, phone }),
+            body: JSON.stringify({ name, postal_code: postal, phone, consent: true }),
         });
         const data = await res.json();
 
@@ -805,6 +805,8 @@ let _popupTimer = null;
 let _popupShown = false;
 
 function showSmsPopup() {
+    // SMS delivery is not configured. Do not promote a non-operational service.
+    return;
     if (_popupShown) return;
     _popupShown = true;
     const popup = document.getElementById("laval-sms-popup");
@@ -891,7 +893,7 @@ document
             const res = await fetch("/api/laval/subscribe", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, postal_code: postal, phone }),
+                body: JSON.stringify({ name, postal_code: postal, phone, consent: true }),
             });
             const data = await res.json();
             if (data.success) {
@@ -953,6 +955,22 @@ document.getElementById("laval-share-btn")?.addEventListener("click", () => {
 
     applyLang(currentLang, false);
     buildLangSwitcher();
+
+    // Do not collect phone numbers before an actual SMS delivery,
+    // consent and opt-out workflow has been implemented.
+    const smsCard = document.querySelector(".laval-subscribe-card");
+    if (smsCard) {
+        smsCard.style.display = "none";
+        const notice = document.createElement("p");
+        notice.className = "data-quality-notice";
+        notice.setAttribute("role", "note");
+        notice.textContent = currentLang === "fr"
+            ? "Les alertes SMS ne sont pas encore disponibles. Aucun numéro n'est recueilli."
+            : currentLang === "es"
+                ? "Las alertas SMS aún no están disponibles. No recopilamos números de teléfono."
+                : "SMS alerts are not available yet. We are not collecting phone numbers.";
+        smsCard.after(notice);
+    }
 
     // Auto-search from URL param (e.g. /laval?postal=H7R4X5)
     const urlPostal = new URLSearchParams(location.search).get("postal");

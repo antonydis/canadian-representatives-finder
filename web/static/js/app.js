@@ -82,6 +82,369 @@ let activeSituationFr = null;
 
 /* last postal code searched — used by feedback modal */
 let currentPostalCode = null;
+// Municipality is only trusted if returned with a postal-code search, never guessed from an FSA.
+let currentMunicipality = '';
+let latestRepresentatives=[];
+let activeTriageRouting = null;
+
+/* Shared guided experience on both search pages. */
+const FIND_TEXT = {
+ en:["Your location","Your representatives","Contact a representative","Change","Choose a representative below to prepare a message.","Prepare your message","Selected representative","To","Subject","Message","Copy message","Open email app","Choose another representative","Message copied","The email will not be sent automatically. Please review and send it yourself.","Contact this representative"],
+ fr:["Votre emplacement","Vos représentants","Contacter un élu","Modifier","Choisissez un élu pour préparer votre message.","Préparer votre message","Élu sélectionné","Destinataire","Objet","Message","Copier le message","Ouvrir le courriel","Choisir un autre élu","Message copié","Le message n'est pas envoyé automatiquement. Vérifiez-le et envoyez-le vous-même.","Contacter cet élu"],
+ es:["Tu ubicación","Tus representantes","Contactar un representante","Cambiar","Selecciona un representante para preparar tu mensaje.","Prepara tu mensaje","Representante seleccionado","Destinatario","Asunto","Mensaje","Copiar mensaje","Abrir correo","Elegir otro representante","Mensaje copiado","El correo no se envía automáticamente. Revísalo y envíalo tú mismo.","Contactar a este representante"],
+ pt:["Sua localização","Seus representantes","Contatar um representante","Alterar","Escolha um representante para preparar sua mensagem.","Prepare sua mensagem","Representante escolhido","Para","Assunto","Mensagem","Copiar mensagem","Abrir e-mail","Escolher outro representante","Mensagem copiada","O e-mail não é enviado automaticamente. Revise-o e envie-o.","Contatar este representante"],
+ zh:["您的位置","您的代表","联系代表","修改","请选择代表以准备邮件。","准备您的邮件","已选代表","收件人","主题","邮件正文","复制邮件","打开邮件应用","选择其他代表","已复制","邮件不会自动发送。请检查后自行发送。","联系这位代表"],
+ tl:["Iyong lokasyon","Iyong mga kinatawan","Makipag-ugnayan","Baguhin","Pumili ng kinatawan para ihanda ang mensahe.","Ihanda ang mensahe","Napiling kinatawan","Para kay","Paksa","Mensahe","Kopyahin","Buksan ang email app","Pumili ng iba","Nakopya","Hindi awtomatikong ipapadala ang email. Suriin at ipadala ito.","Kontakin ang kinatawang ito"]
+};
+const findText=index=>(FIND_TEXT[currentLang]||FIND_TEXT.en)[index];
+let currentComposition = null;
+function updateFindJourney(step, postal){
+ const journey=document.getElementById('find-journey');
+ journey.classList.remove('hidden');
+ const mapping=[['find-step-location',0],['find-step-reps',1],['find-step-contact',2],
+ ['find-location-title',0],['find-change-postal',3],['find-representatives-title',1],
+ ['find-representatives-help',4]];
+ for(const [id,i] of mapping)document.getElementById(id).textContent=findText(i);
+ document.getElementById('find-location-code').textContent=postal;
+ document.querySelectorAll('[data-find-step]').forEach(item=>{
+   const n=Number(item.dataset.findStep);
+   item.classList.toggle('completed',n<step);
+   item.classList.toggle('current',n===step);
+   if(n===step)item.setAttribute('aria-current','step');
+   else item.removeAttribute('aria-current');
+ });
+}
+function closeInlineComposer(context) {
+ const box=document.getElementById(context==='main'?'find-composer':'triage-composer');
+ box.classList.add('hidden');
+ box.replaceChildren();
+ if(context==='main' && currentPostalCode)updateFindJourney(2,currentPostalCode);
+ else if(context==='triage')updateCivicProgress(3);
+ currentComposition=null;
+}
+const CONTACT_CHECK_COPY={
+en:['Before you write','Do you know why you want to contact this representative?','Yes, I know why','Not sure this is the right person','What do you need help with?','Check who can help','Back','Checking…','Government level','This representative belongs to the suggested level.','This looks like a different government level. Consider choosing someone else.','The issue may involve several government levels.','Continue with this representative','Choose another representative','Could not check the issue. Try again or continue.','Describe the issue in more detail.','We need more details to identify the correct office.','This question is outside InfoCivic’s civic guidance scope.'],
+fr:['Avant de rédiger','Savez-vous pourquoi vous voulez contacter cet élu ?','Oui, je sais pourquoi','Je ne suis pas sûr que ce soit le bon élu','Quel est votre problème ?','Trouver le bon interlocuteur','Retour','Vérification…','Palier de gouvernement','Cet élu appartient au palier suggéré.','Le problème semble relever d’un autre palier. Pensez à choisir un autre élu.','Plusieurs paliers peuvent être concernés.','Poursuivre avec cet élu','Choisir un autre élu','Impossible de vérifier. Réessayez ou poursuivez.','Décrivez davantage votre problème.','Plus de détails sont nécessaires pour trouver le bon service.','Cette demande est en dehors du champ d’InfoCivic.'],
+es:['Antes de redactar','¿Sabes por qué quieres contactar a este representante?','Sí, sé por qué','No sé si es la persona adecuada','¿Cuál es el problema?','Comprobar quién puede ayudar','Volver','Consultando…','Nivel de gobierno','Este representante pertenece al nivel sugerido.','Este asunto parece corresponder a otro nivel de gobierno. Considera elegir otro representante.','El asunto puede involucrar varios niveles de gobierno.','Continuar con este representante','Elegir otro representante','No pudimos comprobarlo. Intenta nuevamente o continúa.','Describe el problema con más detalle.','Necesitamos más detalles para identificar el organismo correcto.','Esta consulta está fuera del alcance de InfoCivic.'],
+pt:['Antes de escrever','Você sabe por que deseja contatar este representante?','Sim, sei por quê','Não sei se é a pessoa certa','Qual é o problema?','Verificar quem pode ajudar','Voltar','Verificando…','Nível de governo','Este representante pertence ao nível sugerido.','O problema parece ser de outro nível. Considere outro representante.','O assunto pode envolver vários níveis.','Continuar com este representante','Escolher outro representante','Não foi possível verificar. Tente novamente.','Descreva o problema com mais detalhes.','Precisamos de mais detalhes para identificar o serviço.','Esta pergunta está fora do escopo do InfoCivic.'],
+zh:['写信之前','您知道为什么要联系这位代表吗？','是的，我知道','不确定是否找对人','您需要什么帮助？','查询负责部门','返回','正在查询…','政府层级','该代表属于建议的政府层级。','此问题似乎属于另一政府层级，请考虑其他代表。','问题可能涉及多个政府层级。','继续联系这位代表','选择其他代表','暂时无法查询，可重试或继续。','请更详细地描述问题。','需要更多信息才能确定负责部门。','此问题超出 InfoCivic 的服务范围。'],
+tl:['Bago sumulat','Alam mo ba kung bakit mo gustong kontakin ang kinatawang ito?','Oo, alam ko','Hindi sigurado kung tamang tao','Ano ang kailangan mong tulong?','Alamin kung sino ang makakatulong','Bumalik','Sinusuri…','Antas ng pamahalaan','Nasa iminungkahing antas ang kinatawang ito.','Mukhang ibang antas ito. Isaalang-alang ang ibang kinatawan.','Maaaring maraming antas ang may saklaw.','Magpatuloy sa kinatawang ito','Pumili ng ibang kinatawan','Hindi masuri. Subukan muli o magpatuloy.','Ilarawan pa ang problema.','Kailangan ng dagdag na detalye upang mahanap ang opisina.','Hindi saklaw ng InfoCivic ang tanong na ito.']
+};
+const checkText=i=>(CONTACT_CHECK_COPY[currentLang]||CONTACT_CHECK_COPY.en)[i];
+
+const DIRECT_SERVICE_COPY={
+ en:['Recommended first step','This service may be able to help directly, before contacting an elected representative.','Call','Open official service website','General information line — not necessarily a direct case-resolution service','You can still contact your representative below.','No verified direct contact is available for this situation.','Service details are based on a limited verified directory; confirm current contact options on the official website.'],
+ fr:['Première démarche recommandée','Ce service pourrait vous aider directement, avant de contacter un élu.','Appeler','Consulter le site officiel','Ligne de renseignements généraux — pas nécessairement le service chargé du dossier','Vous pouvez aussi contacter votre élu ci-dessous.','Aucun contact direct vérifié n’est disponible pour cette situation.','Notre répertoire officiel est limité; vérifiez les coordonnées actuelles sur le site de l’organisme.'],
+ es:['Primer paso recomendado','Este servicio podría ayudarte directamente antes de contactar a un representante.','Llamar','Visitar sitio oficial','Línea de información general; no necesariamente resuelve expedientes','También puedes contactar a tu representante más abajo.','No tenemos un contacto directo verificado para esta situación.','Nuestro directorio es limitado; confirma los datos actuales en el sitio oficial.'],
+ pt:['Primeiro passo recomendado','Este serviço pode ajudar diretamente antes de contatar um representante.','Ligar','Visitar site oficial','Linha de informações gerais, não necessariamente resolve casos','Você ainda pode contatar seu representante abaixo.','Não temos um contato direto verificado para este caso.','Nosso diretório é limitado; confirme os contatos no site oficial.'],
+ zh:['建议的第一步','联系民选代表前，该服务可能直接帮助您。','拨打电话','访问官方网站','一般咨询电话，不一定处理具体案件','您仍可在下方联系代表。','目前没有经过核实的直接联系方式。','目录范围有限，请在官方网站确认最新联系方式。'],
+ tl:['Inirerekomendang unang hakbang','Maaaring makatulong nang direkta ang serbisyong ito bago lumapit sa kinatawan.','Tumawag','Bisitahin ang opisyal na website','Pangkalahatang impormasyon lamang, hindi laging tumutugon sa partikular na kaso','Maaari mo pa ring kontakin ang kinatawan sa ibaba.','Walang nakumpirmang direktang kontak para sa isyung ito.','Limitado ang aming direktoryo; kumpirmahin ang kasalukuyang detalye sa opisyal na site.']
+};
+function directServiceText(i){return (DIRECT_SERVICE_COPY[currentLang]||DIRECT_SERVICE_COPY.en)[i];}
+function buildDirectServiceCard(contact,agency){
+ const card=el('aside','direct-service-card');
+ card.setAttribute('aria-label',directServiceText(0));
+ const heading=el('h3','direct-service-title');heading.textContent=directServiceText(0);
+ const intro=el('p','direct-service-intro');intro.textContent=directServiceText(1);
+ card.append(heading,intro);
+ const name=contact?.name||agency?.name||null;
+ if(name){const serviceName=el('strong','direct-service-name');serviceName.textContent=name;card.append(serviceName);}
+ const actions=el('div','direct-service-actions');
+ if(contact?.phone&&/^[0-9+() .-]{3,28}$/.test(contact.phone)){
+   const phone=el('a','civic-compose-btn direct-service-call');
+   phone.href='tel:'+contact.phone.replace(/[^0-9+]/g,'');
+   phone.textContent=directServiceText(2)+': '+contact.phone;
+   phone.setAttribute('aria-label',directServiceText(2)+' '+(contact.name||'')+' '+contact.phone);
+   actions.append(phone);
+   if(contact.alternate_phone&&/^[0-9+() .-]{3,28}$/.test(contact.alternate_phone)){
+     const alt=el('a','civic-secondary-action');
+     alt.href='tel:'+contact.alternate_phone.replace(/[^0-9+]/g,'');
+     alt.textContent=directServiceText(2)+': '+contact.alternate_phone;
+     actions.append(alt);
+   }
+ }
+ const url=contact?.url||agency?.url;
+ if(url&&/^https:\/\/[a-z0-9.-]+(?:\/|$)/i.test(url)){
+   const site=el('a','civic-secondary-action direct-service-website');
+   site.href=url;site.target='_blank';site.rel='noopener noreferrer';
+   site.textContent=directServiceText(3);
+   actions.append(site);
+ }
+ if(actions.childNodes.length)card.append(actions);
+ if(contact?.label){
+   const detail=el('p','direct-service-qualifier');detail.textContent=contact.label;
+   card.append(detail);
+ }
+ const foot=el('p','direct-service-foot');foot.textContent=directServiceText(5);
+ card.append(foot);
+ return card;
+}
+
+function buildContactDecisionGate({rep,context,box,form,template,subjectInput,messageInput,updateLink}){
+ const section=el('section','contact-decision-gate');
+ const title=el('h3');title.tabIndex=-1;title.textContent=checkText(0);
+ const intro=el('p');intro.textContent=checkText(1);
+ const choices=el('div','contact-decision-options');
+ const yes=el('button','civic-compose-btn');yes.type='button';yes.textContent=checkText(2);
+ const unsure=el('button','civic-secondary-action');unsure.type='button';unsure.textContent=checkText(3);
+ const detail=el('div','contact-decision-detail hidden');
+ const label=el('label');label.textContent=checkText(4);
+ const input=el('textarea');input.id=context+'-civic-check';input.rows=3;input.maxLength=200;label.htmlFor=input.id;
+ const check=el('button','civic-compose-btn');check.type='button';check.textContent=checkText(5);
+ const back=el('button','civic-secondary-action');back.type='button';back.textContent=checkText(6);
+ const actions=el('div','civic-compose-actions');actions.append(back,check);
+ const result=el('div','contact-check-result');result.setAttribute('role','status');result.setAttribute('aria-live','polite');
+ detail.append(label,input,actions,result);
+ const continueToDraft=()=>{
+   section.classList.add('hidden');
+   form.classList.remove('hidden');
+   window.InfoCivicScar?.mount({box,editor:form,rep,context,template,
+     subjectInput,messageInput,updateLink,postal:currentPostalCode,uiLanguage:currentLang,
+     priorIssue:input.value.trim()||(context==='triage'?activeTriageSituation:null),
+     onDraftReady:review=>maybeReviewDraftRecipient({rep,context,box,...review}),
+     onRecipientChanged:target=>{
+       template.to=target.email;
+       address.textContent=target.email;
+       subtitle.textContent=findText(6)+': '+target.name+' · '+(target.elected_office||'');
+       currentComposition={rep:target,context};
+       updateLink();
+     }});
+ };
+ yes.addEventListener('click',continueToDraft);
+ unsure.addEventListener('click',()=>{choices.classList.add('hidden');detail.classList.remove('hidden');input.focus();});
+ back.addEventListener('click',()=>{detail.classList.add('hidden');choices.classList.remove('hidden');result.replaceChildren();yes.focus();});
+ function option(text,fn,secondary=false){const b=el('button',secondary?'civic-secondary-action':'civic-compose-btn');b.type='button';b.textContent=text;b.addEventListener('click',fn);return b;}
+ check.addEventListener('click',async()=>{
+  const issue=input.value.trim();result.replaceChildren();
+  if(issue.length<10){result.textContent=checkText(15);return;}
+  check.disabled=true;result.textContent=checkText(7);
+  try{
+   const response=await fetch('/api/classify-situation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:issue,lang:currentLang,postal_code:currentPostalCode||'',municipality:currentMunicipality})});
+   const data=await response.json();result.replaceChildren();
+   if(!response.ok||!data.success)throw Error('unavailable');
+   if(data.requires_clarification||!data.jurisdiction){result.textContent=data.out_of_scope?checkText(17):checkText(16);return;}
+   const levels=['federal','provincial','municipal','mixed'];
+   const level=levels.includes(data.jurisdiction)?data.jurisdiction:'mixed';
+   const labelNames={en:['Federal','Provincial','Municipal','Multiple levels'],fr:['Fédéral','Provincial','Municipal','Plusieurs paliers'],
+     es:['Federal','Provincial','Municipal','Varios niveles'],pt:['Federal','Provincial','Municipal','Vários níveis'],
+     zh:['联邦','省级','市级','多个层级'],tl:['Pederal','Panlalawigan','Munisipal','Maraming antas']};
+   if(data.contact||data.agency?.url)result.append(buildDirectServiceCard(data.contact,data.agency));
+   const title=el('strong');title.textContent=checkText(8)+': '+(labelNames[currentLang]||labelNames.en)[levels.indexOf(level)];
+   const explanation=el('p');explanation.textContent=data.explanation||'';
+   result.append(title,explanation);
+   const guidance=el('p');const same=level===rep.level;
+   guidance.textContent=level==='mixed'?checkText(11):same?checkText(9):checkText(10);result.append(guidance);
+   const controls=el('div','civic-compose-actions');
+   if(!same&&level!=='mixed')controls.append(option(checkText(13),()=>{
+      const container=document.getElementById(context==='main'?'results':'triage-results');
+      const match=[...container.querySelectorAll('.rep-card')].find(x=>x.dataset.level===level);
+      closeInlineComposer(context);
+      (match||container).scrollIntoView({behavior:'smooth',block:'center'});
+      match?.querySelector('.civic-compose-btn')?.focus({preventScroll:true});
+    },true));
+   controls.append(option(checkText(12),continueToDraft));result.append(controls);
+  }catch{result.textContent=checkText(14);}
+  finally{check.disabled=false;}
+ });
+ const labels=[[title,0],[intro,1],[yes,2],[unsure,3],[label,4],[check,5],[back,6]];
+ labels.forEach(([node,index])=>{node.dataset.contactCopy=String(index);});
+ choices.append(yes,unsure);section.append(title,intro,choices,detail);return section;
+}
+
+
+const RECIPIENT_REVIEW_TEXT={
+ en:['Before you send','This issue may be handled more directly by a different level of government.','You selected','Suggested level','The recommendation is not a definitive decision. You can still contact the representative you chose.','Choose the suggested representative','Keep my selected representative','Opening the right contact','We could not prepare a new draft. Your original message is unchanged.','Official service','No representative with a verified email is available at that level. You can contact the official service directly.','Select a representative','Check the official website','Call'],
+ fr:['Avant d’envoyer','Cette situation pourrait être traitée plus directement par un autre palier de gouvernement.','Votre choix','Palier suggéré','Cette suggestion n’est pas une décision définitive. Vous pouvez toujours contacter l’élu choisi.','Choisir un élu du palier suggéré','Conserver mon élu','Préparation du bon contact','Le nouveau brouillon n’a pas pu être préparé. Le message original est intact.','Service officiel','Aucun élu de ce palier avec une adresse courriel disponible. Vous pouvez contacter le service officiel.','Choisir un élu','Consulter le site officiel','Appeler'],
+ es:['Antes de enviar','Este problema podría resolverse más directamente con otro nivel de gobierno.','Elegiste','Nivel recomendado','Es una orientación, no una decisión definitiva. Puedes mantener el representante que elegiste.','Cambiar al representante adecuado','Mantener mi representante','Preparando el contacto adecuado','No se pudo preparar el nuevo borrador. Tu mensaje original no cambió.','Servicio oficial','No encontramos un representante de ese nivel con correo disponible. Puedes contactar directamente al organismo oficial.','Selecciona un representante','Ver sitio oficial','Llamar'],
+ pt:['Antes de enviar','Esse problema pode ser resolvido mais diretamente por outro nível de governo.','Você escolheu','Nível recomendado','É uma sugestão, não uma decisão definitiva. Você ainda pode contatar o representante escolhido.','Mudar para o representante adequado','Manter meu representante','Preparando o contato correto','Não foi possível preparar o novo rascunho. Sua mensagem original permanece intacta.','Serviço oficial','Não encontramos um representante desse nível com e-mail disponível. Você pode contatar diretamente o serviço oficial.','Escolha um representante','Ver site oficial','Ligar'],
+ zh:['发送之前','这个问题可能由其他级别的政府部门更直接地处理。','您选择了','建议的政府级别','这只是一项建议，并非最终判定。您仍可以联系最初选择的代表。','改为联系建议的代表','保留原代表','正在准备合适的联系人','无法准备新草稿，原邮件未作修改。','官方服务','未找到该级别拥有公开电子邮件的代表。您可以直接联系官方服务。','选择代表','访问官方网站','拨打'],
+ tl:['Bago ipadala','Maaaring mas direktang matugunan ang isyu sa ibang antas ng pamahalaan.','Pinili mo','Iminungkahing antas','Mungkahi lamang ito, hindi pinal na pasya. Maaari mo pa ring kontakin ang napiling kinatawan.','Palitan ng naaangkop na kinatawan','Panatilihin ang napili ko','Inihahanda ang tamang kontak','Hindi nagawa ang bagong draft. Hindi nabago ang orihinal.','Opisyal na serbisyo','Walang available na kinatawan sa antas na ito na may email. Maaari kang tumawag sa opisyal na serbisyo.','Pumili ng kinatawan','Bisitahin ang opisyal na site','Tumawag']
+};
+const reviewCopy=i=>(RECIPIENT_REVIEW_TEXT[currentLang]||RECIPIENT_REVIEW_TEXT.en)[i];
+function officialLevelName(level){
+ const terms={en:{federal:'Federal',provincial:'Provincial',municipal:'Municipal'},
+ fr:{federal:'Fédéral',provincial:'Provincial',municipal:'Municipal'},
+ es:{federal:'Federal',provincial:'Provincial',municipal:'Municipal'},
+ pt:{federal:'Federal',provincial:'Provincial',municipal:'Municipal'},
+ zh:{federal:'联邦',provincial:'省级',municipal:'市级'},
+ tl:{federal:'Pederal',provincial:'Panlalawigan',municipal:'Munisipal'}};
+ return (terms[currentLang]||terms.en)[level]||level;
+}
+async function maybeReviewDraftRecipient({rep,context,box,reason,switchRepresentative}){
+ if(!reason?.trim()||!box.isConnected||box.classList.contains('hidden'))return;
+ let classification;
+ try{
+   if(context==='triage'&&activeTriageRouting?.level&&activeTriageRouting.level!=='mixed'){
+     const response=await fetch('/api/resolve-civic-contact',{method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({postal_code:currentPostalCode,jurisdiction:activeTriageRouting.level,
+         agency_id:activeTriageRouting.agency_id||'',municipality:currentMunicipality})});
+     const result=await response.json();
+     if(!response.ok||!result.success)return;
+     classification={jurisdiction:activeTriageRouting.level,contact:result.contact,agency:result.agency};
+   }else{
+     const response=await fetch('/api/classify-situation',{method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({text:reason.slice(0,200),lang:currentLang,postal_code:currentPostalCode||'',municipality:currentMunicipality})});
+     classification=await response.json();
+     if(!response.ok||!classification.success||classification.requires_clarification)return;
+   }
+ }catch{return;} // Never block sending because guidance is unavailable.
+ if(!box.isConnected||box.classList.contains('hidden')||currentComposition?.rep!==rep)return;
+ const level=classification.jurisdiction;
+ if(!['federal','provincial','municipal'].includes(level)||level===rep.level)return;
+ const options=latestRepresentatives.filter(r=>r.level===level&&r.email&&r.name&&r.elected_office);
+ const backdrop=el('div','recipient-review-backdrop');
+ const dialog=el('section','recipient-review-dialog');
+ dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');
+ dialog.setAttribute('aria-labelledby',context+'-recipient-review-title');
+ const title=el('h3');title.id=context+'-recipient-review-title';title.textContent=reviewCopy(0);
+ const intro=el('p');intro.textContent=reviewCopy(1);
+ const comparison=el('div','recipient-review-comparison');
+ const current=el('p');current.textContent=reviewCopy(2)+': '+rep.name+' ('+officialLevelName(rep.level)+')';
+ const proposed=el('p');proposed.textContent=reviewCopy(3)+': '+officialLevelName(level);
+ comparison.append(current,proposed);
+ const explanation=el('p','recipient-review-explanation');explanation.textContent=classification.explanation||'';
+ const caution=el('p','recipient-review-caution');caution.textContent=reviewCopy(4);
+ const actions=el('div','recipient-review-actions');
+ const keep=el('button','civic-secondary-action');keep.type='button';keep.textContent=reviewCopy(6);
+ const message=el('p','recipient-review-status');message.setAttribute('role','status');message.setAttribute('aria-live','polite');
+ const initialFocus=document.activeElement;
+ const dismiss=()=>{backdrop.remove();keep.removeEventListener('click',dismiss);if(initialFocus?.isConnected)initialFocus.focus({preventScroll:true});};
+ keep.addEventListener('click',dismiss);
+ const keyHandler=e=>{
+   if(e.key==='Escape'){e.preventDefault();dismiss();}
+   if(e.key==='Tab'){
+     const focusable=[...dialog.querySelectorAll('button:not([disabled]),a[href],select:not([disabled])')];
+     if(!focusable.length)return;
+     const first=focusable[0],last=focusable[focusable.length-1];
+     if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+     else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+   }
+ };
+ dialog.addEventListener('keydown',keyHandler);
+ if(classification.contact||classification.agency?.url){
+   const service=buildDirectServiceCard(classification.contact,classification.agency);
+   service.querySelector('.direct-service-title').textContent=reviewCopy(9);
+   dialog.append(title,intro,comparison,explanation,service,caution);
+ }else dialog.append(title,intro,comparison,explanation,caution);
+ if(options.length){
+   const choice=el('select','recipient-review-select');
+   choice.setAttribute('aria-label',reviewCopy(11));
+   const list=[...options].sort((a,b)=>a.name.localeCompare(b.name));
+   for(const r of list){const item=el('option');item.value=String(latestRepresentatives.indexOf(r));item.textContent=r.name+' · '+(r.elected_office||'');choice.append(item);}
+   if(list.length>1)dialog.append(choice);
+   const change=el('button','civic-compose-btn');change.type='button';change.textContent=reviewCopy(5);
+   change.addEventListener('click',async()=>{
+     const target=latestRepresentatives[Number(choice.value)];
+     if(!target)return;
+     change.disabled=true;keep.disabled=true;message.textContent=reviewCopy(7);
+     const ok=await switchRepresentative(target);
+     if(ok){dismiss();}
+     else{message.textContent=reviewCopy(8);change.disabled=false;keep.disabled=false;}
+   });
+   actions.append(change);
+ }else{
+   const unavailable=el('p','recipient-review-caution');unavailable.textContent=reviewCopy(10);dialog.append(unavailable);
+ }
+ actions.append(keep);dialog.append(actions,message);backdrop.append(dialog);box.append(backdrop);
+ keep.focus({preventScroll:true});
+}
+
+function openInlineComposer(rep,context){
+ if(!rep.email)return;
+ const box=document.getElementById(context==='main'?'find-composer':'triage-composer');
+ const template=buildEmailTemplate(rep);
+ currentComposition={rep,context};
+ box.replaceChildren();
+ box.classList.remove('hidden');
+ const heading=document.createElement('div');
+ heading.className='civic-compose-heading';
+ const number=document.createElement('span');
+ number.className='civic-step-number';
+ number.setAttribute('aria-hidden','true');
+ number.textContent=context==='main'?'3':'4';
+ const headingText=document.createElement('div');
+ headingText.className='civic-step-heading-text';
+ const title=document.createElement('h2');
+ title.id=context+'-composer-title';
+ title.tabIndex=-1;
+ title.textContent=findText(5);
+ const subtitle=document.createElement('p');
+ subtitle.textContent=findText(6)+': '+rep.name+' · '+(rep.elected_office||'');
+ headingText.append(title,subtitle);
+ const back=document.createElement('button');
+ back.type='button';
+ back.className='civic-edit-btn';
+ back.textContent=findText(12);
+ back.addEventListener('click',()=>closeInlineComposer(context));
+ heading.append(number,headingText,back);
+ const form=document.createElement('form');
+ form.className='civic-compose-form';
+ const field=(text,value,kind)=>{
+   const wrap=document.createElement('div');
+   wrap.className='civic-compose-field';
+   const label=document.createElement('label');
+   label.textContent=text;
+   const input=document.createElement(kind);
+   input.id=context+'-compose-'+kind;
+   label.htmlFor=input.id;
+   if(kind==='textarea'){input.rows=9;input.value=value;}
+   else {input.type='text';input.value=value;}
+   wrap.append(label,input);
+   return {wrap,input};
+ };
+ const recipient=document.createElement('p');
+ recipient.className='civic-compose-to';
+ const strong=document.createElement('strong');
+ strong.textContent=findText(7)+': ';
+ const address=document.createElement('span');
+ address.textContent=template.to;
+ recipient.append(strong,address);
+ const subject=field(findText(8),template.subject,'input');
+ const message=field(findText(9),template.body,'textarea');
+ const actions=document.createElement('div');
+ actions.className='civic-compose-actions';
+ const copy=document.createElement('button');
+ copy.type='button';
+ copy.className='civic-secondary-action';
+ copy.textContent=findText(10);
+ const mail=document.createElement('a');
+ mail.className='civic-compose-btn';
+ mail.textContent=findText(11);
+ const updateLink=()=>{
+   const url='mailto:'+encodeURIComponent(template.to)+'?subject='+encodeURIComponent(subject.input.value)+'&body='+encodeURIComponent(message.input.value);
+   mail.href=url;
+ };
+ subject.input.addEventListener('input',updateLink);
+ message.input.addEventListener('input',updateLink);
+ updateLink();
+ copy.addEventListener('click',async()=>{
+   const content='To: '+template.to+'\\n'+findText(8)+': '+subject.input.value+'\\n\\n'+message.input.value;
+   try{
+     if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(content);
+     else fallbackCopy(content,()=>{});
+     copy.textContent=findText(13);
+   }catch{copy.textContent=findText(10);}
+ });
+ actions.append(copy,mail);
+ const note=document.createElement('p');
+ note.className='civic-compose-note';
+ note.textContent=findText(14);
+ form.addEventListener('submit',e=>e.preventDefault());
+ form.append(recipient,subject.wrap,message.wrap,actions,note);
+ box.append(heading,form);
+ const gate=buildContactDecisionGate({rep,context,box,form,template,
+    subjectInput:subject.input,messageInput:message.input,updateLink});
+ box.insertBefore(gate,form);
+ form.classList.add('hidden');
+ // Citizen already asked for routing on the triage path: do not ask again.
+ if(context==='triage' && activeTriageSituation){
+   gate.querySelector('.contact-decision-options .civic-compose-btn')?.click();
+ }
+ if(context==='main')updateFindJourney(3,currentPostalCode);
+ else updateCivicProgress(4);
+ box.scrollIntoView({behavior:'smooth',block:'start'});
+ gate.querySelector('h3')?.focus({preventScroll:true});
+}
 
 /* ================================================================
    INIT
@@ -104,6 +467,8 @@ async function init() {
   document.getElementById('triage-search-form').addEventListener('submit', e => handleSearch(e, 'triage'));
   document.getElementById('triage-open-form').addEventListener('submit', handleOpenFormSubmit);
   document.getElementById('triage-back-btn').addEventListener('click', resetTriageToPhase1);
+  document.getElementById('civic-edit-question').addEventListener('click', editCivicQuestion);
+  document.getElementById('find-change-postal').addEventListener('click',()=>{document.getElementById('postal-input').focus();document.getElementById('postal-input').select();});
 
   document.getElementById('postal-input').addEventListener('input', () => clearError('main'));
   document.getElementById('triage-postal-input').addEventListener('input', () => clearError('triage'));
@@ -196,6 +561,26 @@ function applyLang(lang) {
     gtag('event', 'change_language', { language: lang });
   }
   document.documentElement.lang = lang;
+  refreshCivicLabels();
+  window.InfoCivicScar?.setLanguage(lang);
+  document.querySelectorAll('[data-contact-copy]').forEach(node=>{node.textContent=checkText(Number(node.dataset.contactCopy));});
+  // Existing journeys and composer may be visible when the language changes.
+  if(!document.getElementById('find-journey')?.classList.contains('hidden') && currentPostalCode){
+    const step=document.getElementById('find-composer')?.classList.contains('hidden')?2:3;
+    updateFindJourney(step,currentPostalCode);
+  }
+  document.querySelectorAll('.civic-inline-composer:not(.hidden)').forEach(composer=>{
+    const title=composer.querySelector('.civic-compose-heading h2');
+    if(title)title.textContent=findText(5);
+    const labels=composer.querySelectorAll('.civic-compose-form .civic-compose-field label');
+    if(labels[0])labels[0].textContent=findText(8);
+    if(labels[1])labels[1].textContent=findText(9);
+    const buttons=composer.querySelectorAll('.civic-compose-actions > *');
+    if(buttons[0])buttons[0].textContent=findText(10);
+    if(buttons[1])buttons[1].textContent=findText(11);
+    const note=composer.querySelector('.civic-compose-note');
+    if(note)note.textContent=findText(14);
+  });
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.dataset.i18n);
@@ -457,7 +842,7 @@ async function handleOpenFormSubmit(e) {
     });
     const data = await resp.json();
 
-    const validLevels = ['federal', 'provincial', 'municipal'];
+    const validLevels = ['federal', 'provincial', 'municipal', 'mixed'];
     if (resp.ok && data.success && validLevels.includes(data.jurisdiction)) {
       activeSituationEn = data.situation_en || null;
       activeSituationFr = data.situation_fr || null;
@@ -465,37 +850,102 @@ async function handleOpenFormSubmit(e) {
         level:       data.jurisdiction,
         explanation: data.explanation,
         service:     data.service,
+        agency:      data.agency || null,
+        contact:     data.contact || null,
+        agency_id:   data.agency_id || null,
+        summary:     data.situation_user || null,
       });
       // GA4: track AI situation classification
       gtag('event', 'classify_situation', {
         jurisdiction: data.jurisdiction,
         service: data.service || 'none',
         lang: currentLang,
-        situation_en: data.situation_en || '',
       });
     } else if (resp.status === 429) {
       showErr(t('error_rate_limit'));
     } else {
-      // Default to municipal on any classification failure
-      activateTriage(null, text, {
-        level:       'municipal',
-        explanation: t('error_classify_fallback'),
-        service:     '311',
-      });
+      showErr(data.out_of_scope
+        ? (currentLang === 'fr' ? 'InfoCivic répond uniquement aux questions sur les services publics et la vie civique au Canada.'
+          : currentLang === 'es' ? 'InfoCivic solo responde preguntas sobre servicios públicos y asuntos cívicos de Canadá.'
+          : 'InfoCivic only helps with Canadian civic and government-service questions.')
+        : data.requires_clarification
+        ? (currentLang === 'fr' ? 'Précisez la situation ou choisissez un des exemples ci-dessous.'
+          : currentLang === 'es' ? 'Describe el problema con más detalle o elige uno de los ejemplos.'
+          : 'Please describe the issue more precisely or choose an example below.')
+        : t('error_classify_fallback'));
     }
   } catch {
-    activateTriage(null, text, {
-      level:       'municipal',
-      explanation: t('error_classify_fallback'),
-      service:     '311',
-    });
+    showErr(t('error_classify_fallback'));
   } finally {
     aiLoading.classList.add('hidden');
     sendBtn.disabled = false;
   }
 }
 
+/* ── Civic journey: meaning first, then agency, representative, action ── */
+const CIVIC_COPY = {
+  en: ['Your situation','Responsible agency','Find representative','Prepare message','What we understood','See your original question','Edit','Who can help','Suggested organization','Visit official website','Find your representative','Enter your postal code to find elected representatives for your area.','Prepare your message','Use the contact details below or prepare a message to review and send yourself.','Prepare a message','No specific organization identified yet. The government level below is a starting point.'],
+  fr: ['Votre situation','Service compétent','Trouver un élu','Préparer un message','Ce que nous avons compris','Voir votre question initiale','Modifier','Qui peut vous aider','Organisme conseillé','Visiter le site officiel','Trouver votre représentant','Entrez votre code postal pour trouver les élus de votre secteur.','Préparer votre message','Utilisez ses coordonnées ou préparez un message à vérifier et à envoyer.','Préparer un message','Aucun organisme précis identifié. Le palier de gouvernement est un point de départ.'],
+  es: ['Tu situación','Organismo responsable','Encontrar representante','Preparar mensaje','Lo que entendimos','Ver tu pregunta original','Editar','Quién puede ayudarte','Organismo recomendado','Visitar sitio oficial','Encuentra tu representante','Introduce tu código postal para encontrar representantes de tu zona.','Prepara tu mensaje','Utiliza sus datos de contacto o prepara un mensaje para revisarlo y enviarlo.','Preparar mensaje','Todavía no identificamos un organismo específico. El nivel de gobierno es un punto de partida.'],
+  pt: ['Sua situação','Órgão responsável','Encontrar representante','Preparar mensagem','O que entendemos','Ver sua pergunta original','Editar','Quem pode ajudar','Órgão recomendado','Visitar site oficial','Encontre seu representante','Digite seu código postal para encontrar seus representantes.','Prepare sua mensagem','Escolha um representante para preparar uma mensagem que poderá revisar e enviar.','Preparar mensagem','Ainda não identificamos um órgão específico. O nível de governo é um ponto de partida.'],
+  zh: ['您的问题','负责机构','查找代表','准备邮件','我们的理解','查看原始问题','编辑','谁能帮助您','建议机构','访问官方网站','查找您的代表','输入邮政编码以查找本地区民选代表。','准备邮件','选择一位代表，准备可审阅后自行发送的邮件。','准备邮件','尚未确定具体机构。政府层级仅供参考。'],
+  tl: ['Iyong sitwasyon','Tamang tanggapan','Hanapin ang kinatawan','Ihanda ang mensahe','Ang aming pagkaunawa','Tingnan ang orihinal na tanong','Baguhin','Sino ang makakatulong','Iminungkahing ahensiya','Bisitahin ang opisyal na site','Hanapin ang kinatawan','Ilagay ang postal code upang makita ang iyong mga kinatawan.','Ihanda ang mensahe','Pumili ng kinatawan upang gumawa ng mensaheng maaari mong suriin at ipadala.','Maghanda ng mensahe','Wala pang natukoy na partikular na ahensiya. Panimulang gabay lamang ang antas ng pamahalaan.']
+};
+function civicCopy(index){return (CIVIC_COPY[currentLang]||CIVIC_COPY.en)[index];}
+function updateCivicProgress(step){
+  document.querySelectorAll('[data-progress-step]').forEach(item=>{
+    const n=Number(item.dataset.progressStep);
+    item.classList.toggle('completed',n<step);
+    item.classList.toggle('current',n===step);
+    if(n===step)item.setAttribute('aria-current','step');
+    else item.removeAttribute('aria-current');
+  });
+}
+function refreshCivicLabels(){
+  const map=[
+    ['progress-understand',0],['progress-agency',1],['progress-postal',2],['progress-contact',3],
+    ['civic-understanding-title',4],['civic-original-label',5],['civic-edit-question',6],
+    ['civic-agency-title',7],['triage-services-label',8],['civic-postal-title',10],
+    ['triage-next-step',11],['civic-contact-title',12],['civic-contact-help',13]
+  ];
+  for(const [id,i] of map){const target=document.getElementById(id);if(target)target.textContent=civicCopy(i);}
+  const edit=document.getElementById('civic-edit-question');
+  if(edit)edit.setAttribute('aria-label',civicCopy(6));
+}
+function editCivicQuestion(){
+  const input=document.getElementById('triage-open-input');
+  const original=activeCaseId ? t('case_'+activeCaseId+'_title') : activeTriageSituation||'';
+  document.getElementById('triage-phase-2').hidden=true;
+  document.getElementById('triage-phase-1').hidden=false;
+  input.value=original;
+  input.dispatchEvent(new Event('input',{bubbles:true}));
+  input.focus();
+}
+
 /* ── Phase 1 → Phase 2 transition ───────────────────────────── */
+async function updateTriageLocalContact(postal,municipality,routing){
+ const box=document.getElementById('triage-agency-link-container');
+ if(!box||!routing)return;
+ const searchPostal=postal;
+ try{
+   const response=await fetch('/api/resolve-civic-contact',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({postal_code:searchPostal,municipality,jurisdiction:routing.level,agency_id:routing.agency_id||null})});
+   const data=await response.json();
+   // Ignore stale responses if a different postal code or case has been selected.
+   if(!response.ok||!data.success||currentPostalCode!==searchPostal||activeTriageRouting!==routing)return;
+   box.replaceChildren();
+   if(data.contact||data.agency){
+     box.append(buildDirectServiceCard(data.contact,data.agency));
+     document.getElementById('triage-services').hidden=true;
+   }else{
+     const notice=el('p','direct-service-qualifier');notice.textContent=directServiceText(6);
+     box.append(notice);
+   }
+ }catch{
+   // Keep the previously displayed verified contact instead of inventing a fallback.
+ }
+}
+
 function activateTriage(caseId, freeText = null, aiData = null) {
   const caseData = caseId ? TRIAGE_CASES.find(c => c.id === caseId) : null;
 
@@ -505,6 +955,20 @@ function activateTriage(caseId, freeText = null, aiData = null) {
   // Store case id + situation text for language-aware email templates
   activeCaseId          = caseId || null;
   activeTriageSituation = freeText || (caseId ? t(`case_${caseId}_title`) : null);
+  // The routing ID is a server allowlist key; the selected issue is never persisted.
+  const issueAgencies={doctor:'qc_health',immigration:'ircc',taxes:'cra',ei:'service_canada'};
+  activeTriageRouting={level:activeTriageLevel,agency_id:caseId?(issueAgencies[caseId]||null):(aiData?.agency_id||null)};
+
+  refreshCivicLabels();
+  document.getElementById('civic-understanding-summary').textContent =
+    caseData ? t('case_'+caseId+'_title')
+    : aiData?.summary || (currentLang === 'fr' ? activeSituationFr : currentLang === 'en' ? activeSituationEn : null)
+      || (freeText.length > 115 ? freeText.slice(0,115)+'…' : freeText);
+  document.getElementById('civic-original-question').textContent =
+    freeText || (caseData ? t('case_'+caseId+'_title') : '');
+  document.getElementById('civic-original-details').open=false;
+  document.getElementById('civic-contact-stage').classList.add('hidden');
+  updateCivicProgress(3);
 
   // Switch phases
   document.getElementById('triage-phase-1').hidden = true;
@@ -516,42 +980,60 @@ function activateTriage(caseId, freeText = null, aiData = null) {
   const explanation = document.getElementById('triage-explanation');
   const services    = document.getElementById('triage-services-value');
 
-  if (caseData) {
-    // Chip-selected path
-    const levelClass = LEVEL_CLASS[caseData.level];
-    header.className  = `triage-result-header ${levelClass}`;
-    badge.className   = `triage-level-badge ${levelClass}`;
-    badge.textContent = t(LEVEL_KEY[caseData.level]);
-    explanation.textContent = t(`case_${caseId}_explanation`);
-    services.textContent    = t(`case_${caseId}_services`);
-    document.querySelector('.triage-services').hidden = false;
-  } else if (aiData) {
-    // AI classification path — map jurisdiction to level and apply same styling as chip path
-    // Ensure aiData.level is valid (federal, provincial, municipal)
-    const validLevel = ['federal', 'provincial', 'municipal'].includes(aiData.level)
-      ? aiData.level
-      : 'mixed';
-    
-    const levelClass = LEVEL_CLASS[validLevel];
-    const levelKey = LEVEL_KEY[validLevel];
-    
-    // Apply the exact same styling as the chip-selected path
-    header.className  = `triage-result-header ${levelClass}`;
-    badge.className   = `triage-level-badge ${levelClass}`;
-    badge.textContent = t(levelKey);
-    explanation.textContent = aiData.explanation || '';
-    
-    // Handle services: show only if a valid service is provided
-    const hasService = aiData.service && aiData.service !== 'null' && aiData.service.trim();
-    services.textContent = hasService ? aiData.service : '';
-    document.querySelector('.triage-services').hidden = !hasService;
-  } else {
-    // Bare fallback (chip path without a match — should not normally occur)
-    header.className  = 'triage-result-header mixed';
-    badge.className   = 'triage-level-badge mixed';
-    badge.textContent = t('level_mixed');
-    explanation.textContent = freeText ? `"${freeText}"` : '';
-    document.querySelector('.triage-services').hidden = true;
+  const officialContainer=document.getElementById('triage-agency-link-container');
+  officialContainer.replaceChildren();
+  let agency=null, description='';
+  if(caseData){
+    const levelClass=LEVEL_CLASS[caseData.level];
+    header.className='triage-result-header '+levelClass;
+    badge.className='triage-level-badge '+levelClass;
+    badge.textContent=t(LEVEL_KEY[caseData.level]);
+    description=t('case_'+caseId+'_explanation');
+    services.textContent=t('case_'+caseId+'_services');
+    document.getElementById('triage-services').hidden=false;
+  }else if(aiData){
+    const level=['federal','provincial','municipal'].includes(aiData.level)?aiData.level:'mixed';
+    header.className='triage-result-header '+LEVEL_CLASS[level];
+    badge.className='triage-level-badge '+LEVEL_CLASS[level];
+    badge.textContent=t(LEVEL_KEY[level]);
+    description=aiData.explanation||'';
+    agency=aiData.agency||null;
+    const service=agency?.name||aiData.service||'';
+    services.replaceChildren();
+    if(agency?.url && /^https:\/\//.test(agency.url)){
+      const agencyLink=el('a','civic-agency-name-link');
+      agencyLink.href=agency.url;
+      agencyLink.target='_blank';
+      agencyLink.rel='noopener noreferrer';
+      agencyLink.textContent=agency.name;
+      const external=el('span','civic-external-mark');
+      external.textContent=' ↗';
+      external.setAttribute('aria-hidden','true');
+      agencyLink.appendChild(external);
+      agencyLink.setAttribute('aria-label',agency.name+' ('+(currentLang==='fr'?'site officiel':currentLang==='es'?'sitio oficial':'official website')+', opens in a new tab)');
+      services.append(agencyLink);
+    }else services.textContent=service;
+    document.getElementById('triage-services').hidden=!service;
+  }else{
+    header.className='triage-result-header mixed';
+    badge.className='triage-level-badge mixed';
+    badge.textContent=t('level_mixed');
+    document.getElementById('triage-services').hidden=true;
+  }
+  explanation.textContent=description;
+  // Direct official service contact is the primary recommendation when verified.
+  if(aiData?.contact||aiData?.agency?.url){
+    const direct=buildDirectServiceCard(aiData.contact,aiData.agency);
+    const summary=el('p','direct-service-qualifier');
+    summary.textContent=directServiceText(7);
+    direct.append(summary);
+    officialContainer.append(direct);
+    document.getElementById('triage-services').hidden=true;
+  }
+  // Do not repeat generic contact labels where no approved agency is known.
+  if(!agency && !aiData?.contact && !services.textContent.trim() && aiData){
+    services.textContent=civicCopy(15);
+    document.getElementById('triage-services').hidden=false;
   }
 
   // Reset postal search
@@ -568,9 +1050,11 @@ function activateTriage(caseId, freeText = null, aiData = null) {
 function resetTriageToPhase1() {
   activeTriageLevel     = null;
   activeTriageSituation = null;
+  activeTriageRouting = null;
   activeCaseId          = null;
   activeSituationEn     = null;
   activeSituationFr     = null;
+  document.getElementById('civic-contact-stage').classList.add('hidden');
   document.getElementById('triage-phase-1').hidden = false;
   document.getElementById('triage-phase-2').hidden = true;
   document.getElementById('triage-open-input').value = '';
@@ -600,6 +1084,11 @@ async function handleSearch(e, source) {
   }
 
   const displayCode = `${rawCode.slice(0, 3)} ${rawCode.slice(3)}`;
+  if(source==='main'){
+    // The direct postal search should not inherit a previous triage issue.
+    activeTriageLevel=null;activeCaseId=null;activeTriageSituation=null;activeTriageRouting=null;
+    activeSituationEn=null;activeSituationFr=null;
+  }
   showLoading(source);
 
   try {
@@ -616,16 +1105,20 @@ async function handleSearch(e, source) {
       return;
     }
 
-    renderResults(data.representatives, displayCode, resultsId, levelFilter, source === 'triage');
-
-    // Laval banner: suggest /laval when postal code is in Laval
-    if (source === 'main' && isLavalPostal(rawCode)) {
-      showLavalBanner(resultsId, rawCode);
+    currentMunicipality=typeof data.municipality==='string'?data.municipality:'';
+    latestRepresentatives=Array.isArray(data.representatives)?data.representatives:[];
+    // A new search invalidates any previously selected representative.
+    closeInlineComposer(source);
+    renderResults(data.representatives, displayCode, resultsId, levelFilter, true, data);
+    if(source==='main')updateFindJourney(2,displayCode);
+    if(source==='triage'&&activeTriageRouting?.level){
+      // Resolve the current agency against the newly known province and municipality.
+      // This is a lightweight allowlist lookup, not a second AI classification.
+      updateTriageLocalContact(displayCode,currentMunicipality,activeTriageRouting);
     }
 
     // GA4: track postal code search
     gtag('event', 'search_representatives', {
-      postal_code: displayCode,
       source: source,
       lang: currentLang,
       result_count: data.representatives.length,
@@ -644,13 +1137,32 @@ function isValidPostalCode(code) {
    RENDER RESULTS
    ================================================================ */
 
-function renderResults(reps, postalCode, containerId, levelFilter = null, showEmailTemplate = false) {
+function renderResults(reps, postalCode, containerId, levelFilter = null, showEmailTemplate = false, metadata = {}) {
   hideLoading(containerId === 'results' ? 'main' : 'triage');
   currentPostalCode = postalCode;
 
   const section = document.getElementById(containerId);
   section.innerHTML = '';
   section.classList.remove('hidden');
+
+  // Show a warning only when an actual geographic ambiguity is detected.
+  const ambiguous = metadata.ambiguity_levels || [];
+  if (ambiguous.length) {
+    const notice = el('aside', 'data-quality-notice');
+    notice.setAttribute('role', 'note');
+    const msg = el('p');
+    msg.textContent = currentLang === 'fr'
+      ? 'Ce code postal pourrait toucher plusieurs circonscriptions. Confirmez avec votre adresse.'
+      : currentLang === 'es'
+        ? 'Este código postal podría cubrir varias circunscripciones. Confirma usando tu dirección.'
+        : 'This postal code may cover more than one electoral district. Confirm using your street address.';
+    const link = el('a');
+    link.href = 'https://www.elections.ca/Scripts/VIS/FindED?L=e&PAGEID=20&QID=-1';
+    link.target = '_blank'; link.rel = 'noopener noreferrer';
+    link.textContent = 'Elections Canada';
+    notice.append(msg, link);
+    section.appendChild(notice);
+  }
 
   // Determine which levels to display
   // 'mixed' or null = show all; any specific level = filter to that level only
@@ -665,22 +1177,21 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
   const hasReps = showLevels.some(lvl => grouped[lvl].length > 0);
 
   if (!hasReps) {
-    section.innerHTML = `<p class="lead">${t('no_results')}</p>`;
+    const empty = el('p', 'lead');
+    empty.textContent = t('no_results');
+    section.appendChild(empty);
     return;
   }
 
-  const header = el('div', 'results-header');
-  const titleSpan = el('span');
-  titleSpan.innerHTML = `${t('results_title')} <strong>${postalCode}</strong>`;
-
-  // Share button
-  const shareBtn = el('button', 'share-btn');
-  shareBtn.setAttribute('aria-label', t('share_results') || 'Share');
-  shareBtn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> ${t('share_results') || 'Share'}`;
-  shareBtn.addEventListener('click', () => shareResults(postalCode));
-
-  header.append(titleSpan, shareBtn);
-  section.appendChild(header);
+  // The postal code already appears in the location step.
+  // A second heading and share bar here would distract from contacting a representative.
+  if(containerId!=='results'){
+    const header=el('div','results-header');
+    const title=el('span');
+    title.textContent=t('results_title')+' '+postalCode;
+    header.appendChild(title);
+    section.appendChild(header);
+  }
 
   // Update URL to reflect current search (deep-linkable)
   const cleanCode = postalCode.replace(' ', '');
@@ -688,6 +1199,7 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
   const newUrl = `${window.location.pathname}?postal=${cleanCode}`;
   history.replaceState({ view, postal: cleanCode }, '', newUrl);
 
+  const activeCardContext=containerId==='results'?'main':'triage';
   showLevels.forEach(level => {
     if (!grouped[level].length) return;
 
@@ -696,12 +1208,17 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
     heading.innerHTML = `${levelSvg(level)}<span>${t(level)}</span>`;
     levelSec.appendChild(heading);
 
-    grouped[level].forEach(rep => levelSec.appendChild(buildRepCard(rep, level, showEmailTemplate)));
+    grouped[level].forEach(rep => levelSec.appendChild(buildRepCard(rep, level, showEmailTemplate, activeCardContext)));
 
     section.appendChild(levelSec);
   });
 
-  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if(containerId==='triage-results'){
+    // Finding representatives is step 3; stage 4 begins only after one is selected.
+    document.getElementById('civic-contact-stage').classList.add('hidden');
+    updateCivicProgress(3);
+  }
+  section.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function levelSvg(level) {
@@ -744,7 +1261,7 @@ function resolveTitle(rep, useFr) {
 }
 
 function buildContextualGuide(useFr) {
-  const level = activeTriageLevel || 'municipal';
+  const level = activeTriageLevel || null;
   if (useFr) {
     const base = [
       '• Adresse exacte ou localisation concernée : [ex. 123 rue Principale, près du feu de signalisation]',
@@ -769,55 +1286,30 @@ function buildContextualGuide(useFr) {
 }
 
 function buildEmailTemplate(rep) {
-  const useFr     = isQuebecRep(rep);
-  const emailLang = useFr ? 'fr' : 'en';
-
-  // Resolve situation in the EMAIL language
-  let situation;
-  if (activeCaseId) {
-    situation = translations[emailLang]?.[`case_${activeCaseId}_title`] || activeTriageSituation || '';
-  } else if (useFr && activeSituationFr) {
-    situation = activeSituationFr;
-  } else if (!useFr && activeSituationEn) {
-    situation = activeSituationEn;
-  } else {
-    situation = activeTriageSituation || '';
-  }
-
-  const title   = resolveTitle(rep, useFr);
-  const snippet = situation.length > 60 ? situation.substring(0, 60) + '…' : situation;
-  const guide   = buildContextualGuide(useFr);
-
-  let subject, body;
-  if (useFr) {
-    subject = `Demande citoyenne${snippet ? ' — ' + snippet : ''}`;
-    body =
-      `${title},\n\n` +
-      (situation
-        ? `Je me permets de vous contacter au sujet de la situation suivante dans votre circonscription :\n\n` +
-          `${situation}\n\n`
-        : `Je me permets de vous contacter en tant que citoyen(ne) de votre circonscription.\n\n`) +
-      `Afin de vous permettre de traiter cette demande efficacement, voici les informations pertinentes :\n\n` +
-      `${guide}\n\n` +
-      `Je vous serais très reconnaissant(e) de bien vouloir examiner cette situation et m'informer des démarches possibles.\n\n` +
-      `Dans l'attente de votre réponse, je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.\n\n` +
-      `[Votre prénom et nom]\n[Votre adresse]\n[Votre courriel / téléphone]`;
-  } else {
-    subject = `Constituent Inquiry${snippet ? ' — ' + snippet : ''}`;
-    body =
-      `Dear ${title},\n\n` +
-      `I am writing to bring to your attention the following matter in your constituency:\n\n` +
-      (situation ? `${situation}\n\n` : '') +
-      `To help you address this efficiently, here are the relevant details:\n\n` +
-      `${guide}\n\n` +
-      `I would greatly appreciate your attention to this matter and any guidance on next steps or available resources.\n\n` +
-      `Thank you for your service to our community.\n\n` +
-      `Sincerely,\n[Your Full Name]\n[Your Address]\n[Your Email / Phone]`;
-  }
-
-  return { subject, body, to: rep.email };
+  // Plain English default. Personalized AI drafts may be converted to French.
+  // This ready-made option stays usable without any paid API call.
+  let situation=activeTriageSituation||activeSituationEn||'';
+  if(activeCaseId)situation=translations.en?.['case_'+activeCaseId+'_title']||situation;
+  const clipped=situation.replace(/\s+/g,' ').trim().slice(0,56).replace(/[\s,;:–-]+$/,'');
+  const postal=String(currentPostalCode||'').trim();
+  const subject=clipped?'Help with '+clipped:'Request for assistance';
+  const title=resolveTitle(rep,false);
+  const body=[
+    'Dear '+title+',',
+    '',
+    'I am reaching out to request your guidance about the following matter'+(postal?' in my area ('+postal+')':'')+'.',
+    '',
+    situation||'I would like to discuss a concern affecting me and learn what assistance your office may be able to provide.',
+    '',
+    'Could your office please advise me on the appropriate next step or direct me to the responsible service?',
+    '',
+    'Thank you for your time and consideration.',
+    '',
+    'Sincerely,',
+    '[Your name]'
+  ].join('\n');
+  return {subject,body,to:rep.email};
 }
-
 
 function fallbackCopy(text, onSuccess) {
   const ta = document.createElement('textarea');
@@ -829,7 +1321,25 @@ function fallbackCopy(text, onSuccess) {
   document.body.removeChild(ta);
 }
 
-function buildRepCard(rep, level, showEmailTemplate = false) {
+function officialDirectoryFor(rep, level) {
+  if (level === 'federal') {
+    return 'https://www.ourcommons.ca/Members/en';
+  }
+  // Only point to the Assemblée nationale for Québec provincial results.
+  // H and G postal prefixes are Québec; J also includes Québec.
+  if (level === 'provincial' && /^[GHJ]/.test(currentPostalCode.replace(/\s/g, ''))) {
+    return 'https://www.assnat.qc.ca/fr/deputes/rapport-liste-depute.html';
+  }
+  if (level === 'municipal') {
+    const district = (rep.district || '').toLowerCase();
+    if (district.includes('laval')) return 'https://www.laval.ca';
+    if (district.includes('montréal') || district.includes('montreal')) return 'https://montreal.ca/en/elected-officials';
+    if (district.includes('québec') || district.includes('quebec')) return 'https://www.ville.quebec.qc.ca/apropos/administration/elus/';
+  }
+  return null;
+}
+
+function buildRepCard(rep, level, showEmailTemplate = false, activeCardContext = 'main') {
   const card = el('div', `rep-card ${level}`);
 
   const main   = el('div', 'rep-main');
@@ -848,24 +1358,24 @@ function buildRepCard(rep, level, showEmailTemplate = false) {
     // Plain email link — no pre-fill
     contact.appendChild(contactRow(ICONS.mail, rep.email, `mailto:${rep.email}`));
   }
-  if (showEmailTemplate) {
-    const copyRow = el('div', 'draft-email-row');
-    const copyBtn = el('button', 'draft-email-btn');
-    copyBtn.type = 'button';
-    copyBtn.innerHTML = `${ICONS.compose}<span data-i18n="copy_template">${t('copy_template')}</span>`;
-    copyBtn.addEventListener('click', () => openEmailModal(rep));
-    copyRow.appendChild(copyBtn);
-    contact.appendChild(copyRow);
-  }
   if (rep.url) contact.appendChild(contactRow(ICONS.link, t('website'), rep.url, true));
 
   const footer = el('div', 'rep-card-footer');
+  if(showEmailTemplate && rep.email){
+    const messageButton=el('button','civic-compose-btn');
+    messageButton.type='button';
+    messageButton.innerHTML=ICONS.compose+'<span></span>';
+    messageButton.querySelector('span').textContent=findText(15);
+    messageButton.addEventListener('click',()=>openInlineComposer(rep,activeCardContext));
+    footer.appendChild(messageButton);
+  }
   const flagBtn = el('button', 'rep-card-flag-btn');
   flagBtn.type = 'button';
   flagBtn.innerHTML = `${ICONS.flag}<span data-i18n="feedback_flag_btn">${t('feedback_flag_btn')}</span>`;
   flagBtn.addEventListener('click', () => openFeedbackModal(rep, currentPostalCode));
   footer.appendChild(flagBtn);
 
+  card.dataset.level=level;
   card.append(main, contact, footer);
   return card;
 }
@@ -968,115 +1478,127 @@ function closeEmailModal() {
 let _feedbackRep    = null;
 let _feedbackPostal = null;
 
+const correctionCopy = {
+  en: { verifyTitle:"Check the official source",verifyText:"We haven't submitted a correction. Please confirm the current representative and contact information in the official directory.",verifyButton:"Open official directory",fallback:"No official directory is configured for this area. Check the representative's official website.",back:"Back to form",emailHelp:"Your email app will open with a prepared message. Review it and press Send there.",emailError:"Unable to open your email application. You can write to contact@infocivic.ca.",missingDetails:"Please describe your suggestion (at least 5 characters).",emailSubject:"InfoCivic suggestion" },
+  fr: { verifyTitle:"Vérifier à la source officielle",verifyText:"Aucune correction n'a été envoyée. Confirmez les coordonnées dans le répertoire officiel.",verifyButton:"Ouvrir le répertoire officiel",fallback:"Aucun répertoire officiel n'est configuré pour cette région. Consultez le site officiel de l'élu.",back:"Retour au formulaire",emailHelp:"Votre messagerie s'ouvrira avec un message préparé. Vérifiez-le et envoyez-le.",emailError:"Impossible d'ouvrir votre messagerie. Écrivez à contact@infocivic.ca.",missingDetails:"Décrivez votre suggestion (au moins 5 caractères).",emailSubject:"Suggestion pour InfoCivic" },
+  es: { verifyTitle:"Comprobar la fuente oficial",verifyText:"No se ha enviado ninguna corrección. Confirma el representante y sus datos en el directorio oficial.",verifyButton:"Abrir directorio oficial",fallback:"No tenemos configurado un directorio oficial para esta zona. Consulta el sitio oficial del representante.",back:"Volver al formulario",emailHelp:"Se abrirá tu aplicación de correo con un mensaje preparado. Revísalo y pulsa Enviar.",emailError:"No se pudo abrir el correo. Puedes escribir a contact@infocivic.ca.",missingDetails:"Describe tu sugerencia (al menos 5 caracteres).",emailSubject:"Sugerencia para InfoCivic" },
+  pt: { verifyTitle:"Verificar na fonte oficial",verifyText:"Nenhuma correção foi enviada. Confirme os dados no diretório oficial.",verifyButton:"Abrir diretório oficial",fallback:"Não há diretório oficial configurado para essa região. Consulte o site oficial do representante.",back:"Voltar ao formulário",emailHelp:"Seu aplicativo de e-mail abrirá com uma mensagem preparada. Revise e envie.",emailError:"Não foi possível abrir seu e-mail. Escreva para contact@infocivic.ca.",missingDetails:"Descreva sua sugestão (ao menos 5 caracteres).",emailSubject:"Sugestão para InfoCivic" },
+  zh: { verifyTitle:"查询官方信息",verifyText:"尚未提交更正。请在官方名录中确认代表及联系方式。",verifyButton:"打开官方名录",fallback:"此地区暂未配置官方名录。请查看代表官方网站。",back:"返回表单",emailHelp:"将打开邮件应用并填入内容。请检查后自行发送。",emailError:"无法打开邮件应用。请发送至 contact@infocivic.ca。",missingDetails:"请描述建议（至少5个字符）。",emailSubject:"InfoCivic 建议" },
+  tl: { verifyTitle:"Tingnan ang opisyal na sanggunian",verifyText:"Wala pang naipadalang pagwawasto. Kumpirmahin ang kinatawan at mga detalye sa opisyal na direktoryo.",verifyButton:"Buksan ang opisyal na direktoryo",fallback:"Walang nakatalagang opisyal na direktoryo para rito. Tingnan ang opisyal na website ng kinatawan.",back:"Bumalik sa form",emailHelp:"Bubuksan ang iyong email app na may nakahandang mensahe. Suriin at ipadala.",emailError:"Hindi mabuksan ang email app. Sumulat sa contact@infocivic.ca.",missingDetails:"Ilarawan ang mungkahi (hindi bababa sa 5 karakter).",emailSubject:"Mungkahi para sa InfoCivic" }
+};
+let _feedbackOrigin = null;
+function feedbackMessage(key) {
+  return (correctionCopy[currentLang] || correctionCopy.en)[key];
+}
 function initFeedbackModal() {
-  const overlay  = document.getElementById('feedback-modal');
+  const overlay = document.getElementById('feedback-modal');
   const closeBtn = document.getElementById('feedback-modal-close');
-  const form     = document.getElementById('feedback-form');
+  const form = document.getElementById('feedback-form');
   const textarea = document.getElementById('feedback-message');
-  const counter  = document.getElementById('feedback-char-count');
+  const counter = document.getElementById('feedback-char-count');
+  const typeInput = document.getElementById('feedback-type');
+  const nextStep = document.getElementById('feedback-next-step');
+  const nextBack = document.getElementById('feedback-next-back');
 
   overlay.addEventListener('click', e => { if (e.target === overlay) closeFeedbackModal(); });
   closeBtn.addEventListener('click', closeFeedbackModal);
-
-  textarea.addEventListener('input', () => {
-    counter.textContent = `${textarea.value.length} / 500`;
+  textarea.addEventListener('input', () => { counter.textContent = `${textarea.value.length} / 500`; });
+  nextBack.addEventListener('click', () => {
+    nextStep.classList.add('hidden');
+    form.classList.remove('hidden');
+    typeInput.focus();
   });
 
-  form.addEventListener('submit', async e => {
+  // Details are optional for official verification, required for other suggestions.
+  const syncForm = () => {
+    textarea.required = typeInput.value === 'suggestion';
+    textarea.setAttribute('aria-required', String(textarea.required));
+  };
+  typeInput.addEventListener('change', syncForm);
+  syncForm();
+
+  form.addEventListener('submit', e => {
     e.preventDefault();
-    const type    = document.getElementById('feedback-type').value;
+    const type = typeInput.value;
     const message = textarea.value.trim();
-    const email   = document.getElementById('feedback-email').value.trim();
-    const errEl   = document.getElementById('feedback-error');
-    const succEl  = document.getElementById('feedback-success');
+    const email = document.getElementById('feedback-email').value.trim();
+    const err = document.getElementById('feedback-error');
+    err.classList.add('hidden');
 
-    errEl.classList.add('hidden');
-    succEl.classList.add('hidden');
-
-    if (!message || message.length < 5) {
-      errEl.textContent = t('feedback_error_short');
-      errEl.classList.remove('hidden');
+    if (type === 'wrong_rep' || type === 'outdated_info') {
+      const official = officialDirectoryFor(_feedbackRep, _feedbackRep?.level);
+      const fallback = _feedbackRep?.url && /^https:\/\//.test(_feedbackRep.url) ? _feedbackRep.url : '';
+      const link = document.getElementById('feedback-official-link');
+      const explanation = document.getElementById('feedback-next-explanation');
+      document.getElementById('feedback-next-title').textContent = feedbackMessage('verifyTitle');
+      explanation.textContent = official ? feedbackMessage('verifyText') : feedbackMessage('fallback');
+      link.textContent = feedbackMessage('verifyButton');
+      link.href = official || fallback || '#';
+      link.classList.toggle('hidden', !official && !fallback);
+      document.getElementById('feedback-next-back').textContent = feedbackMessage('back');
+      form.classList.add('hidden');
+      nextStep.classList.remove('hidden');
+      document.getElementById('feedback-next-title').focus();
+      return;
+    }
+    if (message.length < 5) {
+      err.textContent = feedbackMessage('missingDetails');
+      err.classList.remove('hidden');
       textarea.focus();
       return;
     }
-
-    const submitBtn = form.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-
-    try {
-      const resp = await fetch('/api/feedback', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type,
-          message,
-          email,
-          rep_name:    _feedbackRep?.name || '',
-          postal_code: _feedbackPostal || '',
-        }),
-      });
-      const data = await resp.json();
-      if (resp.ok && data.success) {
-        succEl.classList.remove('hidden');
-        document.getElementById('feedback-actions').classList.add('hidden');
-        form.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
-        setTimeout(closeFeedbackModal, 2800);
-      } else if (resp.status === 429) {
-        errEl.textContent = t('error_rate_limit');
-        errEl.classList.remove('hidden');
-        submitBtn.disabled = false;
-      } else {
-        errEl.textContent = t('feedback_error_generic');
-        errEl.classList.remove('hidden');
-        submitBtn.disabled = false;
-      }
-    } catch {
-      errEl.textContent = t('feedback_error_generic');
-      errEl.classList.remove('hidden');
-      submitBtn.disabled = false;
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      err.textContent = t('feedback_error_generic');
+      err.classList.remove('hidden');
+      return;
     }
+    const subject = feedbackMessage('emailSubject');
+    const text = [
+      'Representative: ' + (_feedbackRep?.name || ''),
+      'Office: ' + (_feedbackRep?.elected_office || ''),
+      'Postal code: ' + (_feedbackPostal || ''),
+      'Suggestion: ' + message,
+      email ? 'Reply to: ' + email : ''
+    ].filter(Boolean).join('\n');
+    const mailto = 'mailto:contact@infocivic.ca?subject=' + encodeURIComponent(subject) +
+      '&body=' + encodeURIComponent(text);
+    // Opens the visitor's mail app; it does NOT claim that feedback was sent.
+    window.location.href = mailto;
+    document.getElementById('feedback-email-note').textContent = feedbackMessage('emailHelp');
+    document.getElementById('feedback-email-note').classList.remove('hidden');
   });
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !overlay.classList.contains('hidden')) closeFeedbackModal();
   });
 }
-
 function openFeedbackModal(rep, postalCode) {
-  _feedbackRep    = rep;
+  _feedbackRep = rep;
   _feedbackPostal = postalCode;
-
-  // Reset form state
-  document.getElementById('feedback-form').reset();
+  _feedbackOrigin = document.activeElement;
+  const form = document.getElementById('feedback-form');
+  form.reset();
+  form.classList.remove('hidden');
+  document.getElementById('feedback-next-step').classList.add('hidden');
+  document.getElementById('feedback-email-note').classList.add('hidden');
   document.getElementById('feedback-char-count').textContent = '0 / 500';
   document.getElementById('feedback-error').classList.add('hidden');
-  document.getElementById('feedback-success').classList.add('hidden');
-  document.getElementById('feedback-actions').classList.remove('hidden');
-  document.getElementById('feedback-form').querySelectorAll('input, select, textarea')
-    .forEach(el => { el.disabled = false; });
-  document.querySelector('#feedback-form button[type="submit"]').disabled = false;
-
-  // Show rep name as subtitle (optional — null when called from results footer)
-  const label = document.getElementById('feedback-rep-label');
-  label.textContent = rep?.name ? `${rep.elected_office} · ${rep.name}` : '';
-
-  // Re-translate select options and labels
+  document.getElementById('feedback-message').required = false;
+  document.getElementById('feedback-rep-label').textContent = rep?.name ? `${rep.elected_office} · ${rep.name}` : '';
   document.querySelectorAll('#feedback-modal [data-i18n]').forEach(node => {
     node.textContent = t(node.dataset.i18n);
   });
   document.querySelectorAll('#feedback-modal [data-i18n-placeholder]').forEach(node => {
     node.placeholder = t(node.dataset.i18nPlaceholder);
   });
-
-  const overlay = document.getElementById('feedback-modal');
-  overlay.classList.remove('hidden');
+  document.getElementById('feedback-modal').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
   document.getElementById('feedback-modal-close').focus();
 }
-
 function closeFeedbackModal() {
   document.getElementById('feedback-modal').classList.add('hidden');
   document.body.style.overflow = '';
+  if (_feedbackOrigin && typeof _feedbackOrigin.focus === 'function') _feedbackOrigin.focus();
 }
 
 /* ================================================================
