@@ -2,7 +2,7 @@ import translations from "./translations.generated.json";
 import overridesA from "../data/overrides.json";
 import overridesB from "../data/mtl_borough_overrides.json";
 import {normalizePostal, isPostalCode, boundaryAmbiguity} from "./quality.js";
-import {policyInput, classifyWithOpenAI, VALID_LANGS, officialContactFor, resolveAgencyContact} from "./civic-ai.js";
+import {policyInput, classifyWithOpenAI, VALID_LANGS, officialContactFor, resolveAgencyContact, obviousCivicIssue} from "./civic-ai.js";
 import {validateDraftRequest,generateScarDraft} from "./scar-email.js";
 
 const headers={"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff"};
@@ -94,6 +94,9 @@ async function classify(request,env){
  const lang=VALID_LANGS.includes(data.lang)?data.lang:"en";
  const checked=policyInput(data.text);
  if(!checked.ok)return fail(checked.code,checked.code==="out_of_scope"?422:400);
+ // A clear missed municipal collection is recognized without a paid AI request.
+ const clearIssue=obviousCivicIssue(checked.text,lang,postal,municipality);
+ if(clearIssue)return respond(clearIssue);
  // Never allow a paid OpenAI call without working abuse limits.
  if(!env.OPENAI_API_KEY){const f=fallback(checked.text,lang);return respond({...f,contact:f.jurisdiction?officialContactFor(f.jurisdiction,null,postal,municipality):null});}
  if(!env.AI_USER_LIMIT||!env.AI_GLOBAL_LIMIT)return fail("ai_protection_unavailable",503);
@@ -107,10 +110,16 @@ async function classify(request,env){
  }catch{return fail("ai_protection_unavailable",503);}
  try{
   const result=await classifyWithOpenAI(checked.text,lang,env,postal,municipality);
-  if(result)return respond(result);
+  if(result){
+    if(result.requires_clarification){
+      const obvious=obviousCivicIssue(checked.text,lang,postal,municipality);
+      if(obvious)return respond(obvious);
+    }
+    return respond(result);
+  }
   const f=fallback(checked.text,lang);
   return respond({...f,contact:f.jurisdiction?officialContactFor(f.jurisdiction,null,postal,municipality):null,classification_method:"rules"});
- }catch{const f=fallback(checked.text,lang);return respond({...f,contact:f.jurisdiction?officialContactFor(f.jurisdiction,null,postal):null,classification_method:"rules"});}
+ }catch{const f=fallback(checked.text,lang);return respond({...f,contact:f.jurisdiction?officialContactFor(f.jurisdiction,null,postal,municipality):null,classification_method:"rules"});}
 }
 async function resolveCivicContact(request){
  const data=await body(request);
