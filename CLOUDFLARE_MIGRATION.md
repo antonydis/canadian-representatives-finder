@@ -24,9 +24,9 @@ The `deploy` script automatically runs `npm run build` to copy static files to `
 - `POST /api/laval/subscribe`: requires D1 binding `DB` and explicit consent.
 - `GET /api/councillor`: currently returns HTTP 501 until address-to-district matching is safely implemented (prevents misidentification).
 
-## Configuring optional Anthropic
+## Legacy Anthropic instructions (deprecated — see OPENAI_SETUP.md)
 
-In Cloudflare Worker settings, add `ANTHROPIC_API_KEY` as an encrypted **secret**. Do not store it in git or a plain variable. Model override, if needed: `ANTHROPIC_MODEL`.
+Do not configure Anthropic; the Worker uses OpenAI. See OPENAI_SETUP.md.
 
 ## Enabling durable data storage
 
