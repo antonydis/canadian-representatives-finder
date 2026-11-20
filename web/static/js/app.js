@@ -330,6 +330,24 @@ function applyLang(lang) {
   }
   document.documentElement.lang = lang;
   refreshCivicLabels();
+  window.InfoCivicScar?.setLanguage(lang);
+  // Existing journeys and composer may be visible when the language changes.
+  if(!document.getElementById('find-journey')?.classList.contains('hidden') && currentPostalCode){
+    const step=document.getElementById('find-composer')?.classList.contains('hidden')?2:3;
+    updateFindJourney(step,currentPostalCode);
+  }
+  document.querySelectorAll('.civic-inline-composer:not(.hidden)').forEach(composer=>{
+    const title=composer.querySelector('.civic-compose-heading h2');
+    if(title)title.textContent=findText(5);
+    const labels=composer.querySelectorAll('.civic-compose-form .civic-compose-field label');
+    if(labels[0])labels[0].textContent=findText(8);
+    if(labels[1])labels[1].textContent=findText(9);
+    const buttons=composer.querySelectorAll('.civic-compose-actions > *');
+    if(buttons[0])buttons[0].textContent=findText(10);
+    if(buttons[1])buttons[1].textContent=findText(11);
+    const note=composer.querySelector('.civic-compose-note');
+    if(note)note.textContent=findText(14);
+  });
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.dataset.i18n);
