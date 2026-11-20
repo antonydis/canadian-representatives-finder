@@ -54,3 +54,19 @@ test('Representative cards record their government level for matching',()=>{
  assert.match(js,/card\.dataset\.level=level/);
  assert.match(js,/level===rep\.level/);
 });
+
+test('Guided contact offers verified phone details and avoids repeat triage gate',()=>{
+ assert.match(js,/data\.contact\?\.phone/);
+ assert.match(js,/civic-phone-help/);
+ assert.match(js,/context==='triage' && activeTriageSituation/);
+ assert.match(js,/postal_code:currentPostalCode/);
+});
+test('Default email avoids home-address and telephone placeholders',()=>{
+ const start=js.indexOf('function buildEmailTemplate(');
+ const end=js.indexOf('function fallbackCopy(',start);
+ const template=js.slice(start,end);
+ assert.ok(start>=0&&end>start);
+ assert.doesNotMatch(template,/\[Your Address\]|\[Votre adresse\]|\[Your Email \/ Phone\]/);
+ assert.match(template,/appropriate next step/);
+ assert.match(template,/currentPostalCode/);
+});
