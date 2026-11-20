@@ -894,7 +894,7 @@ function activateTriage(caseId, freeText = null, aiData = null) {
     document.getElementById('triage-services').hidden=true;
   }
   // Do not repeat generic contact labels where no approved agency is known.
-  if(!agency && !services.textContent.trim() && aiData){
+  if(!agency && !aiData?.contact && !services.textContent.trim() && aiData){
     services.textContent=civicCopy(15);
     document.getElementById('triage-services').hidden=false;
   }
