@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {runInNewContext} from 'node:vm';
 import {validateDraftRequest,validateDraftResponse,determineSuggestedOfficialLanguage} from '../src-worker/scar-email.js';
 const browser=readFileSync('web/static/js/scar-wizard.js','utf8');
 const app=readFileSync('web/static/js/app.js','utf8');
@@ -24,6 +25,15 @@ test('A generated draft must pass server-side validation',()=>{
 test('Language is a recommendation only; federal users may choose either official language',()=>{
  assert.equal(determineSuggestedOfficialLanguage('H7R 4X5','federal'),'fr');
  assert.equal(determineSuggestedOfficialLanguage('M5V 1A1','federal'),'en');
+});
+test('Each of six language catalogs contains 18 nonempty translated messages',()=>{
+ const sandbox={window:{}};
+ runInNewContext(browser,sandbox);
+ for(const lang of ['en','fr','es','pt','zh','tl']){
+   const messages=sandbox.window.InfoCivicScar.labels[lang];
+   assert.equal(messages.length,18,lang);
+   assert.ok(messages.every(value=>typeof value==='string'&&value.trim().length>0),lang);
+ }
 });
 test('All six website languages show all SCAR guidance',()=>{
  for(const lang of ['en','fr','es','pt','zh','tl'])assert.ok(browser.includes(lang+':['),lang);
