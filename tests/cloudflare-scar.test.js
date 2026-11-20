@@ -11,7 +11,8 @@ const worker=readFileSync('src-worker/index.js','utf8');
 test('Small intake requires only name and a reason, with optional address',()=>{
  const base={representative_name:'Example Representative',representative_office:'MP',sender_name:'Sample Citizen',reason:'I would like to ask about a delayed federal application.',language:'en'};
  assert.equal(validateDraftRequest(base).ok,true);
- assert.equal(validateDraftRequest({...base,sender_address:'22 Example Street, Laval'}).ok,true);
+ assert.equal(validateDraftRequest({...base,sender_address:'22 Example Street, Laval',postal_code:'H7R 4X5'}).ok,true);
+ assert.equal(validateDraftRequest({...base,postal_code:'BAD 123'}).ok,false);
  assert.equal(validateDraftRequest({...base,language:'es'}).ok,false);
  assert.equal(validateDraftRequest({...base,sender_name:''}).code,'missing_details');
  assert.equal(validateDraftRequest({...base,reason:''}).code,'missing_details');
@@ -46,6 +47,8 @@ test('Two-stage form and direct template stay available',()=>{
  assert.match(browser,/editor\.classList\.add\('hidden'\)/);
  assert.match(browser,/editor\.classList\.remove\('hidden'\)/);
  assert.match(browser,/sender_address/);
+ assert.match(browser,/postal_code:postalCode/);
+ assert.match(browser,/scar-postal-info/);
  assert.match(browser,/sender_name/);
  assert.match(browser,/reason/);
  assert.doesNotMatch(browser,/immigration.status/i);
