@@ -1022,3 +1022,24 @@ footer a:hover { text-decoration: underline; }
  .civic-compose-actions>*{flex:1 1 170px;text-align:center;justify-content:center}
  .search-card{padding:18px}
 }
+
+
+/* SCAR: progressive writing assistance, optional, screen-reader friendly */
+.scar-wizard{border:1px solid #d0ddeb;background:#f6f9fd;border-radius:18px;padding:20px;margin:0 0 16px}
+.scar-wizard h3{font-size:1.05rem;line-height:1.35;margin:0 0 7px;color:var(--navy);font-weight:750}
+.scar-wizard-intro{color:var(--text-muted);font-size:.91rem;line-height:1.5;margin:0 0 18px}
+.scar-wizard-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px}
+.scar-wizard-fields>.civic-compose-field{min-width:0}
+.scar-wizard-fields .civic-compose-field textarea{width:100%;min-height:86px;box-sizing:border-box;border-radius:14px;background:#fff;font-size:.9rem}
+.scar-language-field{grid-column:1/-1;display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+.scar-language-field label{font-size:.87rem;color:var(--navy);font-weight:700}
+.scar-language-field select{border:1.5px solid #b9c8da;border-radius:999px;padding:10px 15px;min-height:44px;color:var(--navy);background:#fff;font:inherit;font-size:.9rem}
+.scar-language-field select:focus-visible{outline:3px solid #2373c8;outline-offset:2px}
+.scar-wizard-fields>.scar-hint,.scar-wizard-fields>.scar-privacy,.scar-wizard-fields>.civic-compose-actions,.scar-wizard-fields>.scar-status{grid-column:1/-1}
+.scar-hint,.scar-privacy{font-size:.82rem;color:var(--text-muted);margin:0;line-height:1.5}
+.scar-privacy{color:#6b4f31}
+.scar-status{font-size:.9rem;font-weight:650;min-height:0;color:var(--navy);margin:0}
+.scar-wizard>.scar-privacy{margin-top:14px}
+.scar-wizard .civic-compose-actions{gap:10px}
+.scar-wizard button:disabled{opacity:.58;cursor:progress}
+@media(max-width:640px){.scar-wizard-fields{grid-template-columns:1fr}.scar-wizard{padding:15px}.scar-wizard-fields>.civic-compose-field{grid-column:1/-1}}
