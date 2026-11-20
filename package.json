@@ -1,0 +1,14 @@
+{
+  "name": "infocivic",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-cloudflare.mjs",
+    "dev": "npm run build && wrangler dev",
+    "deploy": "npm run build && wrangler deploy",
+    "check": "node --check src-worker/index.js && node --check scripts/build-cloudflare.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.166.0"
+  }
+}
