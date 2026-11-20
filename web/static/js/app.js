@@ -201,6 +201,13 @@ function openInlineComposer(rep,context){
  form.addEventListener('submit',e=>e.preventDefault());
  form.append(recipient,subject.wrap,message.wrap,actions,note);
  box.append(heading,form);
+ // Optional guided SCAR answers; keep the existing editable draft for visitors who skip.
+ window.InfoCivicScar?.mount({
+   box,editor:form,rep,context,template,
+   subjectInput:subject.input,messageInput:message.input,updateLink,
+   postal:currentPostalCode,uiLanguage:currentLang,
+   priorIssue:context==='triage'?activeTriageSituation:null
+ });
  if(context==='main')updateFindJourney(3,currentPostalCode);
  else updateCivicProgress(4);
  box.scrollIntoView({behavior:'smooth',block:'start'});
