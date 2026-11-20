@@ -2,6 +2,7 @@ import translations from "./translations.generated.json";
 import overridesA from "../data/overrides.json";
 import overridesB from "../data/mtl_borough_overrides.json";
 import {normalizePostal, isPostalCode, boundaryAmbiguity} from "./quality.js";
+import {policyInput, classifyWithOpenAI, VALID_LANGS} from "./civic-ai.js";
 
 const headers={"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff"};
 const respond=(payload,status=200)=>new Response(JSON.stringify(payload),{status,headers});
@@ -86,17 +87,25 @@ function fallback(text,lang){
  return {success:true,jurisdiction,requires_clarification:jurisdiction===null,service:jurisdiction==="municipal"?"311":null,explanation:explanation[lang]||explanation.en,situation_en:text.slice(0,100),situation_fr:text.slice(0,100),classification_method:"rules"};
 }
 async function classify(request,env){
- const data=await body(request),text=String(data.text||"").trim(),lang=["en","fr","es","pt","zh","tl"].includes(data.lang)?data.lang:"en";
- if(text.length<10||text.length>500)return fail(text?"invalid_length":"empty_text");
- if(!env.ANTHROPIC_API_KEY)return respond(fallback(text,lang));
+ const data=await body(request);
+ const lang=VALID_LANGS.includes(data.lang)?data.lang:"en";
+ const checked=policyInput(data.text);
+ if(!checked.ok)return fail(checked.code,checked.code==="out_of_scope"?422:400);
+ // Never allow a paid OpenAI call without working abuse limits.
+ if(!env.OPENAI_API_KEY)return respond(fallback(checked.text,lang));
+ if(!env.AI_USER_LIMIT||!env.AI_GLOBAL_LIMIT)return fail("ai_protection_unavailable",503);
+ const ip=request.headers.get("CF-Connecting-IP")||"unknown";
  try{
-  const prompt="Classify Canadian civic issues. Return ONLY valid JSON with keys jurisdiction (federal, provincial or municipal), service (311,811,211 or null), explanation (max 20 words in "+lang+"), situation_en, situation_fr (each max 8 words). Choose one level. Do not invent elected representatives.";
-  const response=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":env.ANTHROPIC_API_KEY,"anthropic-version":"2023-06-01"},body:JSON.stringify({model:env.ANTHROPIC_MODEL||"claude-haiku-4-5-20251001",max_tokens:256,system:prompt,messages:[{role:"user",content:text}]})});
-  if(!response.ok)throw Error("model error");
-  const data=await response.json(),parsed=JSON.parse(String(data.content?.[0]?.text||"").trim());
-  if(!["federal","provincial","municipal"].includes(parsed.jurisdiction))throw Error("invalid result");
-  return respond({success:true,jurisdiction:parsed.jurisdiction,service:["311","811","211"].includes(parsed.service)?parsed.service:null,explanation:String(parsed.explanation||"").slice(0,300),situation_en:String(parsed.situation_en||"").slice(0,100),situation_fr:String(parsed.situation_fr||"").slice(0,100),classification_method:"ai"});
- }catch{return respond(fallback(text,lang));}
+  const [userLimit,globalLimit]=await Promise.all([
+    env.AI_USER_LIMIT.limit({key:ip}),
+    env.AI_GLOBAL_LIMIT.limit({key:"all_civic_requests"})
+  ]);
+  if(!userLimit.success||!globalLimit.success)return fail("rate_limit",429);
+ }catch{return fail("ai_protection_unavailable",503);}
+ try{
+  const result=await classifyWithOpenAI(checked.text,lang,env);
+  return result?respond(result):respond({...fallback(checked.text,lang),classification_method:"rules"});
+ }catch{return respond({...fallback(checked.text,lang),classification_method:"rules"});}
 }
 async function feedback(request,env){
  if(!env.DB)return fail("storage_not_configured",503);
@@ -119,7 +128,7 @@ async function subscribe(request,env){
 }
 export default {async fetch(request,env){
  const url=new URL(request.url),path=url.pathname;
- if(path==="/api/health")return respond({status:"ok",platform:"cloudflare",ai_configured:!!env.ANTHROPIC_API_KEY,storage_configured:!!env.DB});
+ if(path==="/api/health")return respond({status:"ok",platform:"cloudflare",ai_configured:!!(env.OPENAI_API_KEY&&env.AI_USER_LIMIT&&env.AI_GLOBAL_LIMIT),storage_configured:!!env.DB});
  if(path==="/api/translations"&&request.method==="GET")return respond(translations);
  if(path==="/api/councillor")return fail("not_implemented",501);
  if(path.startsWith("/api/")){
