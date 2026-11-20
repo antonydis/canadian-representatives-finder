@@ -127,6 +127,55 @@ zh:['写信之前','您知道为什么要联系这位代表吗？','是的，我
 tl:['Bago sumulat','Alam mo ba kung bakit mo gustong kontakin ang kinatawang ito?','Oo, alam ko','Hindi sigurado kung tamang tao','Ano ang kailangan mong tulong?','Alamin kung sino ang makakatulong','Bumalik','Sinusuri…','Antas ng pamahalaan','Nasa iminungkahing antas ang kinatawang ito.','Mukhang ibang antas ito. Isaalang-alang ang ibang kinatawan.','Maaaring maraming antas ang may saklaw.','Magpatuloy sa kinatawang ito','Pumili ng ibang kinatawan','Hindi masuri. Subukan muli o magpatuloy.','Ilarawan pa ang problema.','Kailangan ng dagdag na detalye upang mahanap ang opisina.','Hindi saklaw ng InfoCivic ang tanong na ito.']
 };
 const checkText=i=>(CONTACT_CHECK_COPY[currentLang]||CONTACT_CHECK_COPY.en)[i];
+
+const DIRECT_SERVICE_COPY={
+ en:['Recommended first step','This service may be able to help directly, before contacting an elected representative.','Call','Open official service website','General information line — not necessarily a direct case-resolution service','You can still contact your representative below.','No verified direct contact is available for this situation.','Service details are based on a limited verified directory; confirm current contact options on the official website.'],
+ fr:['Première démarche recommandée','Ce service pourrait vous aider directement, avant de contacter un élu.','Appeler','Consulter le site officiel','Ligne de renseignements généraux — pas nécessairement le service chargé du dossier','Vous pouvez aussi contacter votre élu ci-dessous.','Aucun contact direct vérifié n’est disponible pour cette situation.','Notre répertoire officiel est limité; vérifiez les coordonnées actuelles sur le site de l’organisme.'],
+ es:['Primer paso recomendado','Este servicio podría ayudarte directamente antes de contactar a un representante.','Llamar','Visitar sitio oficial','Línea de información general; no necesariamente resuelve expedientes','También puedes contactar a tu representante más abajo.','No tenemos un contacto directo verificado para esta situación.','Nuestro directorio es limitado; confirma los datos actuales en el sitio oficial.'],
+ pt:['Primeiro passo recomendado','Este serviço pode ajudar diretamente antes de contatar um representante.','Ligar','Visitar site oficial','Linha de informações gerais, não necessariamente resolve casos','Você ainda pode contatar seu representante abaixo.','Não temos um contato direto verificado para este caso.','Nosso diretório é limitado; confirme os contatos no site oficial.'],
+ zh:['建议的第一步','联系民选代表前，该服务可能直接帮助您。','拨打电话','访问官方网站','一般咨询电话，不一定处理具体案件','您仍可在下方联系代表。','目前没有经过核实的直接联系方式。','目录范围有限，请在官方网站确认最新联系方式。'],
+ tl:['Inirerekomendang unang hakbang','Maaaring makatulong nang direkta ang serbisyong ito bago lumapit sa kinatawan.','Tumawag','Bisitahin ang opisyal na website','Pangkalahatang impormasyon lamang, hindi laging tumutugon sa partikular na kaso','Maaari mo pa ring kontakin ang kinatawan sa ibaba.','Walang nakumpirmang direktang kontak para sa isyung ito.','Limitado ang aming direktoryo; kumpirmahin ang kasalukuyang detalye sa opisyal na site.']
+};
+function directServiceText(i){return (DIRECT_SERVICE_COPY[currentLang]||DIRECT_SERVICE_COPY.en)[i];}
+function buildDirectServiceCard(contact,agency){
+ const card=el('aside','direct-service-card');
+ card.setAttribute('aria-label',directServiceText(0));
+ const heading=el('h3','direct-service-title');heading.textContent=directServiceText(0);
+ const intro=el('p','direct-service-intro');intro.textContent=directServiceText(1);
+ card.append(heading,intro);
+ const name=contact?.name||agency?.name||null;
+ if(name){const serviceName=el('strong','direct-service-name');serviceName.textContent=name;card.append(serviceName);}
+ const actions=el('div','direct-service-actions');
+ if(contact?.phone&&/^[0-9+() .-]{3,28}$/.test(contact.phone)){
+   const phone=el('a','civic-compose-btn direct-service-call');
+   phone.href='tel:'+contact.phone.replace(/[^0-9+]/g,'');
+   phone.textContent=directServiceText(2)+': '+contact.phone;
+   phone.setAttribute('aria-label',directServiceText(2)+' '+(contact.name||'')+' '+contact.phone);
+   actions.append(phone);
+   if(contact.alternate_phone&&/^[0-9+() .-]{3,28}$/.test(contact.alternate_phone)){
+     const alt=el('a','civic-secondary-action');
+     alt.href='tel:'+contact.alternate_phone.replace(/[^0-9+]/g,'');
+     alt.textContent=directServiceText(2)+': '+contact.alternate_phone;
+     actions.append(alt);
+   }
+ }
+ const url=contact?.url||agency?.url;
+ if(url&&/^https:\/\/[a-z0-9.-]+(?:\/|$)/i.test(url)){
+   const site=el('a','civic-secondary-action direct-service-website');
+   site.href=url;site.target='_blank';site.rel='noopener noreferrer';
+   site.textContent=directServiceText(3);
+   actions.append(site);
+ }
+ if(actions.childNodes.length)card.append(actions);
+ if(contact?.label){
+   const detail=el('p','direct-service-qualifier');detail.textContent=contact.label;
+   card.append(detail);
+ }
+ const foot=el('p','direct-service-foot');foot.textContent=directServiceText(5);
+ card.append(foot);
+ return card;
+}
+
 function buildContactDecisionGate({rep,context,box,form,template,subjectInput,messageInput,updateLink}){
  const section=el('section','contact-decision-gate');
  const title=el('h3');title.tabIndex=-1;title.textContent=checkText(0);
@@ -167,24 +216,10 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
    const labelNames={en:['Federal','Provincial','Municipal','Multiple levels'],fr:['Fédéral','Provincial','Municipal','Plusieurs paliers'],
      es:['Federal','Provincial','Municipal','Varios niveles'],pt:['Federal','Provincial','Municipal','Vários níveis'],
      zh:['联邦','省级','市级','多个层级'],tl:['Pederal','Panlalawigan','Munisipal','Maraming antas']};
+   if(data.contact||data.agency?.url)result.append(buildDirectServiceCard(data.contact,data.agency));
    const title=el('strong');title.textContent=checkText(8)+': '+(labelNames[currentLang]||labelNames.en)[levels.indexOf(level)];
    const explanation=el('p');explanation.textContent=data.explanation||'';
    result.append(title,explanation);
-   if(data.agency?.url&&/^https:\/\//.test(data.agency.url)){const a=el('a','civic-agency-name-link');
-     a.href=data.agency.url;a.textContent=data.agency.name;a.target='_blank';a.rel='noopener noreferrer';result.append(a);}
-   if(data.contact?.phone){
-     const phoneBox=el('div','civic-phone-help');
-     const who=el('span');who.textContent=data.contact.name+' · ';
-     const phone=el('a');phone.href='tel:'+data.contact.phone.replace(/[^0-9+]/g,'');
-     phone.textContent=data.contact.phone;phone.setAttribute('aria-label',data.contact.name+': '+data.contact.phone);
-     phoneBox.append(who,phone);
-     if(data.contact.alternate_phone){
-       const alternate=el('a');alternate.href='tel:'+data.contact.alternate_phone.replace(/[^0-9+]/g,'');
-       alternate.textContent=' / '+data.contact.alternate_phone;phoneBox.append(alternate);
-     }
-     const note=el('p','civic-phone-note');note.textContent=data.contact.label||'';
-     phoneBox.append(note);result.append(phoneBox);
-   }
    const guidance=el('p');const same=level===rep.level;
    guidance.textContent=level==='mixed'?checkText(11):same?checkText(9):checkText(10);result.append(guidance);
    const controls=el('div','civic-compose-actions');
@@ -706,6 +741,7 @@ async function handleOpenFormSubmit(e) {
         explanation: data.explanation,
         service:     data.service,
         agency:      data.agency || null,
+        contact:     data.contact || null,
         summary:     data.situation_user || null,
       });
       // GA4: track AI situation classification
@@ -848,6 +884,15 @@ function activateTriage(caseId, freeText = null, aiData = null) {
     document.getElementById('triage-services').hidden=true;
   }
   explanation.textContent=description;
+  // Direct official service contact is the primary recommendation when verified.
+  if(aiData?.contact||aiData?.agency?.url){
+    const direct=buildDirectServiceCard(aiData.contact,aiData.agency);
+    const summary=el('p','direct-service-qualifier');
+    summary.textContent=directServiceText(7);
+    direct.append(summary);
+    officialContainer.append(direct);
+    document.getElementById('triage-services').hidden=true;
+  }
   // Do not repeat generic contact labels where no approved agency is known.
   if(!agency && !services.textContent.trim() && aiData){
     services.textContent=civicCopy(15);
