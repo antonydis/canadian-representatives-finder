@@ -2,54 +2,60 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
-import {validateDraftRequest,validateDraftResponse,determineSuggestedOfficialLanguage} from '../src-worker/scar-email.js';
+import {validateDraftRequest,validateDraftResponse} from '../src-worker/scar-email.js';
 const browser=readFileSync('web/static/js/scar-wizard.js','utf8');
 const app=readFileSync('web/static/js/app.js','utf8');
 const html=readFileSync('web/templates/index.html','utf8');
 const worker=readFileSync('src-worker/index.js','utf8');
 
-test('Only explicit complete civic draft requests may call provider',()=>{
- const base={representative_name:'Example Representative',representative_office:'MP',language:'fr',situation:'La route est bloquée depuis lundi',result:'Je demande une inspection'};
+test('Small intake requires only name and a reason, with optional address',()=>{
+ const base={representative_name:'Example Representative',representative_office:'MP',sender_name:'Sample Citizen',reason:'I would like to ask about a delayed federal application.',language:'en'};
  assert.equal(validateDraftRequest(base).ok,true);
+ assert.equal(validateDraftRequest({...base,sender_address:'22 Example Street, Laval'}).ok,true);
  assert.equal(validateDraftRequest({...base,language:'es'}).ok,false);
- assert.equal(validateDraftRequest({...base,situation:'x'.repeat(551)}).ok,false);
- assert.equal(validateDraftRequest({...base,representative_name:''}).ok,false);
- assert.equal(validateDraftRequest({...base,representative_name:'bad\nname'}).ok,false);
- assert.equal(validateDraftRequest({language:'en',representative_name:'MP',representative_office:'MP'}).ok,false);
+ assert.equal(validateDraftRequest({...base,sender_name:''}).code,'missing_details');
+ assert.equal(validateDraftRequest({...base,reason:''}).code,'missing_details');
+ assert.equal(validateDraftRequest({...base,reason:'x'.repeat(801)}).ok,false);
+ assert.equal(validateDraftRequest({...base,sender_name:'bad\nname'}).ok,false);
 });
-test('A generated draft must pass server-side validation',()=>{
+test('Generated draft stays validated before being shown',()=>{
  assert.equal(validateDraftResponse({subject:'',body:'a'.repeat(150)},'en'),null);
- assert.equal(validateDraftResponse({subject:'A civic request',body:'a'.repeat(150)},'fr').language,'fr');
- assert.equal(validateDraftResponse({subject:'A civic request',body:'My SIN 123-456-789 is private '.repeat(8)},'en'),null);
+ assert.equal(validateDraftResponse({subject:'Request for assistance',body:'a'.repeat(150)},'fr').language,'fr');
+ assert.equal(validateDraftResponse({subject:'Request for assistance',body:'My SIN 123-456-789 is private '.repeat(8)},'en'),null);
 });
-test('Language is a recommendation only; federal users may choose either official language',()=>{
- assert.equal(determineSuggestedOfficialLanguage('H7R 4X5','federal'),'fr');
- assert.equal(determineSuggestedOfficialLanguage('M5V 1A1','federal'),'en');
-});
-test('Each of six language catalogs contains 18 nonempty translated messages',()=>{
+test('Six complete translations for two-step guided intake',()=>{
  const sandbox={window:{}};
  runInNewContext(browser,sandbox);
  for(const lang of ['en','fr','es','pt','zh','tl']){
-   const messages=sandbox.window.InfoCivicScar.labels[lang];
-   assert.equal(messages.length,18,lang);
-   assert.ok(messages.every(value=>typeof value==='string'&&value.trim().length>0),lang);
+  const messages=sandbox.window.InfoCivicScar.labels[lang];
+  assert.equal(messages.length,26,lang);
+  assert.ok(messages.every(s=>typeof s==='string'&&s.trim().length>0),lang);
  }
 });
-test('All six website languages show all SCAR guidance',()=>{
- for(const lang of ['en','fr','es','pt','zh','tl'])assert.ok(browser.includes(lang+':['),lang);
- for(const part of ['Situation','Challenge','Action','Result'])assert.ok(readFileSync('src-worker/scar-email.js','utf8').includes(part),part);
- assert.match(browser,/option.selected=value===suggested/);
- assert.match(browser,/select.value/);
+test('Draft starts in English, French conversion is optional and follows the first draft',()=>{
+ assert.match(browser,/generateDraft\('en'\)/);
+ assert.match(browser,/generatedLanguage==='en'\?'fr':'en'/);
+ assert.match(browser,/switchLanguage\.classList\.remove\('hidden'\)/);
+ assert.match(browser,/switchLanguage\.addEventListener/);
+ assert.doesNotMatch(browser,/option\.selected=value===suggested/);
 });
-test('A separate protected POST endpoint generates drafts without auto sending',()=>{
+test('Two-stage form and direct template stay available',()=>{
+ assert.match(browser,/showStage\(2\)/);
+ assert.match(browser,/showStage\(1\)/);
+ assert.match(browser,/skip\.addEventListener\('click'/);
+ assert.match(browser,/editor\.classList\.add\('hidden'\)/);
+ assert.match(browser,/editor\.classList\.remove\('hidden'\)/);
+ assert.match(browser,/sender_address/);
+ assert.match(browser,/sender_name/);
+ assert.match(browser,/reason/);
+ assert.doesNotMatch(browser,/immigration.status/i);
+});
+test('The AI service is protected and sends no email',()=>{
  assert.match(worker,/if\(path==="\/api\/generate-email"\)return emailDraft\(request,env\)/);
  assert.match(worker,/EMAIL_USER_LIMIT/);
  assert.match(worker,/EMAIL_GLOBAL_LIMIT/);
  assert.match(browser,/fetch\('\/api\/generate-email'/);
  assert.doesNotMatch(browser,/sendEmail\(/);
-});
-test('The SCAR assistant is present on both postal and triage workflows',()=>{
  assert.ok(html.indexOf('/static/js/scar-wizard.js')<html.indexOf('/static/js/app.js'));
  assert.match(app,/window.InfoCivicScar\?\.mount/);
- assert.doesNotMatch(app,/showLavalBanner\(resultsId, rawCode\)/);
 });
