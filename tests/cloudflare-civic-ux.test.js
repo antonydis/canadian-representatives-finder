@@ -70,3 +70,13 @@ test('Default email avoids home-address and telephone placeholders',()=>{
  assert.match(template,/appropriate next step/);
  assert.match(template,/currentPostalCode/);
 });
+
+test('Mobile composer header has two-column layout and accessible action below',()=>{
+ const css=readFileSync('web/static/css/style.css','utf8');
+ assert.match(css,/\.civic-compose-heading\s*\{\s*display:grid/);
+ assert.match(css,/@media\(max-width:720px\)/);
+ assert.match(css,/\.civic-compose-heading>\.civic-edit-btn\s*\{\s*grid-column:2/);
+ assert.match(css,/font-size:16px/);
+ assert.match(css,/overflow-wrap:anywhere/);
+ assert.match(html,/viewport-fit=cover/);
+});
