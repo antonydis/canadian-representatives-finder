@@ -11,8 +11,8 @@ const catalogs={
 };
 const active=[];
 function node(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
-function mount({box,editor,rep,context,template,subjectInput,messageInput,updateLink,uiLanguage,priorIssue}){
- let L=catalogs[uiLanguage]||catalogs.en,step=1,lastData=null,generatedLanguage=null;
+function mount({box,editor,rep,context,template,subjectInput,messageInput,updateLink,uiLanguage,priorIssue,onDraftReady,onRecipientChanged}){
+ let L=catalogs[uiLanguage]||catalogs.en,step=1,lastData=null,generatedLanguage=null,selectedRep=rep;
  const wizard=node('section','scar-wizard scar-simple');
  const heading=node('h3','',L[0]),intro=node('p','scar-wizard-intro',L[1]);
  wizard.append(heading,intro);
@@ -81,12 +81,39 @@ function mount({box,editor,rep,context,template,subjectInput,messageInput,update
      switchLanguage.textContent=language==='en'?L[18]:L[19];
      switchLanguage.classList.remove('hidden');
      status.textContent=L[14];showEditor();
+     if(isInitial && typeof onDraftReady==='function'){
+       // Evaluate mismatch after the citizen can review the generated draft.
+       onDraftReady({
+         reason:data.reason,postal_code:postalCode,
+         switchRepresentative:async(target)=>{
+           if(!target?.email||!target.name||!target.elected_office)return false;
+           const previousData=lastData,previousRep=selectedRep;
+           switchLanguage.disabled=true;generate.disabled=true;
+           status.textContent=L[13];
+           try{
+             const nextData={...previousData,representative_name:target.name,representative_office:target.elected_office};
+             const response=await fetch('/api/generate-email',{method:'POST',
+               headers:{'Content-Type':'application/json'},body:JSON.stringify({...nextData,language:generatedLanguage||'en'})});
+             const next=await response.json();
+             if(!response.ok||!next.success)throw Error('generation_failed');
+             selectedRep=target;lastData=nextData;
+             if(typeof onRecipientChanged==='function')onRecipientChanged(target);
+             subjectInput.value=next.subject;messageInput.value=next.body;updateLink();
+             status.textContent=L[14];
+             return true;
+           }catch{
+             selectedRep=previousRep;lastData=previousData;
+             status.textContent=L[15];return false;
+           }finally{switchLanguage.disabled=false;generate.disabled=false;}
+         }
+       });
+     }
    }catch{status.textContent=L[15];if(generatedLanguage===null)skip.classList.remove('hidden');}
    finally{generate.disabled=false;switchLanguage.disabled=false;}
  }
  generate.addEventListener('click',()=>{
    if(!reason.input.value.trim()){status.textContent=L[17];reason.input.focus();return;}
-   lastData={sender_name:name.input.value.trim(),postal_code:postalCode,reason:reason.input.value.trim(),context:String(priorIssue||'').slice(0,550),representative_name:rep.name,representative_office:rep.elected_office||''};
+   lastData={sender_name:name.input.value.trim(),postal_code:postalCode,reason:reason.input.value.trim(),context:String(priorIssue||'').slice(0,550),representative_name:selectedRep.name,representative_office:selectedRep.elected_office||''};
    generateDraft('en');
  });
  switchLanguage.addEventListener('click',()=>generateDraft(generatedLanguage==='en'?'fr':'en'));
