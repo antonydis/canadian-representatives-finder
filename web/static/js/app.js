@@ -907,11 +907,18 @@ function buildRepCard(rep, level, showEmailTemplate = false) {
           : 'Not my representative? Check official source';
     footer.appendChild(verifyLink);
   }
-  const flagBtn = el('button', 'rep-card-flag-btn');
-  flagBtn.type = 'button';
-  flagBtn.innerHTML = `${ICONS.flag}<span data-i18n="feedback_flag_btn">${t('feedback_flag_btn')}</span>`;
-  flagBtn.addEventListener('click', () => openFeedbackModal(rep, currentPostalCode));
-  footer.appendChild(flagBtn);
+  // The correction form requires D1 and is not accepting submissions yet.
+  // Show a working official verification path instead of a broken form.
+  if (!officialLink && rep.url && /^https:\/\//.test(rep.url)) {
+    const sourceLink = el('a', 'rep-card-flag-btn');
+    sourceLink.href = rep.url;
+    sourceLink.target = '_blank';
+    sourceLink.rel = 'noopener noreferrer';
+    sourceLink.textContent = currentLang === 'fr' ? 'Vérifier les coordonnées'
+      : currentLang === 'es' ? 'Comprobar los datos de contacto'
+      : 'Check contact details';
+    footer.appendChild(sourceLink);
+  }
 
   card.append(main, contact, footer);
   return card;
