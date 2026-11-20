@@ -1219,3 +1219,22 @@ main,.container,.header-inner,.tabs,.search-card,.rep-card,.rep-card-footer,
 .direct-service-foot{font-size:.83rem;color:#536477;margin:12px 0 0;line-height:1.5}
 .direct-service-actions a:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
 @media(max-width:560px){.direct-service-card{padding:15px;margin:12px 0 16px}.direct-service-actions{flex-direction:column;align-items:stretch}.direct-service-actions a{width:100%}}
+
+
+/* Civic correspondence: non-blocking confidence review before opening email. */
+.recipient-review-backdrop{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(12,26,41,.48);overflow-y:auto;overscroll-behavior:contain}
+.recipient-review-dialog{background:#fff;width:min(100%,510px);max-height:min(90dvh,760px);overflow-y:auto;border-radius:20px;box-shadow:0 18px 70px rgba(0,0,0,.22);padding:clamp(18px,4vw,26px);line-height:1.5;min-width:0}
+.recipient-review-dialog h3{font-size:1.2rem;line-height:1.35;color:var(--navy);margin:0 0 8px}
+.recipient-review-dialog>p{font-size:.91rem;margin:8px 0}
+.recipient-review-comparison{background:#f3f7fb;border-radius:12px;padding:12px 14px;margin:15px 0;overflow-wrap:anywhere}
+.recipient-review-comparison p{margin:3px 0}
+.recipient-review-comparison p:last-child{color:var(--navy);font-weight:750}
+.recipient-review-caution{color:#536477;font-size:.84rem}
+.recipient-review-explanation{font-size:.9rem;color:var(--text)}
+.recipient-review-dialog .direct-service-card{margin:14px 0;padding:14px}
+.recipient-review-select{width:100%;max-width:100%;background:#fff;border:1.5px solid #aab9c9;border-radius:12px;padding:12px;margin:10px 0;font:inherit;font-size:16px;min-height:46px;box-sizing:border-box}
+.recipient-review-actions{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.recipient-review-actions button{width:100%;min-height:48px;white-space:normal}
+.recipient-review-status{min-height:0;font-size:.85rem;color:var(--navy);margin:8px 0 0}
+@media(max-width:540px){.recipient-review-backdrop{align-items:flex-end;padding:0}.recipient-review-dialog{border-radius:22px 22px 0 0;width:100%;max-height:calc(100dvh - env(safe-area-inset-top) - 24px);padding:20px 18px max(20px,env(safe-area-inset-bottom));}.recipient-review-dialog h3{font-size:1.15rem}}
+@media(prefers-reduced-motion:reduce){.recipient-review-dialog{scroll-behavior:auto}}
