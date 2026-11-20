@@ -27,8 +27,8 @@ export function officialContactFor(level,agency,postal=""){
  const normalized=String(postal||"").toUpperCase().replace(/\s/g,"");
  const isQC=/^[GHJ]/.test(normalized);
  if(agency?.phone)return {name:agency.name,phone:agency.phone,url:agency.url,label:agency.phone_label||"Official service phone"};
- if(level==="federal"&&!agency)return GENERAL_CONTACTS.federal;
- if(level==="provincial"&&isQC&&!agency)return GENERAL_CONTACTS.quebec;
+ if(level==="federal")return GENERAL_CONTACTS.federal;
+ if(level==="provincial"&&isQC)return GENERAL_CONTACTS.quebec;
  if(level==="municipal"&&/^H7/.test(normalized)&&!agency)return GENERAL_CONTACTS.laval;
  return null; // Don't show an unverified or inappropriate municipal / provincial number.
 }
