@@ -64,3 +64,19 @@ test('The AI service is protected and sends no email',()=>{
  assert.ok(html.indexOf('/static/js/scar-wizard.js')<html.indexOf('/static/js/app.js'));
  assert.match(app,/window.InfoCivicScar\?\.mount/);
 });
+
+test('Generated draft uses concise subject, greeting and citizen signature',()=>{
+ const raw={subject:'Request for assistance about missed waste collection causing considerable problems throughout the neighbourhood and streets',body:'The city has not collected the garbage for two weeks. Could your office please tell me what steps can be taken to fix the schedule?'};
+ const result=validateDraftResponse(raw,'en','Alice Example','Sample Citizen','H7R 4X5');
+ assert.ok(result.subject.length<=72);
+ assert.match(result.body,/^Dear Alice Example,/);
+ assert.match(result.body,/Sincerely,/);
+ assert.match(result.body,/Sample Citizen/);
+ assert.match(result.body,/H7R 4X5/);
+ const french=validateDraftResponse({...raw,subject:'Demande d’aide concernant la collecte des déchets'},'fr','Alice Example','Citoyen Exemple','H7R 4X5');
+ assert.match(french.body,/^Bonjour Alice Example,/);
+ assert.match(french.body,/Cordialement,/);
+});
+test('Six language strings omit the provider name from visible intake',()=>{
+ assert.doesNotMatch(browser,/OpenAI/);
+});
