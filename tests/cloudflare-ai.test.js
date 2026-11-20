@@ -43,3 +43,11 @@ test("Official phone numbers are selected by verified service and jurisdiction, 
  assert.equal(officialContactFor("municipal",null,"M5V1A1"),null);
  assert.equal(officialContactFor("provincial",null,"M5V1A1"),null);
 });
+
+test("Mismatched jurisdiction never attaches an unrelated official agency",()=>{
+ const x=sanitizeClassification({scope:"civic",jurisdiction:"municipal",agency_id:"ircc",
+   explanation:"Municipal issue",situation_user:"Garbage collection issue",
+   situation_en:"Garbage issue",situation_fr:"Collecte des déchets"},"en","H7R4X5");
+ assert.equal(x.agency,null);
+ assert.equal(x.contact.name,"Ville de Laval · municipal services");
+});
