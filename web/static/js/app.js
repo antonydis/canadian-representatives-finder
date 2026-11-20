@@ -1100,9 +1100,9 @@ function buildEmailTemplate(rep) {
   // This ready-made option stays usable without any paid API call.
   let situation=activeTriageSituation||activeSituationEn||'';
   if(activeCaseId)situation=translations.en?.['case_'+activeCaseId+'_title']||situation;
-  const clipped=situation.slice(0,85);
+  const clipped=situation.replace(/\s+/g,' ').trim().slice(0,56).replace(/[\s,;:–-]+$/,'');
   const postal=String(currentPostalCode||'').trim();
-  const subject=clipped?'Request for assistance: '+clipped:'Request for assistance from a constituent';
+  const subject=clipped?'Help with '+clipped:'Request for assistance';
   const title=resolveTitle(rep,false);
   const body=[
     'Dear '+title+',',
