@@ -893,3 +893,8 @@ footer a:hover { text-decoration: underline; }
   flex-shrink: 0;
 }
 .laval-banner-close:hover { color: var(--text); }
+
+/* Identity and boundary verification disclosure */
+.data-quality-notice{margin:1rem 0;padding:1rem 1.15rem;border:1px solid #bc935b;border-radius:12px;background:#fff8e9;color:#493b28;line-height:1.5}
+.data-quality-notice p{margin:0 0 .5rem}
+.data-quality-notice a{color:#614312;text-decoration:underline;font-weight:600}
