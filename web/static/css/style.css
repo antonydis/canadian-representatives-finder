@@ -1157,3 +1157,52 @@ footer a:hover { text-decoration: underline; }
 @supports(padding:max(0px)){
  .civic-inline-composer{padding-bottom:max(14px,env(safe-area-inset-bottom))}
 }
+
+
+/* Mobile finishing pass: predictable widths, comfortable taps and safe areas. */
+html{overflow-x:clip;scroll-padding-top:16px}
+body{min-width:0}
+main,.container,.header-inner,.tabs,.search-card,.rep-card,.rep-card-footer,
+.triage-input-wrapper,.civic-step,.civic-inline-composer{min-width:0}
+.contact-item{min-width:0}
+.contact-item a{overflow-wrap:anywhere;min-width:0}
+.rep-name{overflow-wrap:break-word}
+.civic-compose-to{overflow-wrap:anywhere}
+.civic-inline-composer input,.civic-inline-composer textarea,.civic-inline-composer select,
+.triage-open-input,.postal-input-pill,.feedback-email-input,.feedback-textarea{font-size:16px}
+.lang-dropdown-btn,.tab-btn,.rep-card-footer button,.email-modal-close,
+.civic-edit-btn,.search-btn,.search-pill-btn{min-height:44px}
+@media(max-width:640px){
+ main{padding-left:clamp(12px,4vw,20px);padding-right:clamp(12px,4vw,20px);padding-bottom:48px}
+ .header-inner{padding:12px clamp(12px,4vw,20px);gap:8px;flex-wrap:nowrap}
+ .site-brand{min-width:0;gap:8px}
+ .site-name{min-width:0}
+ .site-name .primary{font-size:clamp(.78rem,3vw,1rem);line-height:1.3;overflow-wrap:break-word}
+ .lang-switcher{flex-shrink:0}
+ .tabs{gap:6px;margin-bottom:24px}
+ .tab-btn{min-width:0;margin:0;white-space:normal;line-height:1.4;padding:12px 8px}
+ .rep-card{padding:15px;gap:10px}
+ .rep-card-footer{justify-content:flex-start}
+ .rep-card-footer .civic-compose-btn{max-width:100%;white-space:normal;text-align:center}
+ .triage-open-input,.postal-input-pill{width:100%;min-width:0}
+ .civic-progress-item{padding:8px 3px;align-items:flex-start}
+ .civic-progress-text{overflow-wrap:break-word}
+ .civic-compose-heading>.civic-edit-btn{max-width:100%}
+ .email-modal-overlay{padding:12px}
+ .email-modal{max-width:100%;max-height:calc(100dvh - 24px)}
+ .email-modal-body{padding:16px}
+ .email-modal-actions{padding:12px 16px 18px}
+ .email-modal-actions>*{flex:1 1 100%;min-width:0}
+}
+@media(max-width:360px){
+ .header-inner{gap:6px}
+ .site-name .primary{font-size:.8rem}
+ .lang-dropdown-btn{padding:6px 8px}
+ .civic-inline-composer{padding:12px 10px}
+ .civic-progress-text{font-size:.69rem}
+ .civic-compose-heading>.civic-edit-btn{margin-left:0;max-width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ .civic-inline-composer *{scroll-behavior:auto}
+}
