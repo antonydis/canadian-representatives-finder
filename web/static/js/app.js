@@ -468,6 +468,7 @@ async function handleOpenFormSubmit(e) {
         explanation: data.explanation,
         service:     data.service,
         agency:      data.agency || null,
+        summary:     data.situation_user || null,
       });
       // GA4: track AI situation classification
       gtag('event', 'classify_situation', {
@@ -550,7 +551,7 @@ function activateTriage(caseId, freeText = null, aiData = null) {
   refreshCivicLabels();
   document.getElementById('civic-understanding-summary').textContent =
     caseData ? t('case_'+caseId+'_title')
-    : (currentLang === 'fr' ? activeSituationFr : currentLang === 'en' ? activeSituationEn : null)
+    : aiData?.summary || (currentLang === 'fr' ? activeSituationFr : currentLang === 'en' ? activeSituationEn : null)
       || (freeText.length > 115 ? freeText.slice(0,115)+'…' : freeText);
   document.getElementById('civic-original-question').textContent =
     freeText || (caseData ? t('case_'+caseId+'_title') : '');
