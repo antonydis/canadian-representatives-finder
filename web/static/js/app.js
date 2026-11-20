@@ -291,7 +291,7 @@ async function maybeReviewDraftRecipient({rep,context,box,reason,switchRepresent
  if(!box.isConnected||box.classList.contains('hidden')||currentComposition?.rep!==rep)return;
  const level=classification.jurisdiction;
  if(!['federal','provincial','municipal'].includes(level)||level===rep.level)return;
- const options=latestRepresentatives.filter(r=>r.level===level&&r.email&&r.name);
+ const options=latestRepresentatives.filter(r=>r.level===level&&r.email&&r.name&&r.elected_office);
  const backdrop=el('div','recipient-review-backdrop');
  const dialog=el('section','recipient-review-dialog');
  dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');
