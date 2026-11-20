@@ -40,7 +40,7 @@ export function sanitizeClassification(data,lang,postal="") {
  const agency=id?AGENCIES[id]:null;
  // Without the location from the form, do not offer province-specific services.
  const isQC=/^[GHJ]/.test(String(postal||"").toUpperCase().replace(/\s/g,""));
- const safeAgency=agency&&(agency.region==="canada"||(agency.region==="quebec"&&isQC))?agency:null;
+ const safeAgency=agency&&(agency.level===level||level==="mixed")&&(agency.region==="canada"||(agency.region==="quebec"&&isQC))?agency:null;
  const contact=data.scope==="civic"?officialContactFor(level,safeAgency,postal):null;
  const preferred=VALID_LANGS.includes(lang)?lang:"en";
  const explanations={
