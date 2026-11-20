@@ -974,3 +974,51 @@ footer a:hover { text-decoration: underline; }
  .civic-progress-text{font-size:.72rem}
  .civic-edit-btn{padding:8px 10px}
 }
+
+
+/* Shared InfoCivic controls — pill style used across primary journeys. */
+:root{--control-pill:999px}
+.search-btn,.civic-compose-btn,.civic-secondary-action,.civic-edit-btn,.civic-official-action,
+.btn-copy-template,.btn-open-mail,.triage-chip,.share-btn{border-radius:var(--control-pill)}
+.postal-input{border-radius:var(--control-pill);padding-inline:17px}
+.search-card{border-radius:20px}
+.find-progress{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:8px}
+.find-location-summary{margin-bottom:14px}
+.find-representatives-heading{display:flex;align-items:flex-start;gap:13px;padding:12px 2px 16px}
+.find-representatives-heading h2{color:var(--navy);font-size:1.1rem;margin:0 0 4px}
+.find-representatives-heading p{color:var(--text-muted);font-size:.91rem;margin:0}
+.civic-agency-name-link{color:#185587;text-underline-offset:3px;font-weight:650;overflow-wrap:anywhere}
+.civic-agency-name-link:hover{color:var(--navy);text-decoration-thickness:2px}
+.civic-agency-name-link:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+.civic-external-mark{font-size:.9em}
+.civic-inline-composer{background:#fff;border:1px solid #cbd9e8;border-top:4px solid var(--navy);
+ border-radius:16px;box-shadow:var(--shadow);padding:22px 24px;margin:24px 0}
+.civic-inline-composer.hidden{display:none}
+.civic-compose-heading{display:flex;align-items:flex-start;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.civic-compose-heading h2{margin:0 0 6px;color:var(--navy);font-size:1.12rem}
+.civic-compose-heading p{margin:0;color:var(--text-muted);line-height:1.45}
+.civic-compose-heading>.civic-edit-btn{margin-left:auto}
+.civic-compose-form{display:flex;flex-direction:column;gap:15px;padding-top:16px}
+.civic-compose-to{margin:0;color:var(--text);overflow-wrap:anywhere}
+.civic-compose-field{display:flex;flex-direction:column;gap:6px}
+.civic-compose-field label{color:var(--navy);font-weight:650;font-size:.88rem}
+.civic-compose-field input,.civic-compose-field textarea{width:100%;box-sizing:border-box;
+ border:1.5px solid #b9c8da;border-radius:12px;padding:11px 14px;font:inherit;color:var(--text);background:#fff}
+.civic-compose-field textarea{resize:vertical;min-height:168px;line-height:1.55}
+.civic-compose-field input:focus-visible,.civic-compose-field textarea:focus-visible{outline:3px solid #2373c8;outline-offset:1px}
+.civic-compose-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.civic-compose-actions .civic-compose-btn{display:inline-flex;text-decoration:none;min-height:46px}
+.civic-secondary-action{font:inherit;background:#f4f7fa;border:1px solid #b9c8da;color:var(--navy);
+ padding:11px 18px;min-height:46px;cursor:pointer;font-weight:650}
+.civic-secondary-action:hover{background:#e8eff7}
+.civic-secondary-action:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+.civic-compose-note{margin:0;color:var(--text-muted);font-size:.85rem;line-height:1.45}
+@media(max-width:560px){
+ .find-progress{grid-template-columns:1fr 1fr;gap:3px}
+ .find-progress [data-find-step="3"]{grid-column:1/-1}
+ .civic-inline-composer{padding:16px}
+ .civic-compose-heading{flex-wrap:wrap}
+ .civic-compose-heading>.civic-edit-btn{margin-left:42px}
+ .civic-compose-actions>*{flex:1 1 170px;text-align:center;justify-content:center}
+ .search-card{padding:18px}
+}
