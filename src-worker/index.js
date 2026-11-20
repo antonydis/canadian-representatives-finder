@@ -46,9 +46,34 @@ async function search(request){
   const res=await fetch("https://represent.opennorth.ca/postcodes/"+postal+"/",{headers:{accept:"application/json"},signal:AbortSignal.timeout(10000)});
   if(res.status===429||res.status===503)return fail("rate_limit",429);
   if(!res.ok)return fail("api_error",502);
-  const raw=await res.json(),all=[...(raw.representatives_centroid||[]),...(raw.representatives_concordance||[])];
+  const raw=await res.json();
+  const centroid=raw.representatives_centroid||[];
+  const concordance=raw.representatives_concordance||[];
+  const all=[...centroid,...concordance];
   const reps=[...new Map(all.map(x=>[String(x.name)+"|"+String(x.elected_office),mapRep(x)])).values()];
-  return respond({success:true,postal_code:postal,representatives:applyOverrides(reps,postal),data_source:"OpenNorth + InfoCivic overrides",data_freshness:"unverified"});
+  // A postal code may cover several electoral boundaries. Never silently
+  // represent a geographic match as an officially verified identity.
+  const disagreement=["federal","provincial","municipal"].filter(lvl=>{
+    const from=(items)=>new Set(items.map(mapRep).filter(r=>r.level===lvl).map(r=>r.district.toLowerCase().trim()).filter(Boolean));
+    const a=from(centroid),z=from(concordance);
+    return a.size>0&&z.size>0&&([...a].some(x=>!z.has(x))||[...z].some(x=>!a.has(x)));
+  });
+  const candidateReps=applyOverrides(reps,postal);
+  const issues=[];
+  if(disagreement.length)issues.push("postal_boundary_ambiguity");
+  if(!candidateReps.length)issues.push("no_representative_data");
+  issues.push("official_verification_required");
+  return respond({
+    success:true,postal_code:postal,representatives:candidateReps,
+    ambiguity_levels:disagreement, warnings:issues,
+    data_source:"OpenNorth + InfoCivic manual overrides",
+    data_freshness:"unverified", verified:false,
+    verification_links:{
+      federal:"https://www.ourcommons.ca/Members/en",
+      federal_district:"https://www.elections.ca/Scripts/VIS/FindED?L=e&PAGEID=20&QID=-1",
+      quebec_provincial:"https://www.assnat.qc.ca/fr/deputes/index.html"
+    }
+  });
  }catch{return fail("api_error",502);}
 }
 function fallback(text,lang){
