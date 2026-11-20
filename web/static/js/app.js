@@ -83,6 +83,130 @@ let activeSituationFr = null;
 /* last postal code searched — used by feedback modal */
 let currentPostalCode = null;
 
+/* Shared guided experience on both search pages. */
+const FIND_TEXT = {
+ en:["Your location","Your representatives","Contact a representative","Change","Choose a representative below to prepare a message.","Prepare your message","Selected representative","To","Subject","Message","Copy message","Open email app","Choose another representative","Message copied","The email will not be sent automatically. Please review and send it yourself.","Contact this representative"],
+ fr:["Votre emplacement","Vos représentants","Contacter un élu","Modifier","Choisissez un élu pour préparer votre message.","Préparer votre message","Élu sélectionné","Destinataire","Objet","Message","Copier le message","Ouvrir le courriel","Choisir un autre élu","Message copié","Le message n'est pas envoyé automatiquement. Vérifiez-le et envoyez-le vous-même.","Contacter cet élu"],
+ es:["Tu ubicación","Tus representantes","Contactar un representante","Cambiar","Selecciona un representante para preparar tu mensaje.","Prepara tu mensaje","Representante seleccionado","Destinatario","Asunto","Mensaje","Copiar mensaje","Abrir correo","Elegir otro representante","Mensaje copiado","El correo no se envía automáticamente. Revísalo y envíalo tú mismo.","Contactar a este representante"],
+ pt:["Sua localização","Seus representantes","Contatar um representante","Alterar","Escolha um representante para preparar sua mensagem.","Prepare sua mensagem","Representante escolhido","Para","Assunto","Mensagem","Copiar mensagem","Abrir e-mail","Escolher outro representante","Mensagem copiada","O e-mail não é enviado automaticamente. Revise-o e envie-o.","Contatar este representante"],
+ zh:["您的位置","您的代表","联系代表","修改","请选择代表以准备邮件。","准备您的邮件","已选代表","收件人","主题","邮件正文","复制邮件","打开邮件应用","选择其他代表","已复制","邮件不会自动发送。请检查后自行发送。","联系这位代表"],
+ tl:["Iyong lokasyon","Iyong mga kinatawan","Makipag-ugnayan","Baguhin","Pumili ng kinatawan para ihanda ang mensahe.","Ihanda ang mensahe","Napiling kinatawan","Para kay","Paksa","Mensahe","Kopyahin","Buksan ang email app","Pumili ng iba","Nakopya","Hindi awtomatikong ipapadala ang email. Suriin at ipadala ito.","Kontakin ang kinatawang ito"]
+};
+const findText=index=>(FIND_TEXT[currentLang]||FIND_TEXT.en)[index];
+let currentComposition = null;
+function updateFindJourney(step, postal){
+ const journey=document.getElementById('find-journey');
+ journey.classList.remove('hidden');
+ const mapping=[['find-step-location',0],['find-step-reps',1],['find-step-contact',2],
+ ['find-location-title',0],['find-change-postal',3],['find-representatives-title',1],
+ ['find-representatives-help',4]];
+ for(const [id,i] of mapping)document.getElementById(id).textContent=findText(i);
+ document.getElementById('find-location-code').textContent=postal;
+ document.querySelectorAll('[data-find-step]').forEach(item=>{
+   const n=Number(item.dataset.findStep);
+   item.classList.toggle('completed',n<step);
+   item.classList.toggle('current',n===step);
+   if(n===step)item.setAttribute('aria-current','step');
+   else item.removeAttribute('aria-current');
+ });
+}
+function closeInlineComposer(context) {
+ const box=document.getElementById(context==='main'?'find-composer':'triage-composer');
+ box.classList.add('hidden');
+ box.replaceChildren();
+ if(context==='main' && currentPostalCode)updateFindJourney(2,currentPostalCode);
+ else if(context==='triage')updateCivicProgress(3);
+ currentComposition=null;
+}
+function openInlineComposer(rep,context){
+ if(!rep.email)return;
+ const box=document.getElementById(context==='main'?'find-composer':'triage-composer');
+ const template=buildEmailTemplate(rep);
+ currentComposition={rep,context};
+ box.replaceChildren();
+ box.classList.remove('hidden');
+ const heading=document.createElement('div');
+ heading.className='civic-compose-heading';
+ const number=document.createElement('span');
+ number.className='civic-step-number';
+ number.setAttribute('aria-hidden','true');
+ number.textContent=context==='main'?'3':'4';
+ const headingText=document.createElement('div');
+ headingText.className='civic-step-heading-text';
+ const title=document.createElement('h2');
+ title.id=context+'-composer-title';
+ title.tabIndex=-1;
+ title.textContent=findText(5);
+ const subtitle=document.createElement('p');
+ subtitle.textContent=findText(6)+': '+rep.name+' · '+(rep.elected_office||'');
+ headingText.append(title,subtitle);
+ const back=document.createElement('button');
+ back.type='button';
+ back.className='civic-edit-btn';
+ back.textContent=findText(12);
+ back.addEventListener('click',()=>closeInlineComposer(context));
+ heading.append(number,headingText,back);
+ const form=document.createElement('form');
+ form.className='civic-compose-form';
+ const field=(text,value,kind)=>{
+   const wrap=document.createElement('div');
+   wrap.className='civic-compose-field';
+   const label=document.createElement('label');
+   label.textContent=text;
+   const input=document.createElement(kind);
+   input.id=context+'-compose-'+kind+'-'+wrap.className.replace(/\\s/g,'');
+   label.htmlFor=input.id;
+   if(kind==='textarea'){input.rows=9;input.value=value;}
+   else {input.type='text';input.value=value;}
+   wrap.append(label,input);
+   return {wrap,input};
+ };
+ const recipient=document.createElement('p');
+ recipient.className='civic-compose-to';
+ const strong=document.createElement('strong');
+ strong.textContent=findText(7)+': ';
+ const address=document.createElement('span');
+ address.textContent=template.to;
+ recipient.append(strong,address);
+ const subject=field(findText(8),template.subject,'input');
+ const message=field(findText(9),template.body,'textarea');
+ const actions=document.createElement('div');
+ actions.className='civic-compose-actions';
+ const copy=document.createElement('button');
+ copy.type='button';
+ copy.className='civic-secondary-action';
+ copy.textContent=findText(10);
+ const mail=document.createElement('a');
+ mail.className='civic-compose-btn';
+ mail.textContent=findText(11);
+ const updateLink=()=>{
+   const url='mailto:'+encodeURIComponent(template.to)+'?subject='+encodeURIComponent(subject.input.value)+'&body='+encodeURIComponent(message.input.value);
+   mail.href=url;
+ };
+ subject.input.addEventListener('input',updateLink);
+ message.input.addEventListener('input',updateLink);
+ updateLink();
+ copy.addEventListener('click',async()=>{
+   const content='To: '+template.to+'\\n'+findText(8)+': '+subject.input.value+'\\n\\n'+message.input.value;
+   try{
+     if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(content);
+     else fallbackCopy(content,()=>{});
+     copy.textContent=findText(13);
+   }catch{copy.textContent=findText(10);}
+ });
+ actions.append(copy,mail);
+ const note=document.createElement('p');
+ note.className='civic-compose-note';
+ note.textContent=findText(14);
+ form.addEventListener('submit',e=>e.preventDefault());
+ form.append(recipient,subject.wrap,message.wrap,actions,note);
+ box.append(heading,form);
+ if(context==='main')updateFindJourney(3,currentPostalCode);
+ else updateCivicProgress(4);
+ box.scrollIntoView({behavior:'smooth',block:'start'});
+ title.focus({preventScroll:true});
+}
+
 /* ================================================================
    INIT
    ================================================================ */
@@ -105,6 +229,7 @@ async function init() {
   document.getElementById('triage-open-form').addEventListener('submit', handleOpenFormSubmit);
   document.getElementById('triage-back-btn').addEventListener('click', resetTriageToPhase1);
   document.getElementById('civic-edit-question').addEventListener('click', editCivicQuestion);
+  document.getElementById('find-change-postal').addEventListener('click',()=>{document.getElementById('postal-input').focus();document.getElementById('postal-input').select();});
 
   document.getElementById('postal-input').addEventListener('input', () => clearError('main'));
   document.getElementById('triage-postal-input').addEventListener('input', () => clearError('triage'));
@@ -674,7 +799,10 @@ async function handleSearch(e, source) {
       return;
     }
 
-    renderResults(data.representatives, displayCode, resultsId, levelFilter, source === 'triage', data);
+    // A new search invalidates any previously selected representative.
+    closeInlineComposer(source);
+    renderResults(data.representatives, displayCode, resultsId, levelFilter, true, data);
+    if(source==='main')updateFindJourney(2,displayCode);
 
     // Laval banner: suggest /laval when postal code is in Laval
     if (source === 'main' && isLavalPostal(rawCode)) {
@@ -766,6 +894,7 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
   const newUrl = `${window.location.pathname}?postal=${cleanCode}`;
   history.replaceState({ view, postal: cleanCode }, '', newUrl);
 
+  const activeCardContext=containerId==='results'?'main':'triage';
   showLevels.forEach(level => {
     if (!grouped[level].length) return;
 
@@ -774,7 +903,7 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
     heading.innerHTML = `${levelSvg(level)}<span>${t(level)}</span>`;
     levelSec.appendChild(heading);
 
-    grouped[level].forEach(rep => levelSec.appendChild(buildRepCard(rep, level, showEmailTemplate)));
+    grouped[level].forEach(rep => levelSec.appendChild(buildRepCard(rep, level, showEmailTemplate, activeCardContext)));
 
     section.appendChild(levelSec);
   });
@@ -931,7 +1060,7 @@ function officialDirectoryFor(rep, level) {
   return null;
 }
 
-function buildRepCard(rep, level, showEmailTemplate = false) {
+function buildRepCard(rep, level, showEmailTemplate = false, activeCardContext = 'main') {
   const card = el('div', `rep-card ${level}`);
 
   const main   = el('div', 'rep-main');
@@ -957,8 +1086,8 @@ function buildRepCard(rep, level, showEmailTemplate = false) {
     const messageButton=el('button','civic-compose-btn');
     messageButton.type='button';
     messageButton.innerHTML=ICONS.compose+'<span></span>';
-    messageButton.querySelector('span').textContent=civicCopy(14);
-    messageButton.addEventListener('click',()=>openEmailModal(rep));
+    messageButton.querySelector('span').textContent=findText(15);
+    messageButton.addEventListener('click',()=>openInlineComposer(rep,activeCardContext));
     footer.appendChild(messageButton);
   }
   const flagBtn = el('button', 'rep-card-flag-btn');
