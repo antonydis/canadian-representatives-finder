@@ -41,3 +41,16 @@ test('Mail is editable, reviewed, and sent only through user mail application',(
  assert.match(js,/mail\.href=url/);
  assert.match(js,/mailto:/);
 });
+
+test('Contact entry asks about suitability before collecting personal information',()=>{
+ assert.match(js,/function buildContactDecisionGate/);
+ assert.match(js,/box\.insertBefore\(gate,form\)/);
+ assert.match(js,/form\.classList\.add\('hidden'\)/);
+ assert.match(js,/\/api\/classify-situation/);
+ assert.match(js,/closeInlineComposer\(context\)/);
+ for(const language of ['en','fr','es','pt','zh','tl'])assert.ok(js.includes(language+':['),language);
+});
+test('Representative cards record their government level for matching',()=>{
+ assert.match(js,/card\.dataset\.level=level/);
+ assert.match(js,/level===rep\.level/);
+});
