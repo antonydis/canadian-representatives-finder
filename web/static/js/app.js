@@ -476,19 +476,14 @@ async function handleOpenFormSubmit(e) {
     } else if (resp.status === 429) {
       showErr(t('error_rate_limit'));
     } else {
-      // Default to municipal on any classification failure
-      activateTriage(null, text, {
-        level:       'municipal',
-        explanation: t('error_classify_fallback'),
-        service:     '311',
-      });
+      showErr(data.requires_clarification
+        ? (currentLang === 'fr' ? 'Précisez la situation ou choisissez un des exemples ci-dessous.'
+          : currentLang === 'es' ? 'Describe el problema con más detalle o elige uno de los ejemplos.'
+          : 'Please describe the issue more precisely or choose an example below.')
+        : t('error_classify_fallback'));
     }
   } catch {
-    activateTriage(null, text, {
-      level:       'municipal',
-      explanation: t('error_classify_fallback'),
-      service:     '311',
-    });
+    showErr(t('error_classify_fallback'));
   } finally {
     aiLoading.classList.add('hidden');
     sendBtn.disabled = false;
