@@ -920,3 +920,57 @@ footer a:hover { text-decoration: underline; }
  .rep-card-flag-btn{min-height:44px}
  #feedback-next-step{padding:14px 16px 22px}
 }
+
+
+/* Civic orientation flow: compact, progressive, responsive and accessible */
+.civic-progress{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:18px 0 20px}
+.civic-progress-item{display:flex;align-items:center;gap:8px;color:#677386;font-size:.78rem;font-weight:600;min-width:0;padding:8px 6px}
+.civic-progress-item.current{color:var(--navy)}
+.civic-progress-item.completed{color:#216a56}
+.civic-progress-number,.civic-step-number{display:inline-flex;justify-content:center;align-items:center;border-radius:50%;font-weight:800;flex-shrink:0}
+.civic-progress-number{width:27px;height:27px;background:#edf0f4;color:#697588}
+.civic-progress-item.current .civic-progress-number{background:var(--navy);color:#fff}
+.civic-progress-item.completed .civic-progress-number{background:#deefe9;color:#216a56}
+.civic-progress-text{line-height:1.25}
+.civic-step{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 22px;margin-bottom:16px;box-shadow:var(--shadow)}
+.civic-step-heading{display:flex;align-items:flex-start;gap:13px}
+.civic-step-heading-text{flex:1;min-width:0}
+.civic-step-heading h2,.civic-contact-stage h2{font-size:1.08rem;line-height:1.35;color:var(--navy);margin:0 0 5px;font-weight:750}
+.civic-step-heading p,.civic-contact-stage p{margin:0;color:var(--text-muted);line-height:1.5;font-size:.92rem}
+.civic-step-number{width:30px;height:30px;background:#e6edf6;color:var(--navy);font-size:.85rem}
+.civic-step-understanding .civic-step-number{background:#deefe9;color:#216a56}
+.civic-edit-btn{margin-left:auto;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--navy);padding:9px 13px;min-height:40px;font:inherit;font-size:.85rem;font-weight:600;cursor:pointer;flex-shrink:0}
+.civic-edit-btn:hover{background:#f0f5fb}
+.civic-original-details{margin:13px 0 0 43px;font-size:.85rem;color:var(--text-muted)}
+.civic-original-details summary{cursor:pointer;text-decoration:underline;text-underline-offset:3px;min-height:30px}
+.civic-original-details p{white-space:pre-wrap;overflow-wrap:anywhere;border-left:3px solid #d7e1ef;padding:8px 12px;margin:6px 0 2px}
+.civic-agency-step .civic-step-heading{margin-bottom:12px}
+.civic-agency-step .triage-level-badge{margin:4px 0 0}
+.civic-agency-inner{padding-left:43px}
+.civic-agency-inner .triage-explanation{margin:0 0 13px}
+.civic-agency-inner .triage-services{display:flex;align-items:baseline;gap:5px 10px;flex-wrap:wrap}
+.civic-agency-link-container{margin-top:12px}
+.civic-official-action{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border:1px solid #b8c9e1;background:#f5f8fd;color:var(--navy);border-radius:8px;padding:9px 14px;font-size:.88rem;font-weight:650;text-decoration:none}
+.civic-official-action:hover{background:#e7eef8}
+.triage-postal-section .civic-step-heading{margin-bottom:15px}
+.triage-postal-section .triage-next-step{margin:0;font-weight:400}
+.civic-contact-stage{display:flex;gap:13px;align-items:flex-start;background:#edf4fa;border:1px solid #d1e0ee;border-radius:var(--radius-lg);padding:17px 22px;margin:0 0 14px}
+.civic-contact-stage.hidden{display:none}
+.civic-contact-stage p{font-weight:400}
+.civic-compose-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 16px;min-height:44px;border:0;border-radius:8px;background:var(--navy);color:#fff;font:inherit;font-size:.9rem;font-weight:700;cursor:pointer}
+.civic-compose-btn:hover{background:var(--navy-light)}
+.civic-compose-btn svg{width:17px;height:17px;stroke:currentColor;fill:none}
+.civic-compose-btn:focus-visible,.civic-edit-btn:focus-visible,.civic-official-action:focus-visible,.civic-original-details summary:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+@media(max-width:700px){
+ .civic-progress{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+ .civic-step{padding:15px}
+ .civic-step-heading{gap:9px}
+ .civic-agency-inner{padding-left:39px}
+ .civic-original-details{margin-left:39px}
+ .civic-contact-stage{padding:15px}
+ .civic-compose-btn{flex:1}
+}
+@media(max-width:380px){
+ .civic-progress-text{font-size:.72rem}
+ .civic-edit-btn{padding:8px 10px}
+}
