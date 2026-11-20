@@ -158,7 +158,7 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
   if(issue.length<10){result.textContent=checkText(15);return;}
   check.disabled=true;result.textContent=checkText(7);
   try{
-   const response=await fetch('/api/classify-situation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:issue,lang:currentLang})});
+   const response=await fetch('/api/classify-situation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:issue,lang:currentLang,postal_code:currentPostalCode||''})});
    const data=await response.json();result.replaceChildren();
    if(!response.ok||!data.success)throw Error('unavailable');
    if(data.requires_clarification||!data.jurisdiction){result.textContent=data.out_of_scope?checkText(17):checkText(16);return;}
@@ -172,6 +172,19 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
    result.append(title,explanation);
    if(data.agency?.url&&/^https:\/\//.test(data.agency.url)){const a=el('a','civic-agency-name-link');
      a.href=data.agency.url;a.textContent=data.agency.name;a.target='_blank';a.rel='noopener noreferrer';result.append(a);}
+   if(data.contact?.phone){
+     const phoneBox=el('div','civic-phone-help');
+     const who=el('span');who.textContent=data.contact.name+' · ';
+     const phone=el('a');phone.href='tel:'+data.contact.phone.replace(/[^0-9+]/g,'');
+     phone.textContent=data.contact.phone;phone.setAttribute('aria-label',data.contact.name+': '+data.contact.phone);
+     phoneBox.append(who,phone);
+     if(data.contact.alternate_phone){
+       const alternate=el('a');alternate.href='tel:'+data.contact.alternate_phone.replace(/[^0-9+]/g,'');
+       alternate.textContent=' / '+data.contact.alternate_phone;phoneBox.append(alternate);
+     }
+     const note=el('p','civic-phone-note');note.textContent=data.contact.label||'';
+     phoneBox.append(note);result.append(phoneBox);
+   }
    const guidance=el('p');const same=level===rep.level;
    guidance.textContent=level==='mixed'?checkText(11):same?checkText(9):checkText(10);result.append(guidance);
    const controls=el('div','civic-compose-actions');
@@ -278,6 +291,10 @@ function openInlineComposer(rep,context){
     subjectInput:subject.input,messageInput:message.input,updateLink});
  box.insertBefore(gate,form);
  form.classList.add('hidden');
+ // Citizen already asked for routing on the triage path: do not ask again.
+ if(context==='triage' && activeTriageSituation){
+   gate.querySelector('.contact-decision-options .civic-compose-btn')?.click();
+ }
  if(context==='main')updateFindJourney(3,currentPostalCode);
  else updateCivicProgress(4);
  box.scrollIntoView({behavior:'smooth',block:'start'});
