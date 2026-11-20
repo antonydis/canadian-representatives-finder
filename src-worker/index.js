@@ -17,8 +17,10 @@ function level(raw) {
 }
 function mapRep(raw) {return {name:raw.name||"",elected_office:raw.elected_office||"",level:raw.level||level(raw),party:raw.party_name||null,district:raw.district_name||"",email:raw.email||null,phone:raw.phone||raw.offices?.find(o=>o.tel)?.tel||null,url:raw.url||raw.personal_url||null,photo_url:raw.photo_url||null};}
 const repKey=r=>String(r.name).toLowerCase()+"|"+String(r.elected_office).toLowerCase();
-function applyOverrides(reps,postal){
+function applyOverrides(reps,postal,city=""){
  let list=[...reps];const prefix=postal.slice(0,3);
+ const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/^ville de /,"").trim();
+ const cityMatches = item => Boolean(norm(city)) && (norm(item.district_name)===norm(city) || norm(item.district_name)===norm("Ville de "+city));
  for(const rule of [...overridesA.overrides,...overridesB.overrides]){
   if(!rule.postal_prefixes?.includes(prefix))continue;
   const items=rule.representative?[rule.representative]:rule.representatives||[];
@@ -31,11 +33,12 @@ function applyOverrides(reps,postal){
    }else if(action==="replace_or_inject"){
     const i=list.findIndex(r=>repKey(r)===repKey(next)||r.level==="municipal"&&/plante/i.test(r.name)&&/maire|mayor/i.test(next.elected_office));
     if(i>=0)list.splice(i,1,next);
-    else if(!list.some(r=>repKey(r)===repKey(next)))list.push(next);
+    else if(cityMatches(raw)&&!list.some(r=>repKey(r)===repKey(next)))list.push(next);
    }else if(action==="replace"){
-    const i=list.findIndex(r=>r.level===next.level&&r.elected_office===next.elected_office);
+    const i=list.findIndex(r=>r.level===next.level&&r.elected_office===next.elected_office&&
+      norm(r.district)===norm(next.district));
     if(i>=0)list[i]=next;
-   }else if(!list.some(r=>repKey(r)===repKey(next)))list.push(next);
+   }else if(action==="inject" && cityMatches(raw)&&!list.some(r=>repKey(r)===repKey(next)))list.push(next);
   }
  }
  return [...new Map(list.map(r=>[repKey(r),r])).values()];
@@ -55,7 +58,7 @@ async function search(request){
   // A postal code may cover several electoral boundaries. Never silently
   // represent a geographic match as an officially verified identity.
   const disagreement=boundaryAmbiguity(raw,mapRep);
-  const candidateReps=applyOverrides(reps,postal);
+  const candidateReps=applyOverrides(reps,postal,raw.city);
   const issues=[];
   if(disagreement.length)issues.push("postal_boundary_ambiguity");
   if(!candidateReps.length)issues.push("no_representative_data");
