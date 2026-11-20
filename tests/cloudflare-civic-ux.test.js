@@ -107,3 +107,13 @@ test('Direct contact rendering never executes user supplied HTML',()=>{
  assert.doesNotMatch(block,/innerHTML/);
  assert.match(block,/textContent=directServiceText\(2\)\+': '\+contact\.phone/);
 });
+
+test('Municipality is loaded from postcode API and refines direct services without new AI calls',()=>{
+ const worker=readFileSync('src-worker/index.js','utf8');
+ assert.match(worker,/municipality:typeof raw\.city/);
+ assert.match(worker,/\/api\/resolve-civic-contact/);
+ assert.match(js,/currentMunicipality=typeof data\.municipality/);
+ assert.match(js,/updateTriageLocalContact\(displayCode,currentMunicipality,activeTriageRouting\)/);
+ assert.match(js,/function updateTriageLocalContact/);
+ assert.match(js,/activeTriageRouting=\{level:activeTriageLevel/);
+});
