@@ -8,10 +8,10 @@ const app=readFileSync('web/static/js/app.js','utf8');
 const html=readFileSync('web/templates/index.html','utf8');
 const worker=readFileSync('src-worker/index.js','utf8');
 
-test('Small intake requires only name and a reason, with optional address',()=>{
+test('Small intake requires only name and reason, and reuses postal code',()=>{
  const base={representative_name:'Example Representative',representative_office:'MP',sender_name:'Sample Citizen',reason:'I would like to ask about a delayed federal application.',language:'en'};
  assert.equal(validateDraftRequest(base).ok,true);
- assert.equal(validateDraftRequest({...base,sender_address:'22 Example Street, Laval',postal_code:'H7R 4X5'}).ok,true);
+ assert.equal(validateDraftRequest({...base,postal_code:'H7R 4X5'}).ok,true);
  assert.equal(validateDraftRequest({...base,postal_code:'BAD 123'}).ok,false);
  assert.equal(validateDraftRequest({...base,language:'es'}).ok,false);
  assert.equal(validateDraftRequest({...base,sender_name:''}).code,'missing_details');
@@ -46,10 +46,12 @@ test('Two-stage form and direct template stay available',()=>{
  assert.match(browser,/skip\.addEventListener\('click'/);
  assert.match(browser,/editor\.classList\.add\('hidden'\)/);
  assert.match(browser,/editor\.classList\.remove\('hidden'\)/);
- assert.match(browser,/sender_address/);
+ assert.doesNotMatch(browser,/sender_address/);
+ assert.doesNotMatch(browser,/sender-address/);
  assert.match(browser,/postal_code:postalCode/);
  assert.match(browser,/scar-postal-info/);
  assert.match(browser,/sender_name/);
+ assert.doesNotMatch(browser,/passport_status/i);
  assert.match(browser,/reason/);
  assert.doesNotMatch(browser,/immigration.status/i);
 });
