@@ -814,11 +814,6 @@ async function handleSearch(e, source) {
     renderResults(data.representatives, displayCode, resultsId, levelFilter, true, data);
     if(source==='main')updateFindJourney(2,displayCode);
 
-    // Laval banner: suggest /laval when postal code is in Laval
-    if (source === 'main' && isLavalPostal(rawCode)) {
-      showLavalBanner(resultsId, rawCode);
-    }
-
     // GA4: track postal code search
     gtag('event', 'search_representatives', {
       source: source,
@@ -885,18 +880,15 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
     return;
   }
 
-  const header = el('div', 'results-header');
-  const titleSpan = el('span');
-  titleSpan.innerHTML = `${t('results_title')} <strong>${postalCode}</strong>`;
-
-  // Share button
-  const shareBtn = el('button', 'share-btn');
-  shareBtn.setAttribute('aria-label', t('share_results') || 'Share');
-  shareBtn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> ${t('share_results') || 'Share'}`;
-  shareBtn.addEventListener('click', () => shareResults(postalCode));
-
-  header.append(titleSpan, shareBtn);
-  section.appendChild(header);
+  // The postal code already appears in the location step.
+  // A second heading and share bar here would distract from contacting a representative.
+  if(containerId!=='results'){
+    const header=el('div','results-header');
+    const title=el('span');
+    title.textContent=t('results_title')+' '+postalCode;
+    header.appendChild(title);
+    section.appendChild(header);
+  }
 
   // Update URL to reflect current search (deep-linkable)
   const cleanCode = postalCode.replace(' ', '');
