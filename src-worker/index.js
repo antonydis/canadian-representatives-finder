@@ -2,7 +2,7 @@ import translations from "./translations.generated.json";
 import overridesA from "../data/overrides.json";
 import overridesB from "../data/mtl_borough_overrides.json";
 import {normalizePostal, isPostalCode, boundaryAmbiguity} from "./quality.js";
-import {policyInput, classifyWithOpenAI, VALID_LANGS, officialContactFor} from "./civic-ai.js";
+import {policyInput, classifyWithOpenAI, VALID_LANGS, officialContactFor, resolveAgencyContact} from "./civic-ai.js";
 import {validateDraftRequest,generateScarDraft} from "./scar-email.js";
 
 const headers={"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff"};
@@ -66,7 +66,7 @@ async function search(request){
   if(!candidateReps.length)issues.push("no_representative_data");
   issues.push("official_verification_required");
   return respond({
-    success:true,postal_code:postal,representatives:candidateReps,
+    success:true,postal_code:postal,municipality:typeof raw.city==="string"?raw.city.slice(0,120):"",representatives:candidateReps,
     ambiguity_levels:disagreement, warnings:issues,
     data_source:"OpenNorth + InfoCivic manual overrides",
     data_freshness:"unverified", verified:false,
@@ -85,16 +85,17 @@ function fallback(text,lang){
  const matches=[federal&&"federal",provincial&&"provincial",municipal&&"municipal"].filter(Boolean);
  const jurisdiction=matches.length===1?matches[0]:null;
  const explanation={en:"Suggested level; please confirm with the official service.",fr:"Niveau suggéré; veuillez confirmer auprès du service officiel.",es:"Nivel sugerido; confirma con el servicio oficial.",pt:"Nível sugerido; confirme com o serviço oficial.",zh:"建议联系该级政府，请向官方核实。",tl:"Iminungkahing antas; kumpirmahin sa opisyal na serbisyo."};
- return {success:true,jurisdiction,requires_clarification:jurisdiction===null,service:jurisdiction==="municipal"?"311":null,explanation:explanation[lang]||explanation.en,situation_en:text.slice(0,100),situation_fr:text.slice(0,100),classification_method:"rules"};
+ return {success:true,jurisdiction,requires_clarification:jurisdiction===null,service:null,agency:null,agency_id:null,explanation:explanation[lang]||explanation.en,situation_en:text.slice(0,100),situation_fr:text.slice(0,100),classification_method:"rules"};
 }
 async function classify(request,env){
  const data=await body(request);
  const postal=valid(normalize(data.postal_code))?normalize(data.postal_code):"";
+ const municipality=String(data.municipality||"").slice(0,120);
  const lang=VALID_LANGS.includes(data.lang)?data.lang:"en";
  const checked=policyInput(data.text);
  if(!checked.ok)return fail(checked.code,checked.code==="out_of_scope"?422:400);
  // Never allow a paid OpenAI call without working abuse limits.
- if(!env.OPENAI_API_KEY){const f=fallback(checked.text,lang);return respond({...f,contact:f.jurisdiction?officialContactFor(f.jurisdiction,null,postal):null});}
+ if(!env.OPENAI_API_KEY){const f=fallback(checked.text,lang);return respond({...f,contact:f.jurisdiction?officialContactFor(f.jurisdiction,null,postal,municipality):null});}
  if(!env.AI_USER_LIMIT||!env.AI_GLOBAL_LIMIT)return fail("ai_protection_unavailable",503);
  const ip=request.headers.get("CF-Connecting-IP")||"unknown";
  try{
@@ -105,9 +106,21 @@ async function classify(request,env){
   if(!userLimit.success||!globalLimit.success)return fail("rate_limit",429);
  }catch{return fail("ai_protection_unavailable",503);}
  try{
-  const result=await classifyWithOpenAI(checked.text,lang,env,postal);
-  return result?respond(result):respond({...fallback(checked.text,lang),classification_method:"rules"});
+  const result=await classifyWithOpenAI(checked.text,lang,env,postal,municipality);
+  if(result)return respond(result);
+  const f=fallback(checked.text,lang);
+  return respond({...f,contact:f.jurisdiction?officialContactFor(f.jurisdiction,null,postal,municipality):null,classification_method:"rules"});
  }catch{const f=fallback(checked.text,lang);return respond({...f,contact:f.jurisdiction?officialContactFor(f.jurisdiction,null,postal):null,classification_method:"rules"});}
+}
+async function resolveCivicContact(request){
+ const data=await body(request);
+ const postal=normalize(data.postal_code);
+ if(!valid(postal))return fail("invalid_postal_code",400);
+ const level=String(data.jurisdiction||"");
+ const id=String(data.agency_id||"");
+ const municipality=String(data.municipality||"").slice(0,120);
+ const resolved=resolveAgencyContact(level,id,postal,municipality);
+ return respond({success:true,...resolved,municipality_confirmed:resolved.contact?.name?.startsWith("Ville de ")||false});
 }
 async function emailDraft(request,env){
  const data=await body(request);
@@ -158,6 +171,7 @@ export default {async fetch(request,env){
   if(request.method!=="POST")return fail("method_not_allowed",405);
   if(path==="/api/search")return search(request);
   if(path==="/api/classify-situation")return classify(request,env);
+  if(path==="/api/resolve-civic-contact")return resolveCivicContact(request);
   if(path==="/api/generate-email")return emailDraft(request,env);
   if(path==="/api/feedback")return feedback(request,env);
   if(path==="/api/laval/subscribe")return subscribe(request,env);
