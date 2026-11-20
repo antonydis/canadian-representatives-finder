@@ -3,6 +3,7 @@ import overridesA from "../data/overrides.json";
 import overridesB from "../data/mtl_borough_overrides.json";
 import {normalizePostal, isPostalCode, boundaryAmbiguity} from "./quality.js";
 import {policyInput, classifyWithOpenAI, VALID_LANGS} from "./civic-ai.js";
+import {validateDraftRequest,generateScarDraft} from "./scar-email.js";
 
 const headers={"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff"};
 const respond=(payload,status=200)=>new Response(JSON.stringify(payload),{status,headers});
@@ -107,6 +108,27 @@ async function classify(request,env){
   return result?respond(result):respond({...fallback(checked.text,lang),classification_method:"rules"});
  }catch{return respond({...fallback(checked.text,lang),classification_method:"rules"});}
 }
+async function emailDraft(request,env){
+ const data=await body(request);
+ const v=validateDraftRequest(data);
+ if(!v.ok)return fail(v.code,400);
+ if(!env.OPENAI_API_KEY)return fail("ai_not_configured",503);
+ // Separate strict paid-endpoint limits, fail closed if not configured.
+ if(!env.EMAIL_USER_LIMIT||!env.EMAIL_GLOBAL_LIMIT)return fail("email_protection_unavailable",503);
+ const ip=request.headers.get("CF-Connecting-IP")||"unknown";
+ try{
+  const [personal,global]=await Promise.all([
+    env.EMAIL_USER_LIMIT.limit({key:ip}),
+    env.EMAIL_GLOBAL_LIMIT.limit({key:"all_civic_email_drafts"})
+  ]);
+  if(!personal.success||!global.success)return fail("rate_limit",429);
+ }catch{return fail("email_protection_unavailable",503);}
+ try{
+   const result=await generateScarDraft(data,env);
+   if(result.error)return fail(result.error,result.status||400);
+   return respond(result);
+ }catch{return fail("email_generation_unavailable",503);}
+}
 async function feedback(request,env){
  if(!env.DB)return fail("storage_not_configured",503);
  const data=await body(request),type=String(data.type||""),message=String(data.message||"").trim(),email=String(data.email||"").trim();
@@ -135,6 +157,7 @@ export default {async fetch(request,env){
   if(request.method!=="POST")return fail("method_not_allowed",405);
   if(path==="/api/search")return search(request);
   if(path==="/api/classify-situation")return classify(request,env);
+  if(path==="/api/generate-email")return emailDraft(request,env);
   if(path==="/api/feedback")return feedback(request,env);
   if(path==="/api/laval/subscribe")return subscribe(request,env);
   return fail("not_found",404);
