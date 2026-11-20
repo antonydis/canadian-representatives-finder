@@ -966,7 +966,7 @@ function resolveTitle(rep, useFr) {
 }
 
 function buildContextualGuide(useFr) {
-  const level = activeTriageLevel || 'municipal';
+  const level = activeTriageLevel || null;
   if (useFr) {
     const base = [
       '• Adresse exacte ou localisation concernée : [ex. 123 rue Principale, près du feu de signalisation]',
