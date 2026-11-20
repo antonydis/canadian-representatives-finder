@@ -154,7 +154,7 @@ function openInlineComposer(rep,context){
    const label=document.createElement('label');
    label.textContent=text;
    const input=document.createElement(kind);
-   input.id=context+'-compose-'+kind+'-'+wrap.className.replace(/\\s/g,'');
+   input.id=context+'-compose-'+kind;
    label.htmlFor=input.id;
    if(kind==='textarea'){input.rows=9;input.value=value;}
    else {input.type='text';input.value=value;}
@@ -713,7 +713,20 @@ function activateTriage(caseId, freeText = null, aiData = null) {
     description=aiData.explanation||'';
     agency=aiData.agency||null;
     const service=agency?.name||aiData.service||'';
-    services.textContent=service;
+    services.replaceChildren();
+    if(agency?.url && /^https:\/\//.test(agency.url)){
+      const agencyLink=el('a','civic-agency-name-link');
+      agencyLink.href=agency.url;
+      agencyLink.target='_blank';
+      agencyLink.rel='noopener noreferrer';
+      agencyLink.textContent=agency.name;
+      const external=el('span','civic-external-mark');
+      external.textContent=' ↗';
+      external.setAttribute('aria-hidden','true');
+      agencyLink.appendChild(external);
+      agencyLink.setAttribute('aria-label',agency.name+' ('+(currentLang==='fr'?'site officiel':currentLang==='es'?'sitio oficial':'official website')+', opens in a new tab)');
+      services.append(agencyLink);
+    }else services.textContent=service;
     document.getElementById('triage-services').hidden=!service;
   }else{
     header.className='triage-result-header mixed';
@@ -722,14 +735,6 @@ function activateTriage(caseId, freeText = null, aiData = null) {
     document.getElementById('triage-services').hidden=true;
   }
   explanation.textContent=description;
-  if(agency?.url && /^https:\/\//.test(agency.url)){
-    const link=el('a','civic-official-action');
-    link.href=agency.url;
-    link.target='_blank';
-    link.rel='noopener noreferrer';
-    link.textContent=civicCopy(9)+' ↗';
-    officialContainer.append(link);
-  }
   // Do not repeat generic contact labels where no approved agency is known.
   if(!agency && !services.textContent.trim() && aiData){
     services.textContent=civicCopy(15);
@@ -783,6 +788,11 @@ async function handleSearch(e, source) {
   }
 
   const displayCode = `${rawCode.slice(0, 3)} ${rawCode.slice(3)}`;
+  if(source==='main'){
+    // The direct postal search should not inherit a previous triage issue.
+    activeTriageLevel=null;activeCaseId=null;activeTriageSituation=null;
+    activeSituationEn=null;activeSituationFr=null;
+  }
   showLoading(source);
 
   try {
@@ -909,12 +919,11 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
   });
 
   if(containerId==='triage-results'){
-    document.getElementById('civic-contact-stage').classList.remove('hidden');
-    updateCivicProgress(4);
-    document.getElementById('civic-contact-stage').scrollIntoView({behavior:'smooth',block:'start'});
-  }else{
-    section.scrollIntoView({behavior:'smooth',block:'start'});
+    // Finding representatives is step 3; stage 4 begins only after one is selected.
+    document.getElementById('civic-contact-stage').classList.add('hidden');
+    updateCivicProgress(3);
   }
+  section.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function levelSvg(level) {
