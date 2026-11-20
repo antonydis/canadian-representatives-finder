@@ -1,6 +1,7 @@
 // Progressive SCAR wizard for InfoCivic. No external dependencies.
 (function(){
 "use strict";
+const activeWizards=[];
 const labels={
 en:["Personalize your email","Answer a few optional questions to organize a clearer request using SCAR (Situation, Challenge, Action, Result).","Situation: What happened?","Challenge: Why does this matter?","Action: What have you already tried?","Result: What would you like the representative to do?","Email language","Generate personalized draft","Use ready-made template","Write answers in any language. The final email is written in the selected official language.","Do not enter SIN, passport numbers, health records or other sensitive information.","Generating your draft…","Draft ready. Review all facts before sending.","The draft could not be generated. Please use the ready-made template.","Describe the situation or result you want.","English","French","Your answers are used only to generate this draft. No email is sent automatically."],
 fr:["Personnaliser votre courriel","Répondez à quelques questions facultatives pour structurer votre demande selon SCAR (Situation, Défi, Actions, Résultat).","Situation : Que s'est-il passé ?","Défi : Pourquoi est-ce important ?","Actions : Qu'avez-vous déjà essayé ?","Résultat : Que souhaitez-vous que l'élu fasse ?","Langue du courriel","Créer un brouillon personnalisé","Utiliser le modèle prêt à envoyer","Répondez dans votre langue. Le courriel sera rédigé dans la langue officielle choisie.","N'inscrivez pas de NAS, numéro de passeport, dossier médical ou données sensibles.","Préparation du brouillon…","Brouillon prêt. Vérifiez les faits avant l'envoi.","Impossible de générer le brouillon. Utilisez le modèle proposé.","Décrivez la situation ou le résultat souhaité.","Anglais","Français","Ces réponses ne servent qu'à générer le brouillon. Aucun courriel n'est envoyé automatiquement."],
@@ -59,8 +60,25 @@ function mount({box,editor,rep,context,template,subjectInput,messageInput,update
   }catch{status.textContent=L[13];}
   finally{generate.disabled=false;}
  });
- wizard.append(form,elem('p','scar-privacy',L[17]));
+ const afterNote=elem('p','scar-privacy',L[17]);
+ wizard.append(form,afterNote);
+ const relabel=(newLanguage)=>{
+  const text=labels[newLanguage]||labels.en;
+  title.textContent=text[0];intro.textContent=text[1];
+  Object.keys(fields).forEach((field,i)=>fields[field].previousElementSibling.textContent=text[2+i]);
+  languageLabel.textContent=text[6];
+  select.options[0].textContent=text[15];select.options[1].textContent=text[16];
+  hint.textContent=text[9];privacy.textContent=text[10];
+  generate.textContent=text[7];skip.textContent=text[8];afterNote.textContent=text[17];
+ };
+ activeWizards.push({wizard,relabel});
  box.insertBefore(wizard,editor);
 }
-window.InfoCivicScar={mount,labels};
+window.InfoCivicScar={mount,labels,setLanguage(lang){
+ for(let i=activeWizards.length-1;i>=0;i--){
+  const instance=activeWizards[i];
+  if(!instance.wizard.isConnected){activeWizards.splice(i,1);continue;}
+  instance.relabel(lang);
+ }
+}};
 })();
