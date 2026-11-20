@@ -42,6 +42,7 @@ export function sanitizeClassification(data,lang) {
    service:safeAgency?.name||null,
    agency:safeAgency?{id,name:safeAgency.name,url:safeAgency.url}:null,
    explanation:data.scope==="civic"?String(data.explanation||"").slice(0,240):explanations[preferred],
+   situation_user:String(data.situation_user||"").slice(0,140),
    situation_en:String(data.situation_en||"").slice(0,90),
    situation_fr:String(data.situation_fr||"").slice(0,90),
    classification_method:"openai",
@@ -51,12 +52,13 @@ export function sanitizeClassification(data,lang) {
 
 const schema={
  type:"object",additionalProperties:false,
- required:["scope","jurisdiction","agency_id","explanation","situation_en","situation_fr"],
+ required:["scope","jurisdiction","agency_id","explanation","situation_user","situation_en","situation_fr"],
  properties:{
   scope:{type:"string",enum:["civic","needs_context","out_of_scope"]},
   jurisdiction:{type:["string","null"],enum:[...VALID_LEVELS,null]},
   agency_id:{type:["string","null"],enum:[...Object.keys(AGENCIES),null]},
   explanation:{type:"string"},
+  situation_user:{type:"string"},
   situation_en:{type:"string"},
   situation_fr:{type:"string"}
  }
@@ -76,7 +78,8 @@ export async function classifyWithOpenAI(text,lang,env) {
    "If enough detail is given: scope=civic and jurisdiction=federal, provincial, municipal, or mixed.",
    "Return agency_id only when confidently relevant AND applies Canada-wide. Otherwise null. Never invent people, contact information, agencies, URLs or official sources.",
    "For imminent emergencies recommend emergency services, not politicians.",
-   "Write an explanation of up to 30 words in language "+lang+". Summarize in English and French in up to 8 words each.",
+   "Write an explanation of up to 30 words in language "+lang+". Return situation_user as a faithful plain-language summary of what the citizen needs (max 14 words) in language "+lang+"; do not merely copy their input. Summarize also in English and French in up to 8 words each.",
+   "Do not repeat an agency name in the explanation when agency_id already identifies it. Explain WHY that agency is relevant and the recommended next action.",
    "Approved IDs (context only):\n"+permitted
   ].join("\n");
   const resp=await fetch("https://api.openai.com/v1/responses",{
