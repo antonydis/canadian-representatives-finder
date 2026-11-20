@@ -645,42 +645,24 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
   section.innerHTML = '';
   section.classList.remove('hidden');
 
-  // Representative names are candidates until checked against a current
-  // official source. Display this even if the search returns no results.
-  const safetyText = {
-    en: 'Representative data is not yet independently verified. Check the current official directory before contacting someone.',
-    fr: 'Les données des élus ne sont pas encore vérifiées auprès des sources officielles. Confirmez les coordonnées avant de contacter une personne.',
-    es: 'Los datos de representantes aún no están verificados con fuentes oficiales. Comprueba los contactos antes de escribirles.',
-    pt: 'Os dados dos representantes ainda não foram verificados nas fontes oficiais. Confirme os contatos antes de escrever.',
-    zh: '代表资料尚未经过官方独立核实。联系前请查阅官方名录。',
-    tl: 'Hindi pa beripikado sa opisyal na sanggunian ang mga kinatawan. Kumpirmahin muna ang impormasyon.'
-  };
-  const notice = el('aside', 'data-quality-notice');
-  notice.setAttribute('role', 'note');
-  const message = el('p');
-  message.textContent = safetyText[currentLang] || safetyText.en;
-  notice.appendChild(message);
-  const official = el('a');
-  official.href = 'https://www.ourcommons.ca/Members/en';
-  official.target = '_blank';
-  official.rel = 'noopener noreferrer';
-  official.textContent = currentLang === 'fr' ? 'Annuaire officiel fédéral' : currentLang === 'es' ? 'Directorio federal oficial' : 'Official federal directory';
-  notice.appendChild(official);
+  // Show a warning only when an actual geographic ambiguity is detected.
   const ambiguous = metadata.ambiguity_levels || [];
   if (ambiguous.length) {
-    const p = el('p');
-    p.textContent = currentLang === 'fr'
-      ? 'Ce code postal pourrait couvrir plusieurs circonscriptions. Vérifiez votre adresse sur le site d’Élections Canada.'
+    const notice = el('aside', 'data-quality-notice');
+    notice.setAttribute('role', 'note');
+    const msg = el('p');
+    msg.textContent = currentLang === 'fr'
+      ? 'Ce code postal pourrait toucher plusieurs circonscriptions. Confirmez avec votre adresse.'
       : currentLang === 'es'
-        ? 'Este código postal podría abarcar varias circunscripciones. Verifica tu dirección en Elections Canada.'
-        : 'This postal code may cross electoral boundaries. Verify your address with Elections Canada.';
+        ? 'Este código postal podría cubrir varias circunscripciones. Confirma usando tu dirección.'
+        : 'This postal code may cover more than one electoral district. Confirm using your street address.';
     const link = el('a');
     link.href = 'https://www.elections.ca/Scripts/VIS/FindED?L=e&PAGEID=20&QID=-1';
     link.target = '_blank'; link.rel = 'noopener noreferrer';
     link.textContent = 'Elections Canada';
-    notice.append(p, link);
+    notice.append(msg, link);
+    section.appendChild(notice);
   }
-  section.appendChild(notice);
 
   // Determine which levels to display
   // 'mixed' or null = show all; any specific level = filter to that level only
@@ -861,6 +843,24 @@ function fallbackCopy(text, onSuccess) {
   document.body.removeChild(ta);
 }
 
+function officialDirectoryFor(rep, level) {
+  if (level === 'federal') {
+    return 'https://www.ourcommons.ca/Members/en';
+  }
+  // Only point to the Assemblée nationale for Québec provincial results.
+  // H and G postal prefixes are Québec; J also includes Québec.
+  if (level === 'provincial' && /^[GHJ]/.test(currentPostalCode.replace(/\s/g, ''))) {
+    return 'https://www.assnat.qc.ca/fr/deputes/rapport-liste-depute.html';
+  }
+  if (level === 'municipal') {
+    const district = (rep.district || '').toLowerCase();
+    if (district.includes('laval')) return 'https://www.laval.ca';
+    if (district.includes('montréal') || district.includes('montreal')) return 'https://montreal.ca/en/elected-officials';
+    if (district.includes('québec') || district.includes('quebec')) return 'https://www.ville.quebec.qc.ca/apropos/administration/elus/';
+  }
+  return null;
+}
+
 function buildRepCard(rep, level, showEmailTemplate = false) {
   const card = el('div', `rep-card ${level}`);
 
@@ -892,6 +892,21 @@ function buildRepCard(rep, level, showEmailTemplate = false) {
   if (rep.url) contact.appendChild(contactRow(ICONS.link, t('website'), rep.url, true));
 
   const footer = el('div', 'rep-card-footer');
+  const officialLink = officialDirectoryFor(rep, level);
+  if (officialLink) {
+    const verifyLink = el('a', 'rep-card-flag-btn');
+    verifyLink.href = officialLink;
+    verifyLink.target = '_blank';
+    verifyLink.rel = 'noopener noreferrer';
+    verifyLink.textContent = currentLang === 'fr'
+      ? 'Ce n’est pas mon représentant ? Vérifier la source officielle'
+      : currentLang === 'es'
+        ? '¿No es mi representante? Consultar la fuente oficial'
+        : currentLang === 'pt'
+          ? 'Não é meu representante? Verificar na fonte oficial'
+          : 'Not my representative? Check official source';
+    footer.appendChild(verifyLink);
+  }
   const flagBtn = el('button', 'rep-card-flag-btn');
   flagBtn.type = 'button';
   flagBtn.innerHTML = `${ICONS.flag}<span data-i18n="feedback_flag_btn">${t('feedback_flag_btn')}</span>`;
