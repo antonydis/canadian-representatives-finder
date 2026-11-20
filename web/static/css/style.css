@@ -1085,3 +1085,9 @@ footer a:hover { text-decoration: underline; }
 .contact-check-result .civic-agency-name-link{display:inline-block;margin:4px 0}
 .scar-postal-info{padding:10px 12px;margin:2px 0;background:#edf4fa;border-radius:10px;font-size:.89rem;font-weight:650;color:var(--navy)}
 @media(max-width:560px){.contact-decision-gate{padding:12px 0}.contact-decision-options>*{flex:1 1 100%}.contact-check-result .civic-compose-actions>*{flex:1 1 100%}}
+
+/* Verified governmental phone contact in jurisdiction guidance */
+.civic-phone-help{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 9px;padding:12px 14px;background:#eff6fc;border:1px solid #cddded;border-radius:12px;margin:12px 0}
+.civic-phone-help>a{font-weight:750;color:#155b93;text-decoration:underline;text-underline-offset:3px;min-height:28px}
+.civic-phone-help>a:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+.civic-phone-note{font-size:.79rem;flex-basis:100%;margin:0;color:#506477;line-height:1.5}
