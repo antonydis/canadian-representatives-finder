@@ -688,7 +688,7 @@ subForm.addEventListener("submit", async (e) => {
         const res = await fetch("/api/laval/subscribe", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, postal_code: postal, phone }),
+            body: JSON.stringify({ name, postal_code: postal, phone, consent: true }),
         });
         const data = await res.json();
 
@@ -891,7 +891,7 @@ document
             const res = await fetch("/api/laval/subscribe", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, postal_code: postal, phone }),
+                body: JSON.stringify({ name, postal_code: postal, phone, consent: true }),
             });
             const data = await res.json();
             if (data.success) {
