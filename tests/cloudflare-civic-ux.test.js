@@ -117,3 +117,35 @@ test('Municipality is loaded from postcode API and refines direct services witho
  assert.match(js,/function updateTriageLocalContact/);
  assert.match(js,/activeTriageRouting=\{level:activeTriageLevel/);
 });
+
+test('Mismatch check happens after draft exists and preserves user choice',()=>{
+ const wizard=readFileSync('web/static/js/scar-wizard.js','utf8');
+ assert.match(wizard,/onDraftReady/);
+ assert.match(wizard,/if\(isInitial && typeof onDraftReady/);
+ assert.match(js,/function maybeReviewDraftRecipient/);
+ assert.match(js,/currentComposition\?\.rep!==rep/);
+ assert.match(js,/level===rep\.level/);
+ assert.match(js,/classification\.requires_clarification/);
+ assert.match(js,/recipient-review-dialog/);
+ assert.match(js,/setAttribute\('aria-modal','true'\)/);
+ assert.match(js,/keep\.addEventListener\('click',dismiss\)/);
+ assert.match(js,/if\(e\.key==='Escape'\)/);
+});
+test('Switching to local representative regenerates an addressed draft',()=>{
+ const wizard=readFileSync('web/static/js/scar-wizard.js','utf8');
+ assert.match(wizard,/switchRepresentative:async\(target\)/);
+ assert.match(wizard,/representative_name:target\.name,representative_office:target\.elected_office/);
+ assert.match(wizard,/selectedRep=target;lastData=nextData/);
+ assert.match(wizard,/typeof onRecipientChanged==='function'/);
+ assert.match(js,/template\.to=target\.email/);
+ assert.match(js,/address\.textContent=target\.email/);
+ assert.match(js,/latestRepresentatives\.filter\(r=>r\.level===level&&r\.email/);
+ assert.match(js,/if\(options\.length\)/);
+ assert.match(js,/if\(classification\.contact\|\|classification\.agency\?\.url\)/);
+});
+test('No automatic send and no invented agency email',()=>{
+ const wizard=readFileSync('web/static/js/scar-wizard.js','utf8');
+ assert.doesNotMatch(wizard,/sendEmail\(/);
+ assert.match(js,/mailto:/);
+ assert.doesNotMatch(js,/target\.email\s*=\s*classification\.agency/);
+});
