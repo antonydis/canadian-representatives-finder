@@ -32,3 +32,14 @@ verified deployment**.
 8. Disable or replace the Azure-only GitHub Action when switching production.
 
 Do not publicly deploy or connect the domain before the blockers are resolved.
+
+## Cloudflare Git build diagnostic (2026-11-20)
+
+Cloudflare initial builds ran against `main` even after the dashboard's
+production-branch setting was changed. Build log reported
+`pyproject.toml not found`. This file exists on `cloudflare-migration`.
+
+This commit is intentionally pushed to `cloudflare-migration` to trigger a
+**new Git-connected build** rather than retry a previous `main` build.
+Verify the branch label on the new deployment before interpreting any errors.
+The worker is not production-ready, and no DNS change is authorized.
