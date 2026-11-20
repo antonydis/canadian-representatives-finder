@@ -471,7 +471,6 @@ async function handleOpenFormSubmit(e) {
         jurisdiction: data.jurisdiction,
         service: data.service || 'none',
         lang: currentLang,
-        situation_en: data.situation_en || '',
       });
     } else if (resp.status === 429) {
       showErr(t('error_rate_limit'));
@@ -620,7 +619,6 @@ async function handleSearch(e, source) {
 
     // GA4: track postal code search
     gtag('event', 'search_representatives', {
-      postal_code: displayCode,
       source: source,
       lang: currentLang,
       result_count: data.representatives.length,
