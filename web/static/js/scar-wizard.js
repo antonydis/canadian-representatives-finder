@@ -31,6 +31,12 @@ function mount({box,editor,rep,context,template,subjectInput,messageInput,update
  name.input.autocomplete='name';
  const address=makeField(stage1,'input','sender-address',5,180);
  address.input.autocomplete='street-address';
+ const postalCode=String(arguments[0].postal||'').trim();
+ const postalInfo=node('p','scar-postal-info');
+ const postalText={en:'Postal code already provided',fr:'Code postal déjà fourni',es:'Código postal ya proporcionado',pt:'Código postal já informado',zh:'已提供的邮政编码',tl:'Naibigay na postal code'};
+ const showPostal=lang=>{postalInfo.textContent=(postalText[lang]||postalText.en)+': '+postalCode;};
+ showPostal(uiLanguage);
+ if(postalCode)stage1.append(postalInfo);
  const addressHelp=node('p','scar-hint',L[6]);stage1.append(addressHelp);
  const continueButton=node('button','civic-compose-btn',L[9]);continueButton.type='button';
  stage1.append(continueButton);
@@ -77,7 +83,7 @@ function mount({box,editor,rep,context,template,subjectInput,messageInput,update
  }
  generate.addEventListener('click',()=>{
    if(!reason.input.value.trim()){status.textContent=L[17];reason.input.focus();return;}
-   lastData={sender_name:name.input.value.trim(),sender_address:address.input.value.trim(),reason:reason.input.value.trim(),context:String(priorIssue||'').slice(0,550),representative_name:rep.name,representative_office:rep.elected_office||''};
+   lastData={sender_name:name.input.value.trim(),sender_address:address.input.value.trim(),postal_code:postalCode,reason:reason.input.value.trim(),context:String(priorIssue||'').slice(0,550),representative_name:rep.name,representative_office:rep.elected_office||''};
    generateDraft('en');
  });
  switchLanguage.addEventListener('click',()=>generateDraft(generatedLanguage==='en'?'fr':'en'));
@@ -86,7 +92,7 @@ function mount({box,editor,rep,context,template,subjectInput,messageInput,update
    heading.textContent=L[0];intro.textContent=L[1];counter1.textContent=L[2];counter2.textContent=L[3];
    name.label.textContent=L[4];address.label.textContent=L[5];addressHelp.textContent=L[6];reason.label.textContent=L[7];reasonHint.textContent=L[8];
    continueButton.textContent=L[9];back.textContent=L[10];generate.textContent=L[11];skip.textContent=L[12];privacy.textContent=L[24];caution.textContent=L[23];
-   edit.textContent=L[25];switchLanguage.textContent=generatedLanguage==='fr'?L[19]:L[18];
+   edit.textContent=L[25];switchLanguage.textContent=generatedLanguage==='fr'?L[19]:L[18];showPostal(lang);
  };
  active.push({wizard,relabel});
  box.insertBefore(wizard,editor);
