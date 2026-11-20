@@ -186,6 +186,8 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
   }catch{result.textContent=checkText(14);}
   finally{check.disabled=false;}
  });
+ const labels=[[title,0],[intro,1],[yes,2],[unsure,3],[label,4],[check,5],[back,6]];
+ labels.forEach(([node,index])=>{node.dataset.contactCopy=String(index);});
  choices.append(yes,unsure);section.append(title,intro,choices,detail);return section;
 }
 
@@ -399,6 +401,7 @@ function applyLang(lang) {
   document.documentElement.lang = lang;
   refreshCivicLabels();
   window.InfoCivicScar?.setLanguage(lang);
+  document.querySelectorAll('[data-contact-copy]').forEach(node=>{node.textContent=checkText(Number(node.dataset.contactCopy));});
   // Existing journeys and composer may be visible when the language changes.
   if(!document.getElementById('find-journey')?.classList.contains('hidden') && currentPostalCode){
     const step=document.getElementById('find-composer')?.classList.contains('hidden')?2:3;
