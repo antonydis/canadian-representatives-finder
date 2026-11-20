@@ -6,7 +6,8 @@
     "build": "node scripts/build-cloudflare.mjs",
     "dev": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy",
-    "check": "node --check src-worker/index.js && node --check scripts/build-cloudflare.mjs"
+    "check": "node --check src-worker/index.js && node --check scripts/build-cloudflare.mjs",
+    "test": "node --test tests/cloudflare-quality.test.js"
   },
   "devDependencies": {
     "wrangler": "^4.166.0"
