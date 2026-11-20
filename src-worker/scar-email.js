@@ -22,7 +22,7 @@ export function validateDraftRequest(data){
 const schema={type:'object',additionalProperties:false,required:['subject','body'],properties:{
  subject:{type:'string'},body:{type:'string'}
 }};
-export function validateDraftResponse(value,language,recipient="") {
+export function validateDraftResponse(value,language,recipient="",sender="",postal="") {
  if(!value||typeof value.subject!=='string'||typeof value.body!=='string')return null;
  let subject=value.subject.replace(/[\r\n\t]+/g,' ').replace(/\s+/g,' ').trim();
  let body=value.body.trim();
@@ -41,6 +41,10 @@ export function validateDraftResponse(value,language,recipient="") {
  if(!greeting)body=salutation+'\n\n'+body;
  const signOff=/\b(sincerely|kind regards|best regards|cordially|respectfully|cordialement|sincèrement|salutations distinguées)\b/i.test(body.slice(-260));
  if(!signOff)body+='\n\n'+(language==='fr'?'Merci pour votre temps et votre attention.\n\nCordialement,':'Thank you for your time and consideration.\n\nSincerely,');
+ const closing=body.slice(-190);
+ if(sender && !closing.toLowerCase().includes(sender.toLowerCase())){
+   body+='\n'+sender+(postal?'\n'+postal:'');
+ }
  if(body.length>3600)return null;
  return {subject,body,language};
 }
@@ -75,7 +79,7 @@ export async function generateScarDraft(data,env){
   if(!res.ok)throw Error('provider_'+res.status);
   const result=await res.json();
   const output=(result.output||[]).flatMap(x=>x.content||[]).filter(x=>x.type==='output_text').map(x=>x.text).join('');
-  const checked=validateDraftResponse(JSON.parse(output),language,name);
+  const checked=validateDraftResponse(JSON.parse(output),language,name,details.sender_name,details.postal_code);
   if(!checked)throw Error('invalid_model_response');
   return {success:true,...checked};
  }finally{clearTimeout(timer)}
