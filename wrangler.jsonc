@@ -32,6 +32,22 @@
         "limit": 60,
         "period": 60
       }
+    },
+    {
+      "name": "EMAIL_USER_LIMIT",
+      "namespace_id": "7081203",
+      "simple": {
+        "limit": 2,
+        "period": 60
+      }
+    },
+    {
+      "name": "EMAIL_GLOBAL_LIMIT",
+      "namespace_id": "7081204",
+      "simple": {
+        "limit": 20,
+        "period": 60
+      }
     }
   ],
   "workers_dev": true
