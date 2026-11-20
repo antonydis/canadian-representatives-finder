@@ -110,7 +110,32 @@
           <p data-i18n="loading">Searching...</p>
         </div>
 
+        <div id="find-journey" class="hidden">
+          <nav class="civic-progress find-progress" aria-label="Representative search steps">
+            <span class="civic-progress-item completed" data-find-step="1"><span class="civic-progress-number">1</span><span class="civic-progress-text" id="find-step-location">Your location</span></span>
+            <span class="civic-progress-item current" data-find-step="2" aria-current="step"><span class="civic-progress-number">2</span><span class="civic-progress-text" id="find-step-reps">Your representatives</span></span>
+            <span class="civic-progress-item" data-find-step="3"><span class="civic-progress-number">3</span><span class="civic-progress-text" id="find-step-contact">Contact a representative</span></span>
+          </nav>
+          <section class="civic-step find-location-summary" aria-labelledby="find-location-title">
+            <div class="civic-step-heading">
+              <span class="civic-step-number" aria-hidden="true">1</span>
+              <div class="civic-step-heading-text">
+                <h2 id="find-location-title">Your location</h2>
+                <p id="find-location-code"></p>
+              </div>
+              <button type="button" class="civic-edit-btn" id="find-change-postal">Change</button>
+            </div>
+          </section>
+          <section class="find-representatives-heading" aria-labelledby="find-representatives-title">
+            <span class="civic-step-number" aria-hidden="true">2</span>
+            <div>
+              <h2 id="find-representatives-title">Your representatives</h2>
+              <p id="find-representatives-help">Choose a representative below to prepare a message.</p>
+            </div>
+          </section>
+        </div>
         <div id="results" class="hidden" aria-live="polite"></div>
+        <section id="find-composer" class="civic-inline-composer hidden" aria-live="polite"></section>
 
       </div><!-- /panel-find -->
 
@@ -245,6 +270,7 @@
           </div>
 
           <div id="triage-results" class="hidden" aria-live="polite"></div>
+          <section id="triage-composer" class="civic-inline-composer hidden" aria-live="polite"></section>
 
         </div><!-- /triage-phase-2 -->
 
