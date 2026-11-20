@@ -77,9 +77,13 @@ async function search(request){
  }catch{return fail("api_error",502);}
 }
 function fallback(text,lang){
- const jurisdiction=/immigra|visa|passport|citizen|refugee|border|ircc|federal|pasaporte/i.test(text)?"federal":/hospital|doctor|health|school|teacher|education|tenant|rent|santé|école|loyer|salud|escuela|provincial/i.test(text)?"provincial":"municipal";
+ const federal=/immigra|visa|passport|citizen|refugee|border|ircc|federal|pasaporte/i.test(text);
+ const provincial=/hospital|doctor|health|school|teacher|education|tenant|rent|santé|école|loyer|salud|escuela|provincial/i.test(text);
+ const municipal=/pothole|garbage|trash|road|sidewalk|snow|streetlight|zoning|recycling|nid.de.poule|ordure|déchet|trottoir|neige|calle|basura|municipal/i.test(text);
+ const matches=[federal&&"federal",provincial&&"provincial",municipal&&"municipal"].filter(Boolean);
+ const jurisdiction=matches.length===1?matches[0]:null;
  const explanation={en:"Suggested level; please confirm with the official service.",fr:"Niveau suggéré; veuillez confirmer auprès du service officiel.",es:"Nivel sugerido; confirma con el servicio oficial.",pt:"Nível sugerido; confirme com o serviço oficial.",zh:"建议联系该级政府，请向官方核实。",tl:"Iminungkahing antas; kumpirmahin sa opisyal na serbisyo."};
- return {success:true,jurisdiction,service:jurisdiction==="municipal"?"311":null,explanation:explanation[lang]||explanation.en,situation_en:text.slice(0,100),situation_fr:text.slice(0,100),classification_method:"rules"};
+ return {success:true,jurisdiction,requires_clarification:jurisdiction===null,service:jurisdiction==="municipal"?"311":null,explanation:explanation[lang]||explanation.en,situation_en:text.slice(0,100),situation_fr:text.slice(0,100),classification_method:"rules"};
 }
 async function classify(request,env){
  const data=await body(request),text=String(data.text||"").trim(),lang=["en","fr","es","pt","zh","tl"].includes(data.lang)?data.lang:"en";
