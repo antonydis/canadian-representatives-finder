@@ -616,7 +616,7 @@ async function handleSearch(e, source) {
       return;
     }
 
-    renderResults(data.representatives, displayCode, resultsId, levelFilter, source === 'triage');
+    renderResults(data.representatives, displayCode, resultsId, levelFilter, source === 'triage', data);
 
     // Laval banner: suggest /laval when postal code is in Laval
     if (source === 'main' && isLavalPostal(rawCode)) {
@@ -644,13 +644,50 @@ function isValidPostalCode(code) {
    RENDER RESULTS
    ================================================================ */
 
-function renderResults(reps, postalCode, containerId, levelFilter = null, showEmailTemplate = false) {
+function renderResults(reps, postalCode, containerId, levelFilter = null, showEmailTemplate = false, metadata = {}) {
   hideLoading(containerId === 'results' ? 'main' : 'triage');
   currentPostalCode = postalCode;
 
   const section = document.getElementById(containerId);
   section.innerHTML = '';
   section.classList.remove('hidden');
+
+  // Representative names are candidates until checked against a current
+  // official source. Display this even if the search returns no results.
+  const safetyText = {
+    en: 'Representative data is not yet independently verified. Check the current official directory before contacting someone.',
+    fr: 'Les données des élus ne sont pas encore vérifiées auprès des sources officielles. Confirmez les coordonnées avant de contacter une personne.',
+    es: 'Los datos de representantes aún no están verificados con fuentes oficiales. Comprueba los contactos antes de escribirles.',
+    pt: 'Os dados dos representantes ainda não foram verificados nas fontes oficiais. Confirme os contatos antes de escrever.',
+    zh: '代表资料尚未经过官方独立核实。联系前请查阅官方名录。',
+    tl: 'Hindi pa beripikado sa opisyal na sanggunian ang mga kinatawan. Kumpirmahin muna ang impormasyon.'
+  };
+  const notice = el('aside', 'data-quality-notice');
+  notice.setAttribute('role', 'note');
+  const message = el('p');
+  message.textContent = safetyText[currentLang] || safetyText.en;
+  notice.appendChild(message);
+  const official = el('a');
+  official.href = 'https://www.ourcommons.ca/Members/en';
+  official.target = '_blank';
+  official.rel = 'noopener noreferrer';
+  official.textContent = currentLang === 'fr' ? 'Annuaire officiel fédéral' : currentLang === 'es' ? 'Directorio federal oficial' : 'Official federal directory';
+  notice.appendChild(official);
+  const ambiguous = metadata.ambiguity_levels || [];
+  if (ambiguous.length) {
+    const p = el('p');
+    p.textContent = currentLang === 'fr'
+      ? 'Ce code postal pourrait couvrir plusieurs circonscriptions. Vérifiez votre adresse sur le site d’Élections Canada.'
+      : currentLang === 'es'
+        ? 'Este código postal podría abarcar varias circunscripciones. Verifica tu dirección en Elections Canada.'
+        : 'This postal code may cross electoral boundaries. Verify your address with Elections Canada.';
+    const link = el('a');
+    link.href = 'https://www.elections.ca/Scripts/VIS/FindED?L=e&PAGEID=20&QID=-1';
+    link.target = '_blank'; link.rel = 'noopener noreferrer';
+    link.textContent = 'Elections Canada';
+    notice.append(p, link);
+  }
+  section.appendChild(notice);
 
   // Determine which levels to display
   // 'mixed' or null = show all; any specific level = filter to that level only
@@ -665,7 +702,9 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
   const hasReps = showLevels.some(lvl => grouped[lvl].length > 0);
 
   if (!hasReps) {
-    section.innerHTML = `<p class="lead">${t('no_results')}</p>`;
+    const empty = el('p', 'lead');
+    empty.textContent = t('no_results');
+    section.appendChild(empty);
     return;
   }
 
