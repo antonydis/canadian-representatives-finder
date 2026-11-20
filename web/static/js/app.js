@@ -84,6 +84,7 @@ let activeSituationFr = null;
 let currentPostalCode = null;
 // Municipality is only trusted if returned with a postal-code search, never guessed from an FSA.
 let currentMunicipality = '';
+let latestRepresentatives=[];
 let activeTriageRouting = null;
 
 /* Shared guided experience on both search pages. */
@@ -199,7 +200,15 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
    form.classList.remove('hidden');
    window.InfoCivicScar?.mount({box,editor:form,rep,context,template,
      subjectInput,messageInput,updateLink,postal:currentPostalCode,uiLanguage:currentLang,
-     priorIssue:input.value.trim()||(context==='triage'?activeTriageSituation:null)});
+     priorIssue:input.value.trim()||(context==='triage'?activeTriageSituation:null),
+     onDraftReady:review=>maybeReviewDraftRecipient({rep,context,box,...review}),
+     onRecipientChanged:target=>{
+       template.to=target.email;
+       address.textContent=target.email;
+       subtitle.textContent=findText(6)+': '+target.name+' · '+(target.elected_office||'');
+       currentComposition={rep:target,context};
+       updateLink();
+     }});
  };
  yes.addEventListener('click',continueToDraft);
  unsure.addEventListener('click',()=>{choices.classList.add('hidden');detail.classList.remove('hidden');input.focus();});
@@ -240,6 +249,104 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
  const labels=[[title,0],[intro,1],[yes,2],[unsure,3],[label,4],[check,5],[back,6]];
  labels.forEach(([node,index])=>{node.dataset.contactCopy=String(index);});
  choices.append(yes,unsure);section.append(title,intro,choices,detail);return section;
+}
+
+
+const RECIPIENT_REVIEW_TEXT={
+ en:['Before you send','This issue may be handled more directly by a different level of government.','You selected','Suggested level','The recommendation is not a definitive decision. You can still contact the representative you chose.','Choose the suggested representative','Keep my selected representative','Opening the right contact','We could not prepare a new draft. Your original message is unchanged.','Official service','No representative with a verified email is available at that level. You can contact the official service directly.','Select a representative','Check the official website','Call'],
+ fr:['Avant d’envoyer','Cette situation pourrait être traitée plus directement par un autre palier de gouvernement.','Votre choix','Palier suggéré','Cette suggestion n’est pas une décision définitive. Vous pouvez toujours contacter l’élu choisi.','Choisir un élu du palier suggéré','Conserver mon élu','Préparation du bon contact','Le nouveau brouillon n’a pas pu être préparé. Le message original est intact.','Service officiel','Aucun élu de ce palier avec une adresse courriel disponible. Vous pouvez contacter le service officiel.','Choisir un élu','Consulter le site officiel','Appeler'],
+ es:['Antes de enviar','Este problema podría resolverse más directamente con otro nivel de gobierno.','Elegiste','Nivel recomendado','Es una orientación, no una decisión definitiva. Puedes mantener el representante que elegiste.','Cambiar al representante adecuado','Mantener mi representante','Preparando el contacto adecuado','No se pudo preparar el nuevo borrador. Tu mensaje original no cambió.','Servicio oficial','No encontramos un representante de ese nivel con correo disponible. Puedes contactar directamente al organismo oficial.','Selecciona un representante','Ver sitio oficial','Llamar'],
+ pt:['Antes de enviar','Esse problema pode ser resolvido mais diretamente por outro nível de governo.','Você escolheu','Nível recomendado','É uma sugestão, não uma decisão definitiva. Você ainda pode contatar o representante escolhido.','Mudar para o representante adequado','Manter meu representante','Preparando o contato correto','Não foi possível preparar o novo rascunho. Sua mensagem original permanece intacta.','Serviço oficial','Não encontramos um representante desse nível com e-mail disponível. Você pode contatar diretamente o serviço oficial.','Escolha um representante','Ver site oficial','Ligar'],
+ zh:['发送之前','这个问题可能由其他级别的政府部门更直接地处理。','您选择了','建议的政府级别','这只是一项建议，并非最终判定。您仍可以联系最初选择的代表。','改为联系建议的代表','保留原代表','正在准备合适的联系人','无法准备新草稿，原邮件未作修改。','官方服务','未找到该级别拥有公开电子邮件的代表。您可以直接联系官方服务。','选择代表','访问官方网站','拨打'],
+ tl:['Bago ipadala','Maaaring mas direktang matugunan ang isyu sa ibang antas ng pamahalaan.','Pinili mo','Iminungkahing antas','Mungkahi lamang ito, hindi pinal na pasya. Maaari mo pa ring kontakin ang napiling kinatawan.','Palitan ng naaangkop na kinatawan','Panatilihin ang napili ko','Inihahanda ang tamang kontak','Hindi nagawa ang bagong draft. Hindi nabago ang orihinal.','Opisyal na serbisyo','Walang available na kinatawan sa antas na ito na may email. Maaari kang tumawag sa opisyal na serbisyo.','Pumili ng kinatawan','Bisitahin ang opisyal na site','Tumawag']
+};
+const reviewCopy=i=>(RECIPIENT_REVIEW_TEXT[currentLang]||RECIPIENT_REVIEW_TEXT.en)[i];
+function officialLevelName(level){
+ const terms={en:{federal:'Federal',provincial:'Provincial',municipal:'Municipal'},
+ fr:{federal:'Fédéral',provincial:'Provincial',municipal:'Municipal'},
+ es:{federal:'Federal',provincial:'Provincial',municipal:'Municipal'},
+ pt:{federal:'Federal',provincial:'Provincial',municipal:'Municipal'},
+ zh:{federal:'联邦',provincial:'省级',municipal:'市级'},
+ tl:{federal:'Pederal',provincial:'Panlalawigan',municipal:'Munisipal'}};
+ return (terms[currentLang]||terms.en)[level]||level;
+}
+async function maybeReviewDraftRecipient({rep,context,box,reason,switchRepresentative}){
+ if(!reason?.trim()||!box.isConnected||box.classList.contains('hidden'))return;
+ let classification;
+ try{
+   if(context==='triage'&&activeTriageRouting?.level&&activeTriageRouting.level!=='mixed'){
+     const response=await fetch('/api/resolve-civic-contact',{method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({postal_code:currentPostalCode,jurisdiction:activeTriageRouting.level,
+         agency_id:activeTriageRouting.agency_id||'',municipality:currentMunicipality})});
+     const result=await response.json();
+     if(!response.ok||!result.success)return;
+     classification={jurisdiction:activeTriageRouting.level,contact:result.contact,agency:result.agency};
+   }else{
+     const response=await fetch('/api/classify-situation',{method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({text:reason.slice(0,200),lang:currentLang,postal_code:currentPostalCode||'',municipality:currentMunicipality})});
+     classification=await response.json();
+     if(!response.ok||!classification.success||classification.requires_clarification)return;
+   }
+ }catch{return;} // Never block sending because guidance is unavailable.
+ if(!box.isConnected||box.classList.contains('hidden')||currentComposition?.rep!==rep)return;
+ const level=classification.jurisdiction;
+ if(!['federal','provincial','municipal'].includes(level)||level===rep.level)return;
+ const options=latestRepresentatives.filter(r=>r.level===level&&r.email&&r.name);
+ const backdrop=el('div','recipient-review-backdrop');
+ const dialog=el('section','recipient-review-dialog');
+ dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');
+ dialog.setAttribute('aria-labelledby',context+'-recipient-review-title');
+ const title=el('h3');title.id=context+'-recipient-review-title';title.textContent=reviewCopy(0);
+ const intro=el('p');intro.textContent=reviewCopy(1);
+ const comparison=el('div','recipient-review-comparison');
+ const current=el('p');current.textContent=reviewCopy(2)+': '+rep.name+' ('+officialLevelName(rep.level)+')';
+ const proposed=el('p');proposed.textContent=reviewCopy(3)+': '+officialLevelName(level);
+ comparison.append(current,proposed);
+ const explanation=el('p','recipient-review-explanation');explanation.textContent=classification.explanation||'';
+ const caution=el('p','recipient-review-caution');caution.textContent=reviewCopy(4);
+ const actions=el('div','recipient-review-actions');
+ const keep=el('button','civic-secondary-action');keep.type='button';keep.textContent=reviewCopy(6);
+ const message=el('p','recipient-review-status');message.setAttribute('role','status');message.setAttribute('aria-live','polite');
+ const initialFocus=document.activeElement;
+ const dismiss=()=>{backdrop.remove();keep.removeEventListener('click',dismiss);if(initialFocus?.isConnected)initialFocus.focus({preventScroll:true});};
+ keep.addEventListener('click',dismiss);
+ const keyHandler=e=>{
+   if(e.key==='Escape'){e.preventDefault();dismiss();}
+   if(e.key==='Tab'){
+     const focusable=[...dialog.querySelectorAll('button:not([disabled]),a[href],select:not([disabled])')];
+     if(!focusable.length)return;
+     const first=focusable[0],last=focusable[focusable.length-1];
+     if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+     else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+   }
+ };
+ dialog.addEventListener('keydown',keyHandler);
+ if(classification.contact||classification.agency?.url){
+   const service=buildDirectServiceCard(classification.contact,classification.agency);
+   service.querySelector('.direct-service-title').textContent=reviewCopy(9);
+   dialog.append(title,intro,comparison,explanation,service,caution);
+ }else dialog.append(title,intro,comparison,explanation,caution);
+ if(options.length){
+   const choice=el('select','recipient-review-select');
+   choice.setAttribute('aria-label',reviewCopy(11));
+   const list=[...options].sort((a,b)=>a.name.localeCompare(b.name));
+   for(const r of list){const item=el('option');item.value=String(latestRepresentatives.indexOf(r));item.textContent=r.name+' · '+(r.elected_office||'');choice.append(item);}
+   if(list.length>1)dialog.append(choice);
+   const change=el('button','civic-compose-btn');change.type='button';change.textContent=reviewCopy(5);
+   change.addEventListener('click',async()=>{
+     const target=latestRepresentatives[Number(choice.value)];
+     if(!target)return;
+     change.disabled=true;keep.disabled=true;message.textContent=reviewCopy(7);
+     const ok=await switchRepresentative(target);
+     if(ok){dismiss();}
+     else{message.textContent=reviewCopy(8);change.disabled=false;keep.disabled=false;}
+   });
+   actions.append(change);
+ }else{
+   const unavailable=el('p','recipient-review-caution');unavailable.textContent=reviewCopy(10);dialog.append(unavailable);
+ }
+ actions.append(keep);dialog.append(actions,message);backdrop.append(dialog);box.append(backdrop);
+ keep.focus({preventScroll:true});
 }
 
 function openInlineComposer(rep,context){
@@ -999,6 +1106,7 @@ async function handleSearch(e, source) {
     }
 
     currentMunicipality=typeof data.municipality==='string'?data.municipality:'';
+    latestRepresentatives=Array.isArray(data.representatives)?data.representatives:[];
     // A new search invalidates any previously selected representative.
     closeInlineComposer(source);
     renderResults(data.representatives, displayCode, resultsId, levelFilter, true, data);
