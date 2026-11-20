@@ -56,8 +56,8 @@ test('Representative cards record their government level for matching',()=>{
 });
 
 test('Guided contact offers verified phone details and avoids repeat triage gate',()=>{
- assert.match(js,/data\.contact\?\.phone/);
- assert.match(js,/civic-phone-help/);
+ assert.match(js,/contact\?\.phone/);
+ assert.match(js,/direct-service-card/);
  assert.match(js,/context==='triage' && activeTriageSituation/);
  assert.match(js,/postal_code:currentPostalCode/);
 });
@@ -105,5 +105,5 @@ test('Direct service recommendation is embedded in both orientation flows',()=>{
 test('Direct contact rendering never executes user supplied HTML',()=>{
  const block=js.slice(js.indexOf('function buildDirectServiceCard'),js.indexOf('function buildContactDecisionGate'));
  assert.doesNotMatch(block,/innerHTML/);
- assert.match(block,/textContent=contact\.phone/);
+ assert.match(block,/textContent=directServiceText\(2\)\+': '\+contact\.phone/);
 });
