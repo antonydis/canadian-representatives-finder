@@ -1,84 +1,97 @@
-// Progressive SCAR wizard for InfoCivic. No external dependencies.
+// InfoCivic's progressive, low-friction representative email assistant.
 (function(){
-"use strict";
-const activeWizards=[];
-const labels={
-en:["Personalize your email","Answer a few optional questions to organize a clearer request using SCAR (Situation, Challenge, Action, Result).","Situation: What happened?","Challenge: Why does this matter?","Action: What have you already tried?","Result: What would you like the representative to do?","Email language","Generate personalized draft","Use ready-made template","Write answers in any language. The final email is written in the selected official language.","Do not enter SIN, passport numbers, health records or other sensitive information.","Generating your draft…","Draft ready. Review all facts before sending.","The draft could not be generated. Please use the ready-made template.","Describe the situation or result you want.","English","French","Your answers are used only to generate this draft. No email is sent automatically."],
-fr:["Personnaliser votre courriel","Répondez à quelques questions facultatives pour structurer votre demande selon SCAR (Situation, Défi, Actions, Résultat).","Situation : Que s'est-il passé ?","Défi : Pourquoi est-ce important ?","Actions : Qu'avez-vous déjà essayé ?","Résultat : Que souhaitez-vous que l'élu fasse ?","Langue du courriel","Créer un brouillon personnalisé","Utiliser le modèle prêt à envoyer","Répondez dans votre langue. Le courriel sera rédigé dans la langue officielle choisie.","N'inscrivez pas de NAS, numéro de passeport, dossier médical ou données sensibles.","Préparation du brouillon…","Brouillon prêt. Vérifiez les faits avant l'envoi.","Impossible de générer le brouillon. Utilisez le modèle proposé.","Décrivez la situation ou le résultat souhaité.","Anglais","Français","Ces réponses ne servent qu'à générer le brouillon. Aucun courriel n'est envoyé automatiquement."],
-es:["Personaliza tu correo","Responde unas preguntas opcionales para organizar un mensaje claro con SCAR (Situación, Desafío, Acciones, Resultado).","Situación: ¿Qué ocurrió?","Desafío: ¿Por qué te afecta?","Acciones: ¿Qué has intentado?","Resultado: ¿Qué le pides al representante?","Idioma del correo","Generar correo personalizado","Usar plantilla predeterminada","Responde en cualquier idioma. El correo final estará en el idioma oficial que elijas.","No incluyas SIN/NAS, pasaporte, historial médico ni otros datos sensibles.","Preparando tu correo…","Borrador listo. Comprueba todos los datos antes de enviarlo.","No pudimos generar el correo. Usa la plantilla predeterminada.","Describe tu situación o el resultado que buscas.","Inglés","Francés","Las respuestas solo se usan para generar el borrador. Ningún correo se envía automáticamente."],
-pt:["Personalize seu e-mail","Responda algumas perguntas opcionais para organizar uma mensagem com SCAR (Situação, Desafio, Ações, Resultado).","Situação: O que aconteceu?","Desafio: Por que isso importa?","Ações: O que já tentou?","Resultado: O que deseja do representante?","Idioma do e-mail","Gerar e-mail personalizado","Usar modelo pronto","Responda em qualquer idioma. O e-mail será redigido no idioma oficial escolhido.","Não inclua número de seguro social, passaporte, detalhes médicos ou dados sensíveis.","Preparando seu e-mail…","Rascunho pronto. Verifique os fatos antes de enviar.","Não foi possível gerar o e-mail. Use o modelo pronto.","Descreva a situação ou o resultado desejado.","Inglês","Francês","As respostas servem apenas para gerar o rascunho. Nenhum e-mail é enviado automaticamente."],
-zh:["个性化邮件","回答几个可选问题，我们将根据 SCAR（情况、困难、行动、结果）整理邮件。","情况：发生了什么？","困难：对您有什么影响？","行动：您已经尝试了什么？","结果：您希望代表做什么？","邮件语言","生成个性化邮件","使用现成模板","可使用任何语言回答。邮件将按所选官方语言撰写。","请勿输入社会保险号码、护照号码、医疗记录或其他敏感信息。","正在生成草稿…","草稿已生成，请核对事实后发送。","无法生成草稿，请使用现成模板。","请描述问题或希望得到的结果。","英语","法语","答案仅用于生成草稿，系统不会自动发送邮件。"],
-tl:["I-personalize ang email","Sagutin ang opsyonal na tanong para mabuo ang SCAR (Sitwasyon, Hamon, Aksyon, Resulta) na mensahe.","Sitwasyon: Ano ang nangyari?","Hamon: Bakit mahalaga ito?","Aksyon: Ano na ang sinubukan mo?","Resulta: Ano ang gusto mong gawin ng kinatawan?","Wika ng email","Gumawa ng personalized na email","Gamitin ang handang template","Maaari kang sumagot sa anumang wika. Ang email ay isusulat sa napiling opisyal na wika.","Huwag ilagay ang SIN, passport number, medikal na detalye o sensitibong impormasyon.","Ginagawa ang draft…","Handa ang draft. Suriin ang mga detalye bago ipadala.","Hindi magawa ang draft. Gamitin ang handang template.","Ilarawan ang sitwasyon o hinihiling na resulta.","Ingles","Pranses","Ginagamit lang ang mga sagot upang gumawa ng draft. Walang email na awtomatikong ipinapadala."]
+'use strict';
+const catalogs={
+ en:['Prepare an email in a few steps','We can draft a clear email you can review and send to your representative.','1 of 2 · Your details','2 of 2 · Why you are writing','Your name','Your address (optional)','Include your street address only if you want to show you live in this constituency.','Why do you want to contact your representative?','Describe the issue in your own words. No special format needed.','Continue','Back','Generate email','Use a ready-made template instead','Creating your email…','Your email is ready. Review it before sending.','We couldn’t generate the email. The ready-made template is still available.','Please enter your name.','Please describe why you are contacting the representative.','See the French version','See the English version','Creating the French version…','Creating the English version…','You can answer in any language. The email is generated in English first.','Please avoid sharing your SIN, passport number, medical records or other sensitive information.','Your details are sent to OpenAI only when you choose to generate the draft. Nothing is sent to the representative automatically.','Change your answers'],
+ fr:['Préparer un courriel en quelques étapes','Nous pouvons rédiger un courriel clair à vérifier et à envoyer à votre élu.','1 sur 2 · Vos coordonnées','2 sur 2 · Objet du message','Votre nom','Votre adresse (facultative)','Indiquez votre adresse seulement si vous souhaitez confirmer que vous résidez dans la circonscription.','Pourquoi souhaitez-vous contacter votre élu ?','Expliquez la situation avec vos propres mots. Aucun format particulier.','Continuer','Retour','Créer le courriel','Utiliser le modèle prêt à envoyer','Création du courriel…','Votre courriel est prêt. Vérifiez-le avant l’envoi.','Impossible de générer le courriel. Le modèle reste disponible.','Indiquez votre nom.','Expliquez pourquoi vous contactez cet élu.','Voir la version française','Voir la version anglaise','Création de la version française…','Création de la version anglaise…','Répondez dans n’importe quelle langue. Le premier courriel sera en anglais.','N’indiquez pas de NAS, numéro de passeport, dossier médical ou autres données sensibles.','Vos réponses sont transmises à OpenAI seulement si vous demandez le brouillon. Aucun courriel n’est envoyé automatiquement.','Modifier vos réponses'],
+ es:['Prepara un correo en pocos pasos','Podemos redactar un correo claro para que lo revises y envíes a tu representante.','1 de 2 · Tus datos','2 de 2 · Motivo del contacto','Tu nombre','Tu dirección (opcional)','Incluye tu dirección solo si quieres demostrar que resides en la circunscripción.','¿Por qué quieres contactar a tu representante?','Explica la situación con tus propias palabras, sin un formato especial.','Continuar','Volver','Generar correo','Usar una plantilla sin responder','Preparando tu correo…','Tu correo está listo. Revísalo antes de enviarlo.','No pudimos generar el correo. Puedes usar la plantilla.','Introduce tu nombre.','Cuéntanos por qué quieres contactar al representante.','Ver versión en francés','Ver versión en inglés','Preparando la versión francesa…','Preparando la versión inglesa…','Responde en cualquier idioma. El primer correo se redactará en inglés.','Evita incluir SIN/NAS, pasaporte, expedientes médicos u otros datos sensibles.','Solo enviamos tus respuestas a OpenAI cuando decides generar el borrador. Nada se envía automáticamente al representante.','Editar tus respuestas'],
+ pt:['Prepare um e-mail em poucos passos','Podemos redigir um e-mail claro para você revisar e enviar ao seu representante.','1 de 2 · Seus dados','2 de 2 · Motivo do contato','Seu nome','Seu endereço (opcional)','Inclua seu endereço somente se desejar demonstrar que reside na circunscrição.','Por que deseja contatar o representante?','Descreva a situação com suas próprias palavras. Sem formato especial.','Continuar','Voltar','Gerar e-mail','Usar modelo pronto','Preparando o e-mail…','Seu e-mail está pronto. Revise antes de enviar.','Não foi possível gerar. O modelo pronto continua disponível.','Digite seu nome.','Explique por que deseja contatar o representante.','Ver versão em francês','Ver versão em inglês','Preparando a versão francesa…','Preparando a versão inglesa…','Responda em qualquer idioma. O primeiro e-mail será em inglês.','Evite SIN, passaporte, prontuário médico ou outras informações sensíveis.','Suas respostas são enviadas à OpenAI somente ao gerar o rascunho. Nenhum e-mail é enviado automaticamente.','Editar suas respostas'],
+ zh:['简单几步准备邮件','我们可以帮您起草清晰的邮件，供您核对后发送给民选代表。','第 1 步，共 2 步 · 您的信息','第 2 步，共 2 步 · 联系原因','您的姓名','您的地址（选填）','只有当您想表明自己住在该选区时才需填写街道地址。','您为什么要联系代表？','请用自己的话说明情况，不必遵循特定格式。','继续','返回','生成邮件','直接使用现成模板','正在生成邮件…','邮件已准备好，请核对后发送。','无法生成邮件，仍可使用现成模板。','请输入您的姓名。','请说明联系代表的原因。','查看法语版本','查看英语版本','正在生成法语版本…','正在生成英语版本…','您可以使用任何语言回答。邮件首先以英语生成。','请勿输入社会保险号码、护照号码、医疗记录或其他敏感信息。','只有在您选择生成草稿时才会将答案发送给 OpenAI。不会自动发送给代表。','修改答案'],
+ tl:['Maghanda ng email sa ilang hakbang','Tutulungan ka naming gumawa ng malinaw na email na maaari mong suriin at ipadala sa kinatawan.','Hakbang 1 sa 2 · Iyong detalye','Hakbang 2 sa 2 · Dahilan ng pakikipag-ugnayan','Iyong pangalan','Iyong address (opsyonal)','Ilagay lamang ang address kung nais mong patunayang residente ka ng distrito.','Bakit mo gustong makipag-ugnayan sa kinatawan?','Ilarawan ang sitwasyon sa sarili mong salita. Walang kailangang espesyal na format.','Magpatuloy','Bumalik','Gumawa ng email','Gamitin ang handang template','Ginagawa ang email…','Handa na ang email. Suriin bago ipadala.','Hindi magawa ang email. Maaari pa ring gamitin ang handang template.','Ilagay ang iyong pangalan.','Ipaliwanag kung bakit mo gustong kontakin ang kinatawan.','Tingnan sa Pranses','Tingnan sa Ingles','Ginagawa ang bersyong Pranses…','Ginagawa ang bersyong Ingles…','Maaari kang sumagot sa anumang wika. Ang unang email ay sa Ingles.','Huwag isama ang SIN, passport number, medical records o iba pang sensitibong datos.','Ipapadala lamang sa OpenAI ang mga sagot kapag pinili mong gumawa ng draft. Walang awtomatikong ipapadalang email.','Baguhin ang mga sagot']
 };
-function elem(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
-function mount({box,editor,rep,context,template,subjectInput,messageInput,updateLink,postal,uiLanguage,priorIssue}){
- const L=labels[uiLanguage]||labels.en;
- const wizard=elem('section','scar-wizard');
- const title=elem('h3',null,L[0]);wizard.append(title,elem('p','scar-wizard-intro',L[1]));
- const form=elem('form','scar-wizard-fields');
- const fields={};
- ['situation','challenge','action','result'].forEach((key,i)=>{
-   const wrapper=elem('div','civic-compose-field');
-   const label=elem('label',null,L[i+2]);
-   const input=elem('textarea');input.rows=2;input.maxLength=550;
-   input.id=context+'-scar-'+key;label.htmlFor=input.id;
-   if(key==='situation'&&priorIssue)input.value=priorIssue.slice(0,550);
-   fields[key]=input;wrapper.append(label,input);form.append(wrapper);
- });
- const languageRow=elem('div','scar-language-field');
- const languageLabel=elem('label',null,L[6]);const select=elem('select');
- select.id=context+'-scar-language';languageLabel.htmlFor=select.id;
- const suggested=/^[GHJ]/.test(String(postal||'').toUpperCase())?'fr':'en';
- for(const [value,text] of [['en',L[15]],['fr',L[16]]]){
-  const option=elem('option',null,text);
-  option.value=value;option.selected=value===suggested;select.append(option);
- }
- languageRow.append(languageLabel,select);
- form.append(languageRow,elem('p','scar-hint',L[9]),elem('p','scar-privacy',L[10]));
- const actions=elem('div','civic-compose-actions');
- const generate=elem('button','civic-compose-btn',L[7]);generate.type='submit';
- const skip=elem('button','civic-secondary-action',L[8]);skip.type='button';
- actions.append(generate,skip);form.append(actions);
- const status=elem('p','scar-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');form.append(status);
- const setTemplate=()=>{subjectInput.value=template.subject;messageInput.value=template.body;updateLink();status.textContent='';editor.scrollIntoView({behavior:'smooth',block:'nearest'});};
- skip.addEventListener('click',setTemplate);
- form.addEventListener('submit',async e=>{
-  e.preventDefault();
-  const body=Object.fromEntries(Object.entries(fields).map(([key,input])=>[key,input.value.trim()]));
-  body.context=String(priorIssue||'').slice(0,550);
-  if(!body.situation&&!body.result&&!body.context){status.textContent=L[14];fields.situation.focus();return;}
-  body.language=select.value;
-  body.representative_name=rep.name;
-  body.representative_office=rep.elected_office||'';
-  generate.disabled=true;status.textContent=L[11];
-  try{
-   const response=await fetch('/api/generate-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-   const result=await response.json();
-   if(!response.ok||!result.success)throw Error(result.error||'service_error');
-   subjectInput.value=result.subject;messageInput.value=result.body;updateLink();
-   status.textContent=L[12];editor.scrollIntoView({behavior:'smooth',block:'start'});
-  }catch{status.textContent=L[13];}
-  finally{generate.disabled=false;}
- });
- const afterNote=elem('p','scar-privacy',L[17]);
- wizard.append(form,afterNote);
- const relabel=(newLanguage)=>{
-  const text=labels[newLanguage]||labels.en;
-  title.textContent=text[0];intro.textContent=text[1];
-  Object.keys(fields).forEach((field,i)=>fields[field].previousElementSibling.textContent=text[2+i]);
-  languageLabel.textContent=text[6];
-  select.options[0].textContent=text[15];select.options[1].textContent=text[16];
-  hint.textContent=text[9];privacy.textContent=text[10];
-  generate.textContent=text[7];skip.textContent=text[8];afterNote.textContent=text[17];
+const active=[];
+function node(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
+function mount({box,editor,rep,context,template,subjectInput,messageInput,updateLink,uiLanguage,priorIssue}){
+ let L=catalogs[uiLanguage]||catalogs.en,step=1,lastData=null,generatedLanguage=null;
+ const wizard=node('section','scar-wizard scar-simple');
+ const heading=node('h3','',L[0]),intro=node('p','scar-wizard-intro',L[1]);
+ wizard.append(heading,intro);
+ const stage1=node('div','scar-step');
+ const counter1=node('p','scar-step-counter',L[2]);stage1.append(counter1);
+ const makeField=(parent,tag,id,labelIndex,maxLength)=>{
+   const wrap=node('div','civic-compose-field');
+   const label=node('label','',L[labelIndex]);
+   const input=node(tag);input.id=context+'-'+id;label.htmlFor=input.id;
+   input.maxLength=maxLength;
+   if(tag==='textarea')input.rows=4;
+   wrap.append(label,input);parent.append(wrap);
+   return {label,input};
  };
- activeWizards.push({wizard,relabel});
+ const name=makeField(stage1,'input','sender-name',4,110);
+ name.input.autocomplete='name';
+ const address=makeField(stage1,'input','sender-address',5,180);
+ address.input.autocomplete='street-address';
+ const addressHelp=node('p','scar-hint',L[6]);stage1.append(addressHelp);
+ const continueButton=node('button','civic-compose-btn',L[9]);continueButton.type='button';
+ stage1.append(continueButton);
+ const stage2=node('div','scar-step hidden');
+ const counter2=node('p','scar-step-counter',L[3]);stage2.append(counter2);
+ const reason=makeField(stage2,'textarea','reason',7,800);
+ reason.input.value=(priorIssue||'').slice(0,800);
+ const reasonHint=node('p','scar-hint',L[8]);stage2.append(reasonHint);
+ const stageActions=node('div','civic-compose-actions');
+ const back=node('button','civic-secondary-action',L[10]);back.type='button';
+ const generate=node('button','civic-compose-btn',L[11]);generate.type='button';
+ stageActions.append(back,generate);stage2.append(stageActions);
+ const status=node('p','scar-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+ const privacy=node('p','scar-privacy',L[24]);
+ const caution=node('p','scar-privacy',L[23]);
+ const skip=node('button','scar-skip',L[12]);skip.type='button';
+ const switchLanguage=node('button','civic-secondary-action hidden',L[18]);switchLanguage.type='button';
+ const edit=node('button','scar-edit hidden',L[25]);edit.type='button';
+ wizard.append(stage1,stage2,status,caution,privacy,skip,switchLanguage,edit);
+ // Keep the original template available but do not display both flows at once.
+ editor.classList.add('hidden');
+ function showStage(n){step=n;stage1.classList.toggle('hidden',n!==1);stage2.classList.toggle('hidden',n!==2);(n===1?counter1:counter2).scrollIntoView({behavior:'smooth',block:'nearest'});}
+ function showEditor(){stage1.classList.add('hidden');stage2.classList.add('hidden');editor.classList.remove('hidden');skip.classList.add('hidden');edit.classList.remove('hidden');editor.scrollIntoView({behavior:'smooth',block:'nearest'});}
+ continueButton.addEventListener('click',()=>{if(!name.input.value.trim()){status.textContent=L[16];name.input.focus();return;}status.textContent='';showStage(2);reason.input.focus({preventScroll:true});});
+ back.addEventListener('click',()=>{status.textContent='';showStage(1);});
+ edit.addEventListener('click',()=>{editor.classList.add('hidden');edit.classList.add('hidden');skip.classList.remove('hidden');switchLanguage.classList.add('hidden');status.textContent='';showStage(1);});
+ skip.addEventListener('click',()=>{subjectInput.value=template.subject;messageInput.value=template.body;updateLink();generatedLanguage=null;switchLanguage.classList.add('hidden');status.textContent='';showEditor();});
+ async function generateDraft(language){
+   const data=lastData;
+   if(!data)return;
+   const isInitial=language==='en'&&generatedLanguage===null;
+   generate.disabled=true;switchLanguage.disabled=true;
+   status.textContent=isInitial?L[13]:(language==='fr'?L[20]:L[21]);
+   try{
+     const response=await fetch('/api/generate-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,language})});
+     const result=await response.json();
+     if(!response.ok||!result.success)throw Error(result.error||'unavailable');
+     subjectInput.value=result.subject;messageInput.value=result.body;updateLink();generatedLanguage=language;
+     switchLanguage.textContent=language==='en'?L[18]:L[19];
+     switchLanguage.classList.remove('hidden');
+     status.textContent=L[14];showEditor();
+   }catch{status.textContent=L[15];if(generatedLanguage===null)skip.classList.remove('hidden');}
+   finally{generate.disabled=false;switchLanguage.disabled=false;}
+ }
+ generate.addEventListener('click',()=>{
+   if(!reason.input.value.trim()){status.textContent=L[17];reason.input.focus();return;}
+   lastData={sender_name:name.input.value.trim(),sender_address:address.input.value.trim(),reason:reason.input.value.trim(),context:String(priorIssue||'').slice(0,550),representative_name:rep.name,representative_office:rep.elected_office||''};
+   generateDraft('en');
+ });
+ switchLanguage.addEventListener('click',()=>generateDraft(generatedLanguage==='en'?'fr':'en'));
+ const relabel=lang=>{
+   L=catalogs[lang]||catalogs.en;
+   heading.textContent=L[0];intro.textContent=L[1];counter1.textContent=L[2];counter2.textContent=L[3];
+   name.label.textContent=L[4];address.label.textContent=L[5];addressHelp.textContent=L[6];reason.label.textContent=L[7];reasonHint.textContent=L[8];
+   continueButton.textContent=L[9];back.textContent=L[10];generate.textContent=L[11];skip.textContent=L[12];privacy.textContent=L[24];caution.textContent=L[23];
+   edit.textContent=L[25];switchLanguage.textContent=generatedLanguage==='fr'?L[19]:L[18];
+ };
+ active.push({wizard,relabel});
  box.insertBefore(wizard,editor);
 }
-window.InfoCivicScar={mount,labels,setLanguage(lang){
- for(let i=activeWizards.length-1;i>=0;i--){
-  const instance=activeWizards[i];
-  if(!instance.wizard.isConnected){activeWizards.splice(i,1);continue;}
-  instance.relabel(lang);
- }
+window.InfoCivicScar={mount,labels:catalogs,setLanguage(lang){
+ for(let i=active.length-1;i>=0;i--){if(!active[i].wizard.isConnected)active.splice(i,1);else active[i].relabel(lang);}
 }};
 })();
