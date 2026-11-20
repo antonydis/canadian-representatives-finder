@@ -1043,3 +1043,25 @@ footer a:hover { text-decoration: underline; }
 .scar-wizard .civic-compose-actions{gap:10px}
 .scar-wizard button:disabled{opacity:.58;cursor:progress}
 @media(max-width:640px){.scar-wizard-fields{grid-template-columns:1fr}.scar-wizard{padding:15px}.scar-wizard-fields>.civic-compose-field{grid-column:1/-1}}
+
+
+/* Minimal two-step message flow replaces the four-question intake. */
+.scar-simple{max-width:750px;margin-inline:auto}
+.scar-simple .scar-step{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
+.scar-simple .scar-step.hidden{display:none}
+.scar-simple .scar-step-counter{font-size:.78rem;color:#53677e;font-weight:750;letter-spacing:.02em;margin:0}
+.scar-simple .civic-compose-field input,
+.scar-simple .civic-compose-field textarea{width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #b9c8da;border-radius:14px;padding:12px 15px;min-height:46px;font:inherit;line-height:1.5}
+.scar-simple .civic-compose-field textarea{min-height:116px;resize:vertical}
+.scar-simple .civic-compose-field input:focus-visible,
+.scar-simple .civic-compose-field textarea:focus-visible{outline:3px solid #2373c8;outline-offset:2px}
+.scar-simple .scar-step>.civic-compose-btn{align-self:flex-start}
+.scar-simple .scar-step .civic-compose-actions{display:flex;flex-wrap:wrap;gap:12px}
+.scar-simple .scar-skip,.scar-simple .scar-edit{border:0;background:transparent;padding:10px 2px;margin-top:6px;color:#285981;font:inherit;font-size:.88rem;font-weight:650;text-decoration:underline;text-underline-offset:3px;cursor:pointer;align-self:flex-start}
+.scar-simple .scar-skip:hover,.scar-simple .scar-edit:hover{color:var(--navy)}
+.scar-simple .scar-skip:focus-visible,.scar-simple .scar-edit:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+.scar-simple .scar-status{min-height:0;line-height:1.5}
+.scar-simple .scar-privacy{font-size:.79rem}
+.scar-simple>.civic-secondary-action{margin:10px 0}
+.civic-compose-form.hidden{display:none}
+@media(max-width:560px){.scar-simple .scar-step>.civic-compose-btn{width:100%}.scar-simple .scar-step .civic-compose-actions>*{flex:1 1 100%}}
