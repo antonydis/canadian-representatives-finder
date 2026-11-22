@@ -624,9 +624,18 @@ function applyLang(lang) {
     const labels=composer.querySelectorAll('.civic-compose-form .civic-compose-field label');
     if(labels[0])labels[0].textContent=findText(8);
     if(labels[1])labels[1].textContent=findText(9);
-    const buttons=composer.querySelectorAll('.civic-compose-actions > *');
-    if(buttons[0])buttons[0].textContent=findText(10);
-    if(buttons[1])buttons[1].textContent=findText(11);
+    // Scope to the actual email form: the suitability gate has its own action row.
+    const formActions=composer.querySelector('.civic-compose-form > .civic-compose-actions');
+    if(formActions?.children[0])formActions.children[0].textContent=findText(10);
+    if(formActions?.children[1])formActions.children[1].textContent=findText(11);
+    const recipientLabel=composer.querySelector('.civic-compose-to strong');
+    if(recipientLabel)recipientLabel.textContent=findText(7)+': ';
+    const chosen=composer.querySelector('.civic-compose-heading .civic-step-heading-text p');
+    if(chosen && currentComposition?.rep && currentComposition.context===(composer.id==='find-composer'?'main':'triage')){
+      chosen.textContent=findText(6)+': '+currentComposition.rep.name+' · '+(currentComposition.rep.elected_office||'');
+    }
+    const chooseAnother=composer.querySelector('.civic-compose-heading > .civic-edit-btn');
+    if(chooseAnother)chooseAnother.textContent=findText(12);
     const note=composer.querySelector('.civic-compose-note');
     if(note)note.textContent=findText(14);
   });
@@ -678,6 +687,8 @@ function buildLangButtons() {
   const menu = document.createElement('ul');
   menu.className = 'lang-dropdown-menu';
   menu.setAttribute('role', 'listbox');
+  menu.id='language-options';
+  btn.setAttribute('aria-controls',menu.id);
   menu.hidden = true;
 
   LANGS.forEach(lang => {
@@ -689,6 +700,7 @@ function buildLangButtons() {
     li.addEventListener('click', () => {
       applyLang(lang);
       closeDropdown();
+      btn.focus({preventScroll:true});
     });
     menu.appendChild(li);
   });
@@ -711,7 +723,7 @@ function buildLangButtons() {
     // Align right edge to button right, but clamp to viewport
     const menuW = 160;
     const left  = Math.max(8, rect.right - menuW);
-    menu.style.left = left + 'px';
+    menu.style.left = Math.min(left,Math.max(8,window.innerWidth-menuW-8)) + 'px';
   }
 
   function closeDropdown() {
@@ -726,6 +738,9 @@ function buildLangButtons() {
   });
 
   document.addEventListener('click', () => closeDropdown());
+  // On mobile, a fixed-position language menu must not remain detached from its trigger.
+  window.addEventListener('scroll',closeDropdown,{passive:true});
+  window.addEventListener('resize',closeDropdown,{passive:true});
   menu.addEventListener('click', e => e.stopPropagation());
 
   // Keyboard navigation
@@ -741,7 +756,7 @@ function buildLangButtons() {
     if (e.key === 'Enter')     { e.preventDefault(); document.activeElement.click(); }
     if (e.key === 'Escape')    { closeDropdown(); btn.focus(); }
   });
-  menu.querySelectorAll('.lang-dropdown-item').forEach(li => { li.tabIndex = 0; });
+  menu.querySelectorAll('.lang-dropdown-item').forEach(li => { li.tabIndex = -1; });
 
   // Expose update function so applyLang can refresh the label
   wrapper._updateCurrent = updateCurrent;
