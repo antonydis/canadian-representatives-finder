@@ -58,7 +58,11 @@ async function search(request){
   // Keep backend ambiguity metadata for quality auditing (not a UI alert).
   const reps=preferredRepresentatives(raw,mapRep);
   const disagreement=boundaryAmbiguity(raw,mapRep);
-  const candidateReps=applyOverrides(reps,postal,raw.city);
+  // Overrides may add an additional officeholder; keep the same
+  // one-card-per-office rule after they are applied.
+  const candidateReps=preferredRepresentatives(
+    {representatives_centroid:applyOverrides(reps,postal,raw.city)}, r=>r
+  );
   const issues=[];
   if(disagreement.length)issues.push("postal_boundary_ambiguity");
   if(!candidateReps.length)issues.push("no_representative_data");
