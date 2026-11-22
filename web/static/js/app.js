@@ -579,6 +579,14 @@ function t(key) {
   return translations[currentLang]?.[key] || translations['en']?.[key] || key;
 }
 
+const PUBLIC_BRAND={
+ en:{subtitle:'Find your representatives and the right public service',about:'About',privacy:'Privacy'},
+ fr:{subtitle:'Trouvez vos élus et le bon service public',about:'À propos',privacy:'Confidentialité'},
+ es:{subtitle:'Encuentra tus representantes y el servicio público adecuado',about:'Acerca de',privacy:'Privacidad'},
+ pt:{subtitle:'Encontre seus representantes e o serviço público certo',about:'Sobre',privacy:'Privacidade'},
+ zh:{subtitle:'寻找您的民选代表和合适的公共服务',about:'关于',privacy:'隐私'},
+ tl:{subtitle:'Hanapin ang kinatawan at tamang pampublikong serbisyo',about:'Tungkol dito',privacy:'Privacy'}
+};
 function applyLang(lang) {
   const prevLang = currentLang;
   currentLang = lang;
@@ -588,6 +596,12 @@ function applyLang(lang) {
     gtag('event', 'change_language', { language: lang });
   }
   document.documentElement.lang = lang;
+  const publicBrand=PUBLIC_BRAND[lang]||PUBLIC_BRAND.en;
+  const subtitle=document.getElementById('brand-subtitle');
+  if(subtitle)subtitle.textContent=publicBrand.subtitle;
+  document.querySelectorAll('[data-public-page]').forEach(link=>{
+    link.textContent=publicBrand[link.dataset.publicPage]||link.textContent;
+  });
   refreshCivicLabels();
   window.InfoCivicScar?.setLanguage(lang);
   document.querySelectorAll('[data-contact-copy]').forEach(node=>{node.textContent=checkText(Number(node.dataset.contactCopy));});
