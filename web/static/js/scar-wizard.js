@@ -44,10 +44,12 @@ function mount({box,editor,rep,context,template,subjectInput,messageInput,update
  const stage2=node('div','scar-step hidden');
  const counter2=node('p','scar-step-counter',L[3]);stage2.append(counter2);
  const reason=makeField(stage2,'textarea','reason',7,800);
+ reason.input.setAttribute('enterkeyhint','done');
+ reason.input.setAttribute('aria-describedby',context+'-reason-hint');
  reason.input.value=(priorIssue||'').slice(0,800);
  reason.input.required=true;
  reason.input.setAttribute('aria-required','true');
- const reasonHint=node('p','scar-hint',L[8]);stage2.append(reasonHint);
+ const reasonHint=node('p','scar-hint',L[8]);reasonHint.id=context+'-reason-hint';stage2.append(reasonHint);
  const stageActions=node('div','civic-compose-actions');
  const back=node('button','civic-secondary-action',L[10]);back.type='button';
  const generate=node('button','civic-compose-btn',L[11]);generate.type='button';
@@ -86,12 +88,12 @@ function mount({box,editor,rep,context,template,subjectInput,messageInput,update
        onDraftReady({
          reason:data.reason,postal_code:postalCode,
          switchRepresentative:async(target)=>{
-           if(!target?.email||!target.name||!target.elected_office)return false;
+           if(!target?.email||!target.name)return false;
            const previousData=lastData,previousRep=selectedRep;
            switchLanguage.disabled=true;generate.disabled=true;
            status.textContent=L[13];
            try{
-             const nextData={...previousData,representative_name:target.name,representative_office:target.elected_office};
+             const nextData={...previousData,representative_name:target.name,representative_office:target.elected_office||'Elected representative'};
              const response=await fetch('/api/generate-email',{method:'POST',
                headers:{'Content-Type':'application/json'},body:JSON.stringify({...nextData,language:generatedLanguage||'en'})});
              const next=await response.json();
@@ -108,13 +110,22 @@ function mount({box,editor,rep,context,template,subjectInput,messageInput,update
          }
        });
      }
-   }catch{status.textContent=L[15];if(generatedLanguage===null)skip.classList.remove('hidden');}
+   }catch{
+     status.textContent=L[15];
+     // A provider failure should never trap a person on the mobile form.
+     // Keep all answers available, and reveal the editable ready-made template.
+     skip.classList.remove('hidden');
+     status.scrollIntoView({behavior:'smooth',block:'nearest'});
+   }
    finally{generate.disabled=false;switchLanguage.disabled=false;}
  }
+ reason.input.addEventListener('keydown',e=>{
+   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();generate.click();}
+ });
  generate.addEventListener('click',()=>{
    if(!reason.input.value.trim()){status.textContent=L[17];reason.input.focus();return;}
-   lastData={sender_name:name.input.value.trim(),postal_code:postalCode,reason:reason.input.value.trim(),context:String(priorIssue||'').slice(0,550),representative_name:selectedRep.name,representative_office:selectedRep.elected_office||''};
-   generateDraft('en');
+   lastData={sender_name:name.input.value.trim(),postal_code:postalCode,reason:reason.input.value.trim(),context:String(priorIssue||'').slice(0,550),representative_name:selectedRep.name,representative_office:selectedRep.elected_office||'Elected representative'};
+   generateDraft('en').catch(()=>{status.textContent=L[15];skip.classList.remove('hidden');});
  });
  switchLanguage.addEventListener('click',()=>generateDraft(generatedLanguage==='en'?'fr':'en'));
  const relabel=lang=>{
