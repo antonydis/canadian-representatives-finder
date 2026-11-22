@@ -107,39 +107,54 @@
    const v=(saved||navigator.language||'en').slice(0,2).toLowerCase();
    return Object.hasOwn(DATA,v)?v:'en';
  }
- function render(code){
-   const page=document.body.dataset.page;
-   const messages=DATA[code]||DATA.en;
-   const content=messages[page];
-   if(!content)return;
-   document.documentElement.lang=code;
-   document.title=content.title+' | InfoCivic Canada';
-   document.querySelector('meta[name="description"]')?.setAttribute('content',content.lead);
-   document.getElementById('info-title').textContent=content.title;
-   document.getElementById('info-lead').textContent=content.lead;
-   const container=document.getElementById('info-sections');container.replaceChildren();
-   for(const [heading,paragraphs] of content.sections){
-     const section=document.createElement('section');section.className='info-section';
-     const h2=document.createElement('h2');h2.textContent=heading;section.append(h2);
-     for(const paragraph of paragraphs){const p=document.createElement('p');p.textContent=paragraph;section.append(p);}
-     if(page==='about'&&heading===content.sections[4][0]){
-       const a=document.createElement('a');a.href='https://represent.opennorth.ca/';a.target='_blank';a.rel='noopener noreferrer';
-       a.textContent=content.source;section.append(a);
-     }
-     container.append(section);
-   }
-   const privacyAction=document.getElementById('info-privacy-action');
-   if(privacyAction){privacyAction.textContent=content.choices;privacyAction.addEventListener('click',()=>window.InfoCivicPrivacy?.manage());}
-   const citation=document.getElementById('info-privacy-contact');
-   if(citation){citation.textContent=content.privacyLabel;citation.href='mailto:contact@infocivic.ca';}
-   const brand=document.getElementById('info-brand-subtitle');
-   if(brand)brand.textContent=messages.about.lead.split('.')[0]+'.';
-   for(const target of document.querySelectorAll('[data-info-nav]'))target.textContent=messages.nav[target.dataset.infoNav]||target.textContent;
-   document.getElementById('info-footer-note').textContent=messages.footer;
-   const select=document.getElementById('info-language');select.value=code;
+ const page=location.pathname.startsWith('/privacy')?'privacy':'about';
+ const root=document.querySelector('.public-page');
+ const staticPanels=[...document.querySelectorAll('[data-public-panel]')];
+ const generated=document.createElement('article');
+ generated.className='info-article';generated.id='info-article';
+ // Existing English/French/Spanish content remains available if scripting is disabled.
+ staticPanels.forEach(x=>x.hidden=true);
+ root.append(generated);
+ const nav=document.querySelector('.public-language-nav');
+ if(nav){
+  nav.replaceChildren();
+  const label=document.createElement('label');label.htmlFor='info-language';label.className='sr-only';label.textContent='Language';
+  const select=document.createElement('select');select.id='info-language';select.setAttribute('aria-label','Choose language');
+  for(const [code,name] of Object.entries(LANGS)){const item=document.createElement('option');item.value=code;item.textContent=name;select.append(item);}
+  select.addEventListener('change',()=>{try{localStorage.setItem('canrep-lang',select.value);}catch{}render(select.value);});
+  nav.append(label,select);
  }
- const select=document.getElementById('info-language');
- for(const [code,label] of Object.entries(LANGS)){const opt=document.createElement('option');opt.value=code;opt.textContent=label;select.append(opt);}
- select.addEventListener('change',()=>{try{localStorage.setItem('canrep-lang',select.value);}catch{}render(select.value);});
+ function textElement(tag,content,cls){const node=document.createElement(tag);if(cls)node.className=cls;node.textContent=content;return node;}
+ function render(code){
+   const pack=DATA[code]||DATA.en,info=pack[page];if(!info)return;
+   document.documentElement.lang=code;document.title=info.title+' | InfoCivic Canada';
+   document.querySelector('meta[name="description"]')?.setAttribute('content',info.lead);
+   generated.replaceChildren();
+   generated.append(textElement('h1',info.title),textElement('p',info.lead,'public-lead'));
+   for(const [heading,paragraphs] of info.sections){
+      const section=document.createElement('section');section.className='info-section';
+      section.append(textElement('h2',heading));
+      for(const text of paragraphs)section.append(textElement('p',text));
+      if(page==='about'&&heading===info.sections[4][0]){
+        const a=document.createElement('a');a.href='https://represent.opennorth.ca/';a.target='_blank';a.rel='noopener noreferrer';a.textContent=info.source;section.append(a);
+      }
+      generated.append(section);
+   }
+   if(page==='privacy'){
+     const panel=document.createElement('section');panel.className='info-preference-panel';
+     const button=document.createElement('button');button.type='button';button.className='public-privacy-button';
+     button.textContent=info.choices;button.addEventListener('click',()=>window.InfoCivicPrivacy?.manage());
+     panel.append(button);
+     const email=document.createElement('a');email.href='mailto:contact@infocivic.ca';email.textContent=info.privacyLabel;
+     panel.append(email);generated.append(panel);
+   }
+   document.querySelectorAll('[data-public-subtitle]').forEach(n=>n.textContent=pack.about.lead.split('.')[0]+'.');
+   document.querySelectorAll('[data-public-home]').forEach(n=>n.textContent=pack.nav.home);
+   document.querySelectorAll('[data-public-current]').forEach(n=>n.textContent=pack.nav[page]);
+   document.querySelectorAll('[data-public-about]').forEach(n=>n.textContent=pack.nav.about);
+   document.querySelectorAll('[data-public-privacy]').forEach(n=>n.textContent=pack.nav.privacy);
+   document.querySelectorAll('[data-public-disclaimer]').forEach(n=>n.textContent=pack.footer);
+   const select=document.getElementById('info-language');if(select)select.value=code;
+ }
  render(lang());
 })();
