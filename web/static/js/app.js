@@ -516,8 +516,8 @@ async function init() {
   if (openInput && charCounter) {
     openInput.addEventListener('input', () => {
       const len = openInput.value.length;
-      charCounter.textContent = `${len} / 200`;
-      charCounter.classList.toggle('triage-char-count--warn', len > 180);
+      charCounter.textContent = `${len} / 500`;
+      charCounter.classList.toggle('triage-char-count--warn', len > 470);
     });
   }
 
