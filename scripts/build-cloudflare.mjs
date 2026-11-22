@@ -12,6 +12,12 @@ const about=readFileSync(join(root, "web/templates/about.html"), "utf8");
 const privacy=readFileSync(join(root, "web/templates/privacy.html"), "utf8");
 writeFileSync(join(out, "index.html"), index);
 writeFileSync(join(out, "laval.html"), laval);
+for(const page of ["about","privacy"]){
+ const html=readFileSync(join(root,"web/templates",page+".html"),"utf8");
+ writeFileSync(join(out,page+".html"),html);
+ mkdirSync(join(out,page),{recursive:true});
+ writeFileSync(join(out,page,"index.html"),html);
+}
 writeFileSync(join(out, "about.html"), about);
 writeFileSync(join(out, "privacy.html"), privacy);
 mkdirSync(join(out, "reps"), { recursive: true });
