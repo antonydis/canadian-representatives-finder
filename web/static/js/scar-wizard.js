@@ -24,7 +24,7 @@ function mount({box,editor,rep,context,template,subjectInput,messageInput,update
    const input=node(tag);input.id=context+'-'+id;label.htmlFor=input.id;
    input.setAttribute('aria-label',L[labelIndex]);
    input.maxLength=maxLength;
-   if(tag==='textarea')input.rows=4;
+   if(tag==='textarea'){input.rows=5;input.setAttribute('inputmode','text');input.setAttribute('spellcheck','true');}
    wrap.append(label,input);parent.append(wrap);
    return {label,input};
  };
@@ -63,9 +63,17 @@ function mount({box,editor,rep,context,template,subjectInput,messageInput,update
  wizard.append(stage1,stage2,status,caution,privacy,skip,switchLanguage,edit);
  // Keep the original template available but do not display both flows at once.
  editor.classList.add('hidden');
- function showStage(n){step=n;stage1.classList.toggle('hidden',n!==1);stage2.classList.toggle('hidden',n!==2);(n===1?counter1:counter2).scrollIntoView({behavior:'smooth',block:'nearest'});}
+ function showStage(n){
+   step=n;
+   stage1.classList.toggle('hidden',n!==1);
+   stage2.classList.toggle('hidden',n!==2);
+   // Avoid smooth scrolling and auto-keyboard focus in iOS Safari while
+   // the virtual keyboard is opening. The user can tap the visible field.
+   const heading=n===1?counter1:counter2;
+   heading.scrollIntoView({behavior:'instant',block:'nearest'});
+ }
  function showEditor(){stage1.classList.add('hidden');stage2.classList.add('hidden');editor.classList.remove('hidden');skip.classList.add('hidden');edit.classList.remove('hidden');messageInput.dispatchEvent(new Event('input',{bubbles:true}));editor.scrollIntoView({behavior:'smooth',block:'nearest'});}
- continueButton.addEventListener('click',()=>{if(!name.input.value.trim()){status.textContent=L[16];name.input.focus();return;}status.textContent='';showStage(2);reason.input.focus({preventScroll:true});});
+ continueButton.addEventListener('click',()=>{if(!name.input.value.trim()){status.textContent=L[16];name.input.focus();return;}status.textContent='';showStage(2);});
  back.addEventListener('click',()=>{status.textContent='';showStage(1);});
  edit.addEventListener('click',()=>{editor.classList.add('hidden');edit.classList.add('hidden');skip.classList.remove('hidden');switchLanguage.classList.add('hidden');status.textContent='';showStage(1);});
  skip.addEventListener('click',()=>{subjectInput.value=template.subject;messageInput.value=template.body;updateLink();generatedLanguage=null;switchLanguage.classList.add('hidden');status.textContent='';showEditor();});
