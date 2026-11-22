@@ -174,7 +174,7 @@ test('Mobile email editor resizes and clipboard uses actual newlines',()=>{
  assert.match(js,/function openInlineComposer/);
  assert.match(js,/const fitMessage=\(\)=>/);
  assert.match(js,/field\.scrollHeight/);
- assert.match(js,/Math\.round\(window\.innerHeight\*0\.52\)/);
+ assert.match(js,/Math\.round\(visibleHeight\*0\.52\)/);
  const composer=js.slice(js.indexOf('function openInlineComposer('),js.indexOf('async function init('));
  assert.match(composer,/const content='To: '\+template\.to\+'\\n'/);
  assert.doesNotMatch(composer,/const content='To: '\+template\.to\+'\\\\n'/);
