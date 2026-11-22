@@ -1238,3 +1238,14 @@ main,.container,.header-inner,.tabs,.search-card,.rep-card,.rep-card-footer,
 .recipient-review-status{min-height:0;font-size:.85rem;color:var(--navy);margin:8px 0 0}
 @media(max-width:540px){.recipient-review-backdrop{align-items:flex-end;padding:0}.recipient-review-dialog{border-radius:22px 22px 0 0;width:100%;max-height:calc(100dvh - env(safe-area-inset-top) - 24px);padding:20px 18px max(20px,env(safe-area-inset-bottom));}.recipient-review-dialog h3{font-size:1.15rem}}
 @media(prefers-reduced-motion:reduce){.recipient-review-dialog{scroll-behavior:auto}}
+
+/* Mobile writing: keep native text selection and the iOS keyboard reliable. */
+[data-civic-issue],.scar-simple textarea,.contact-decision-detail textarea{
+ -webkit-user-select:text;user-select:text;
+ -webkit-touch-callout:default;touch-action:auto;
+ position:relative;z-index:1;
+ font-size:16px;line-height:1.5;
+ min-height:130px;
+ caret-color:var(--navy);
+}
+.civic-issue-count{font-size:.8rem;color:var(--text-muted);text-align:right;margin:5px 0 0}
