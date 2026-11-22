@@ -212,3 +212,12 @@ test('Mobile audit: edited draft and recipient switch are disclosed before regen
  assert.match(js,/hasEditedDraft\?\.\(\)/);
  assert.match(css,/max-height:52dvh/);
 });
+
+test('Ambiguous postal matches show no multi-district banner and keep correction available',()=>{
+  const worker=readFileSync('src-worker/index.js','utf8');
+  assert.doesNotMatch(js,/This postal code may cover more than one electoral district/);
+  assert.doesNotMatch(js,/data-quality-notice/);
+  assert.match(worker,/preferredRepresentatives\(raw,mapRep\)/);
+  assert.match(js,/openFeedbackModal\(rep, currentPostalCode\)/);
+  assert.match(js,/rep-card-flag-btn/);
+});
