@@ -101,6 +101,6 @@ test('Unknown jurisdiction does not manufacture a number or block a user',()=>{
 test('Input lengths and mobile presentation are consistent',()=>{
  assert.match(html,/maxlength="500"/);
  assert.match(appSource,/charCounter\.textContent = `\$\{len\} \/ 500`/);
- assert.match(wizardSource,/data-civic-issue/);
+ assert.match(wizardSource,/makeField\(stage2,'textarea','reason',7,800\)/);
  assert.doesNotMatch(wizardSource,/showStage\(2\);reason\.input\.focus/);
 });
