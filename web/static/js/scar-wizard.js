@@ -113,6 +113,7 @@ function mount({box,editor,rep,context,template,subjectInput,messageInput,update
        // Evaluate mismatch after the citizen can review the generated draft.
        onDraftReady({
          reason:data.reason,postal_code:postalCode,
+         hasEditedDraft:()=>!!latestRendered&&(subjectInput.value!==latestRendered.subject||messageInput.value!==latestRendered.body),
          switchRepresentative:async(target)=>{
            if(!target?.email||!target.name)return false;
            const previousData=lastData,previousRep=selectedRep;
