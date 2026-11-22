@@ -28,8 +28,8 @@ export const VALID_LANGS = ["en","fr","es","pt","zh","tl"];
 
 export function policyInput(value) {
  const text=String(value||"").trim();
- if(text.length<10||text.length>200)return {ok:false,code:"invalid_length"};
- const screened=inspectCivicInput(text,200);
+ if(text.length<10||text.length>500)return {ok:false,code:"invalid_length"};
+ const screened=inspectCivicInput(text,500);
  if(!screened.ok)return {ok:false,code:screened.code};
  if(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(text))return {ok:false,code:"invalid_characters"};
  if(/(?:write|create|generate|écris|écrire|escribe|escrever|编写).{0,28}(?:poem|story|song|code|python|javascript|poème|cuento|poema|historia)/i.test(text)||
