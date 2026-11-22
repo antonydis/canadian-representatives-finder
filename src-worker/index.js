@@ -1,7 +1,7 @@
 import translations from "./translations.generated.json";
 import overridesA from "../data/overrides.json";
 import overridesB from "../data/mtl_borough_overrides.json";
-import {normalizePostal, isPostalCode, boundaryAmbiguity} from "./quality.js";
+import {normalizePostal, isPostalCode, boundaryAmbiguity, preferredRepresentatives} from "./quality.js";
 import {policyInput, classifyWithOpenAI, VALID_LANGS, officialContactFor, resolveAgencyContact, obviousCivicIssue} from "./civic-ai.js";
 import {validateDraftRequest,generateScarDraft} from "./scar-email.js";
 
@@ -53,12 +53,10 @@ async function search(request){
   if(res.status===429||res.status===503)return fail("rate_limit",429);
   if(!res.ok)return fail("api_error",502);
   const raw=await res.json();
-  const centroid=raw.representatives_centroid||[];
-  const concordance=raw.representatives_concordance||[];
-  const all=[...centroid,...concordance];
-  const reps=[...new Map(all.map(x=>[String(x.name)+"|"+String(x.elected_office),mapRep(x)])).values()];
-  // A postal code may cover several electoral boundaries. Never silently
-  // represent a geographic match as an officially verified identity.
+  // Show a single suggested match for each office, preferring the postcode
+  // centroid over other districts that may intersect the postal code.
+  // Keep backend ambiguity metadata for quality auditing (not a UI alert).
+  const reps=preferredRepresentatives(raw,mapRep);
   const disagreement=boundaryAmbiguity(raw,mapRep);
   const candidateReps=applyOverrides(reps,postal,raw.city);
   const issues=[];
