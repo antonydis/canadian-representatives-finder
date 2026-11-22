@@ -189,12 +189,20 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
  const unsure=el('button','civic-secondary-action');unsure.type='button';unsure.textContent=checkText(3);
  const detail=el('div','contact-decision-detail hidden');
  const label=el('label');label.textContent=checkText(4);
- const input=el('textarea');input.id=context+'-civic-check';input.rows=3;input.maxLength=200;label.htmlFor=input.id;
+ const input=el('textarea');input.id=context+'-civic-check';input.rows=5;input.maxLength=500;label.htmlFor=input.id;
+ input.setAttribute('data-civic-issue','true');
+ input.setAttribute('spellcheck','true');
+ input.setAttribute('aria-describedby',context+'-civic-hint');
+ const hint=el('p','scar-hint');hint.id=context+'-civic-hint';hint.textContent=checkText(4);
+ const count=el('p','civic-issue-count');count.setAttribute('aria-live','off');
+ const showCount=()=>{count.textContent=input.value.length+' / 500';};
+ input.addEventListener('input',()=>{showCount();result.replaceChildren();});
+ showCount();
  const check=el('button','civic-compose-btn');check.type='button';check.textContent=checkText(5);
  const back=el('button','civic-secondary-action');back.type='button';back.textContent=checkText(6);
  const actions=el('div','civic-compose-actions');actions.append(back,check);
  const result=el('div','contact-check-result');result.setAttribute('role','status');result.setAttribute('aria-live','polite');
- detail.append(label,input,actions,result);
+ detail.append(label,input,hint,count,actions,result);
  const continueToDraft=()=>{
    section.classList.add('hidden');
    form.classList.remove('hidden');
@@ -210,7 +218,7 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
  function option(text,fn,secondary=false){const b=el('button',secondary?'civic-secondary-action':'civic-compose-btn');b.type='button';b.textContent=text;b.addEventListener('click',fn);return b;}
  check.addEventListener('click',async()=>{
   const issue=input.value.trim();result.replaceChildren();
-  if(issue.length<10){result.textContent=checkText(15);return;}
+  if(issue.length<10){result.textContent=checkText(15);input.focus();return;}
   check.disabled=true;result.textContent=checkText(7);
   try{
    const response=await fetch('/api/classify-situation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:issue,lang:currentLang,postal_code:currentPostalCode||'',municipality:currentMunicipality})});
