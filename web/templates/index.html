@@ -5,32 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="description" content="Find your Canadian elected representatives by postal code — federal, provincial, and municipal. Not sure who to contact? Our AI helps you identify the right level of government." />
   <meta name="robots" content="index, follow" />
-  <title>Canadian Representatives Finder 🍁</title>
+  <title>InfoCivic Canada | Civic guidance and representatives</title>
 
   <!-- Open Graph (WhatsApp, Facebook, LinkedIn, iMessage) -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://infocivic.ca/" />
-  <meta property="og:title" content="Canadian Representatives Finder 🍁" />
+  <meta property="og:title" content="InfoCivic Canada" />
   <meta property="og:description" content="Find your federal MP, provincial MNA/MPP, and municipal councillors by postal code — and get help figuring out who to contact." />
   <meta property="og:locale" content="en_CA" />
 
   <!-- Twitter / X card -->
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Canadian Representatives Finder 🍁" />
+  <meta name="twitter:title" content="InfoCivic Canada" />
   <meta name="twitter:description" content="Find your federal MP, provincial MNA/MPP, and municipal councillors by postal code — and get help figuring out who to contact." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="/static/css/style.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍁</text></svg>" />
 
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-12Q5H9M7GX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-12Q5H9M7GX');
-  </script>
+  <script defer src="/static/js/privacy-consent.js"></script>
+
 </head>
 <body>
 
@@ -39,11 +33,11 @@
   <!-- ── HEADER ─────────────────────────────────────────────────── -->
   <header role="banner">
     <div class="header-inner">
-      <a href="/" class="site-brand" aria-label="Canadian Representatives Finder — Home">
+      <a href="/" class="site-brand" aria-label="InfoCivic Canada — Home">
         <span class="maple-icon" aria-hidden="true">🍁</span>
         <div class="site-name">
-          <span class="primary">Canadian Representatives Finder</span>
-          <span class="secondary">Trouveur de représentants canadiens</span>
+          <span class="primary">InfoCivic Canada</span>
+          <span class="secondary" id="brand-subtitle">Find your representatives and the right public service</span>
         </div>
       </a>
       <nav aria-label="Language selection">
@@ -283,7 +277,10 @@
   <footer role="contentinfo">
     <div class="footer-inner">
       <span data-i18n="footer_note">Independent civic project · Not an official government website</span>
-      <span>Data provided by <a href="https://represent.opennorth.ca/" target="_blank" rel="noopener noreferrer">OpenNorth</a></span>
+      <nav class="footer-legal-links" aria-label="Information and privacy">
+        <a href="/about" data-public-page="about">About</a>
+        <a href="/privacy" data-public-page="privacy">Privacy</a>
+      </nav>
     </div>
     <div class="footer-author">
       Built by <a href="https://github.com/antonydis" target="_blank" rel="noopener noreferrer">Antony</a>
