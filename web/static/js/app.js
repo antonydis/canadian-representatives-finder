@@ -410,6 +410,15 @@ function openInlineComposer(rep,context){
  recipient.append(strong,address);
  const subject=field(findText(8),template.subject,'input');
  const message=field(findText(9),template.body,'textarea');
+ // Adapt the preview height to the message without swallowing the whole iPhone screen.
+ const fitMessage=()=>{
+   const field=message.input;
+   field.style.height='auto';
+   const max=Math.max(220,Math.round(window.innerHeight*0.52));
+   field.style.height=Math.min(field.scrollHeight+2,max)+'px';
+   field.style.overflowY=field.scrollHeight>max?'auto':'hidden';
+ };
+ message.input.addEventListener('input',fitMessage);
  const actions=document.createElement('div');
  actions.className='civic-compose-actions';
  const copy=document.createElement('button');
@@ -422,12 +431,13 @@ function openInlineComposer(rep,context){
  const updateLink=()=>{
    const url='mailto:'+encodeURIComponent(template.to)+'?subject='+encodeURIComponent(subject.input.value)+'&body='+encodeURIComponent(message.input.value);
    mail.href=url;
+   fitMessage();
  };
  subject.input.addEventListener('input',updateLink);
  message.input.addEventListener('input',updateLink);
  updateLink();
  copy.addEventListener('click',async()=>{
-   const content='To: '+template.to+'\\n'+findText(8)+': '+subject.input.value+'\\n\\n'+message.input.value;
+   const content='To: '+template.to+'\n'+findText(8)+': '+subject.input.value+'\n\n'+message.input.value;
    try{
      if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(content);
      else fallbackCopy(content,()=>{});
