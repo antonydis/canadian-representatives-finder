@@ -8,12 +8,20 @@ mkdirSync(out, { recursive: true });
 cpSync(join(root, "web/static"), join(out, "static"), { recursive: true });
 const index = readFileSync(join(root, "web/templates/index.html"), "utf8");
 const laval = readFileSync(join(root, "web/templates/laval.html"), "utf8");
+const about=readFileSync(join(root, "web/templates/about.html"), "utf8");
+const privacy=readFileSync(join(root, "web/templates/privacy.html"), "utf8");
 writeFileSync(join(out, "index.html"), index);
 writeFileSync(join(out, "laval.html"), laval);
+writeFileSync(join(out, "about.html"), about);
+writeFileSync(join(out, "privacy.html"), privacy);
 mkdirSync(join(out, "reps"), { recursive: true });
 mkdirSync(join(out, "triage"), { recursive: true });
+mkdirSync(join(out, "about"), { recursive: true });
+mkdirSync(join(out, "privacy"), { recursive: true });
 writeFileSync(join(out, "reps/index.html"), index);
 writeFileSync(join(out, "triage/index.html"), index);
+writeFileSync(join(out, "about/index.html"), about);
+writeFileSync(join(out, "privacy/index.html"), privacy);
 const translations = {};
 for (const name of readdirSync(join(root, "web/translations"))) {
   if (name.endsWith(".json")) {
