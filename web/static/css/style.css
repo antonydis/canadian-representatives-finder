@@ -1249,3 +1249,16 @@ main,.container,.header-inner,.tabs,.search-card,.rep-card,.rep-card-footer,
  caret-color:var(--navy);
 }
 .civic-issue-count{font-size:.8rem;color:var(--text-muted);text-align:right;margin:5px 0 0}
+
+/* Mobile UX audit: preserve edited email content and iPhone keyboard comfort. */
+.scar-replacement-notice{border:1px solid #d1ac66;background:#fff9ed;border-radius:12px;padding:14px;margin:12px 0;max-width:100%;box-sizing:border-box}
+.scar-replacement-notice p{color:#54401f;font-size:.88rem;line-height:1.5;margin:0 0 12px}
+.scar-replacement-notice .civic-compose-actions{gap:10px;flex-wrap:wrap}
+.scar-replacement-notice .civic-compose-actions>button{flex:1 1 155px;min-height:44px}
+.recipient-review-edit-warning{color:#654619;font-size:.86rem;line-height:1.5;background:#fff8e8;padding:10px 12px;border:1px solid #e4d4af;border-radius:10px;margin:12px 0}
+.civic-compose-form textarea{min-height:160px;max-height:52dvh;overscroll-behavior:contain;resize:vertical}
+@media(max-width:520px){
+ .scar-replacement-notice{padding:12px}
+ .scar-replacement-notice .civic-compose-actions>button{flex-basis:100%}
+ .recipient-review-edit-warning{font-size:.83rem}
+}
