@@ -186,8 +186,8 @@ export default {async fetch(request,env){
   if(path==="/api/laval/subscribe")return subscribe(request,env);
   return fail("not_found",404);
  }
- if(["/reps","/triage","/laval"].includes(path)){
-  const rewritten=new URL(request.url);rewritten.pathname=path==="/laval"?"/laval.html":"/index.html";
+ if(["/reps","/triage","/laval","/about","/privacy"].includes(path)){
+  const rewritten=new URL(request.url);rewritten.pathname=({"/laval":"/laval.html","/about":"/about.html","/privacy":"/privacy.html"})[path]||"/index.html";
   return env.ASSETS.fetch(new Request(rewritten,request));
  }
  return env.ASSETS.fetch(request);
