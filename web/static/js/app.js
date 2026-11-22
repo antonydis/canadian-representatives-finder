@@ -272,7 +272,7 @@ function officialLevelName(level){
  tl:{federal:'Pederal',provincial:'Panlalawigan',municipal:'Munisipal'}};
  return (terms[currentLang]||terms.en)[level]||level;
 }
-async function maybeReviewDraftRecipient({rep,context,box,reason,switchRepresentative}){
+async function maybeReviewDraftRecipient({rep,context,box,reason,switchRepresentative,hasEditedDraft}){
  if(!reason?.trim()||!box.isConnected||box.classList.contains('hidden'))return;
  let classification;
  try{
@@ -311,6 +311,17 @@ async function maybeReviewDraftRecipient({rep,context,box,reason,switchRepresent
  comparison.append(current,proposed);
  const explanation=el('p','recipient-review-explanation');explanation.textContent=classification.explanation||'';
  const caution=el('p','recipient-review-caution');caution.textContent=reviewCopy(4);
+ const overwrittenNotice=el('p','recipient-review-edit-warning');
+ const overwriteText={
+  en:'Switching representatives creates a new draft. Any edits you have made to this email will be replaced.',
+  fr:'Changer d’élu créera un nouveau brouillon. Les modifications apportées à ce courriel seront remplacées.',
+  es:'Al cambiar de representante se generará otro borrador. Los cambios que hayas hecho en este correo se reemplazarán.',
+  pt:'Mudar de representante criará outro rascunho. As alterações feitas neste e-mail serão substituídas.',
+  zh:'更换代表将生成新的邮件草稿，您对当前邮件作出的修改会被替换。',
+  tl:'Kapag nagpalit ka ng kinatawan, gagawa ng bagong draft at mapapalitan ang mga edit mo.'
+ };
+ overwrittenNotice.textContent=overwriteText[currentLang]||overwriteText.en;
+ if(!hasEditedDraft?.())overwrittenNotice.classList.add('hidden');
  const actions=el('div','recipient-review-actions');
  const keep=el('button','civic-secondary-action');keep.type='button';keep.textContent=reviewCopy(6);
  const message=el('p','recipient-review-status');message.setAttribute('role','status');message.setAttribute('aria-live','polite');
@@ -348,10 +359,13 @@ async function maybeReviewDraftRecipient({rep,context,box,reason,switchRepresent
    const list=[...options].sort((a,b)=>a.name.localeCompare(b.name));
    for(const r of list){const item=el('option');item.value=String(latestRepresentatives.indexOf(r));item.textContent=r.name+' · '+(r.elected_office||'');choice.append(item);}
    if(list.length>1)dialog.append(choice);
+   dialog.append(overwrittenNotice);
    const change=el('button','civic-compose-btn');change.type='button';change.textContent=reviewCopy(5);
    change.addEventListener('click',async()=>{
      const target=latestRepresentatives[Number(choice.value)];
      if(!target)return;
+     // Surface the impact if the user edited the draft after this dialog appeared.
+     if(hasEditedDraft?.())overwrittenNotice.classList.remove('hidden');
      change.disabled=true;keep.disabled=true;message.textContent=reviewCopy(7);
      const ok=await switchRepresentative(target);
      if(ok){dismiss();}
@@ -422,7 +436,9 @@ function openInlineComposer(rep,context){
  const fitMessage=()=>{
    const field=message.input;
    field.style.height='auto';
-   const max=Math.max(220,Math.round(window.innerHeight*0.52));
+   // iOS visualViewport reflects the on-screen keyboard more reliably than innerHeight.
+   const visibleHeight=window.visualViewport?.height||window.innerHeight;
+   const max=Math.max(160,Math.round(visibleHeight*0.52));
    field.style.height=Math.min(field.scrollHeight+2,max)+'px';
    field.style.overflowY=field.scrollHeight>max?'auto':'hidden';
  };
@@ -756,7 +772,7 @@ function buildLangButtons() {
     if (e.key === 'Enter')     { e.preventDefault(); document.activeElement.click(); }
     if (e.key === 'Escape')    { closeDropdown(); btn.focus(); }
   });
-  menu.querySelectorAll('.lang-dropdown-item').forEach(li => { li.tabIndex = -1; });
+  menu.querySelectorAll('.lang-dropdown-item').forEach(li => { li.tabIndex = 0; });
 
   // Expose update function so applyLang can refresh the label
   wrapper._updateCurrent = updateCurrent;
