@@ -1225,25 +1225,6 @@ function renderResults(reps, postalCode, containerId, levelFilter = null, showEm
   section.innerHTML = '';
   section.classList.remove('hidden');
 
-  // Show a warning only when an actual geographic ambiguity is detected.
-  const ambiguous = metadata.ambiguity_levels || [];
-  if (ambiguous.length) {
-    const notice = el('aside', 'data-quality-notice');
-    notice.setAttribute('role', 'note');
-    const msg = el('p');
-    msg.textContent = currentLang === 'fr'
-      ? 'Ce code postal pourrait toucher plusieurs circonscriptions. Confirmez avec votre adresse.'
-      : currentLang === 'es'
-        ? 'Este código postal podría cubrir varias circunscripciones. Confirma usando tu dirección.'
-        : 'This postal code may cover more than one electoral district. Confirm using your street address.';
-    const link = el('a');
-    link.href = 'https://www.elections.ca/Scripts/VIS/FindED?L=e&PAGEID=20&QID=-1';
-    link.target = '_blank'; link.rel = 'noopener noreferrer';
-    link.textContent = 'Elections Canada';
-    notice.append(msg, link);
-    section.appendChild(notice);
-  }
-
   // Determine which levels to display
   // 'mixed' or null = show all; any specific level = filter to that level only
   const showLevels = (!levelFilter || levelFilter === 'mixed')
