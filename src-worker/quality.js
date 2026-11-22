@@ -17,3 +17,38 @@ export function boundaryAmbiguity(raw, toRep) {
   }
   return result;
 }
+
+/**
+ * Select one suggested representative per elected office.
+ * The postcode centroid is our best available geographic estimate, so its
+ * matches take precedence over other districts in the postcode concordance.
+ * Keep distinct municipal offices (mayor, borough mayor, councillor, etc.)
+ * because they legitimately represent the same resident at once.
+ * This is a suggestion, not official address-level verification.
+ */
+export function preferredRepresentatives(raw, toRep) {
+  const selected = new Map();
+  const sources = [
+    ...(raw.representatives_centroid || []),
+    ...(raw.representatives_concordance || [])
+  ];
+  for (const item of sources) {
+    const rep = toRep(item);
+    if (!rep.name || !rep.level) continue;
+    const office = String(rep.elected_office || '').normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    let slot = rep.level;
+    if (rep.level === 'municipal') {
+      const borough = /borough|arrondissement/.test(office);
+      if (/mayor|maire|mairesse/.test(office)) {
+        slot += borough ? '|borough-mayor' : '|mayor';
+      } else if (/councill?or|conseiller|conseillere|alderman|echevin/.test(office)) {
+        slot += borough ? '|borough-councillor' : '|councillor';
+      } else {
+        slot += '|' + (office || 'other');
+      }
+    }
+    if (!selected.has(slot)) selected.set(slot, rep);
+  }
+  return [...selected.values()];
+}
