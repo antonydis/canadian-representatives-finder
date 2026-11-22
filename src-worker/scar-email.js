@@ -11,7 +11,7 @@ export function validateDraftRequest(data){
  const reason=String(data.reason||'').trim();
  const context=String(data.context||'').trim();
  const name=String(data.representative_name||'').trim();
- const office=String(data.representative_office||'').trim();
+ const office=String(data.representative_office||'Elected representative').trim();
  const lang=OUTPUT_LANGS.includes(data.language)?data.language:null;
  if(!senderName||!reason)return {ok:false,code:'missing_details'};
  // Inspect all citizen-controlled fields before their inclusion in the model context.
