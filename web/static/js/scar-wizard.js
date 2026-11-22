@@ -62,7 +62,7 @@ function mount({box,editor,rep,context,template,subjectInput,messageInput,update
  // Keep the original template available but do not display both flows at once.
  editor.classList.add('hidden');
  function showStage(n){step=n;stage1.classList.toggle('hidden',n!==1);stage2.classList.toggle('hidden',n!==2);(n===1?counter1:counter2).scrollIntoView({behavior:'smooth',block:'nearest'});}
- function showEditor(){stage1.classList.add('hidden');stage2.classList.add('hidden');editor.classList.remove('hidden');skip.classList.add('hidden');edit.classList.remove('hidden');editor.scrollIntoView({behavior:'smooth',block:'nearest'});}
+ function showEditor(){stage1.classList.add('hidden');stage2.classList.add('hidden');editor.classList.remove('hidden');skip.classList.add('hidden');edit.classList.remove('hidden');messageInput.dispatchEvent(new Event('input',{bubbles:true}));editor.scrollIntoView({behavior:'smooth',block:'nearest'});}
  continueButton.addEventListener('click',()=>{if(!name.input.value.trim()){status.textContent=L[16];name.input.focus();return;}status.textContent='';showStage(2);reason.input.focus({preventScroll:true});});
  back.addEventListener('click',()=>{status.textContent='';showStage(1);});
  edit.addEventListener('click',()=>{editor.classList.add('hidden');edit.classList.add('hidden');skip.classList.remove('hidden');switchLanguage.classList.add('hidden');status.textContent='';showStage(1);});
