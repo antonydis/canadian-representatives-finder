@@ -179,3 +179,36 @@ test('Mobile email editor resizes and clipboard uses actual newlines',()=>{
  assert.match(composer,/const content='To: '\+template\.to\+'\\n'/);
  assert.doesNotMatch(composer,/const content='To: '\+template\.to\+'\\\\n'/);
 });
+
+test('Mobile audit: language changes target email actions and preserve recipient identity',()=>{
+ const start=js.indexOf('function applyLang(');
+ const end=js.indexOf('function buildLangButtons(',start);
+ const lang=js.slice(start,end);
+ assert.match(lang,/querySelector\('\.civic-compose-form > \.civic-compose-actions'\)/);
+ assert.doesNotMatch(lang,/querySelectorAll\('\.civic-compose-actions > \*'\)/);
+ assert.match(lang,/recipientLabel\.textContent=findText\(7\)/);
+ assert.match(lang,/chooseAnother\.textContent=findText\(12\)/);
+});
+test('Mobile audit: keyboard and language dropdown respect available screen and keyboard focus',()=>{
+ const start=js.indexOf('function buildLangButtons(');
+ const end=js.indexOf('const ROUTES',start);
+ const dropdown=js.slice(start,end);
+ assert.match(dropdown,/aria-controls/);
+ assert.match(dropdown,/btn\.focus\(\{preventScroll:true\}\)/);
+ assert.match(dropdown,/window\.addEventListener\('scroll',closeDropdown/);
+ assert.match(dropdown,/window\.addEventListener\('resize',closeDropdown/);
+ assert.match(js,/window\.visualViewport\?\.height\|\|window\.innerHeight/);
+});
+test('Mobile audit: edited draft and recipient switch are disclosed before regeneration',()=>{
+ const wizard=readFileSync('web/static/js/scar-wizard.js','utf8');
+ const css=readFileSync('web/static/css/style.css','utf8');
+ assert.match(wizard,/const DRAFT_REPLACEMENT=/);
+ assert.match(wizard,/subjectInput\.value!==latestRendered\.subject/);
+ assert.match(wizard,/replacementNotice\.classList\.remove\('hidden'\)/);
+ assert.match(wizard,/confirmReplace\.addEventListener\('click'/);
+ assert.match(wizard,/cancelReplace\.addEventListener\('click'/);
+ assert.match(wizard,/hasEditedDraft:\(\)=>/);
+ assert.match(js,/recipient-review-edit-warning/);
+ assert.match(js,/hasEditedDraft\?\.\(\)/);
+ assert.match(css,/max-height:52dvh/);
+});
