@@ -180,7 +180,7 @@ function buildDirectServiceCard(contact,agency){
  return card;
 }
 
-function buildContactDecisionGate({rep,context,box,form,template,subjectInput,messageInput,updateLink}){
+function buildContactDecisionGate({rep,context,box,form,template,subjectInput,messageInput,updateLink,onRecipientChanged}){
  const section=el('section','contact-decision-gate');
  const title=el('h3');title.tabIndex=-1;title.textContent=checkText(0);
  const intro=el('p');intro.textContent=checkText(1);
@@ -202,13 +202,7 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
      subjectInput,messageInput,updateLink,postal:currentPostalCode,uiLanguage:currentLang,
      priorIssue:input.value.trim()||(context==='triage'?activeTriageSituation:null),
      onDraftReady:review=>maybeReviewDraftRecipient({rep,context,box,...review}),
-     onRecipientChanged:target=>{
-       template.to=target.email;
-       address.textContent=target.email;
-       subtitle.textContent=findText(6)+': '+target.name+' · '+(target.elected_office||'');
-       currentComposition={rep:target,context};
-       updateLink();
-     }});
+     onRecipientChanged});
  };
  yes.addEventListener('click',continueToDraft);
  unsure.addEventListener('click',()=>{choices.classList.add('hidden');detail.classList.remove('hidden');input.focus();});
@@ -433,7 +427,15 @@ function openInlineComposer(rep,context){
  form.append(recipient,subject.wrap,message.wrap,actions,note);
  box.append(heading,form);
  const gate=buildContactDecisionGate({rep,context,box,form,template,
-    subjectInput:subject.input,messageInput:message.input,updateLink});
+    subjectInput:subject.input,messageInput:message.input,updateLink,
+    onRecipientChanged:target=>{
+      // All recipient-dependent UI must change together, only after the new draft succeeded.
+      template.to=target.email;
+      address.textContent=target.email;
+      subtitle.textContent=findText(6)+': '+target.name+' · '+(target.elected_office||'');
+      currentComposition={rep:target,context};
+      updateLink();
+    }});
  box.insertBefore(gate,form);
  form.classList.add('hidden');
  // Citizen already asked for routing on the triage path: do not ask again.
@@ -443,7 +445,7 @@ function openInlineComposer(rep,context){
  if(context==='main')updateFindJourney(3,currentPostalCode);
  else updateCivicProgress(4);
  box.scrollIntoView({behavior:'smooth',block:'start'});
- gate.querySelector('h3')?.focus({preventScroll:true});
+ (gate.classList.contains('hidden')?title:gate.querySelector('h3'))?.focus({preventScroll:true});
 }
 
 /* ================================================================
