@@ -149,3 +149,33 @@ test('No automatic send and no invented agency email',()=>{
  assert.match(js,/mailto:/);
  assert.doesNotMatch(js,/target\.email\s*=\s*classification\.agency/);
 });
+
+test('Jurisdiction alert is exceptional and needs a practical alternative',()=>{
+ assert.match(js,/level===rep\.level\)return/);
+ assert.match(js,/classification\.classification_method==='rules'\)return/);
+ assert.match(js,/!options\.length&&!classification\.contact\?\.phone/);
+ assert.match(js,/classification\.out_of_scope/);
+ assert.match(js,/document\.body\.style\.overflow='hidden'/);
+ assert.match(js,/document\.body\.style\.overflow=previousScrollLock/);
+});
+test('Representative switch receives the actual recipient UI, not variables out of scope',()=>{
+ const start=js.indexOf('function buildContactDecisionGate(');
+ const end=js.indexOf('const RECIPIENT_REVIEW_TEXT=',start);
+ const gate=js.slice(start,end);
+ assert.match(gate,/onRecipientChanged\}\);/);
+ assert.doesNotMatch(gate,/address\.textContent=target\.email/);
+ const composer=js.slice(js.indexOf('function openInlineComposer('),js.indexOf('async function init('));
+ assert.match(composer,/onRecipientChanged:target=>\{/);
+ assert.match(composer,/address\.textContent=target\.email/);
+ assert.match(composer,/subtitle\.textContent=findText\(6\)/);
+ assert.match(composer,/template\.to=target\.email/);
+});
+test('Mobile email editor resizes and clipboard uses actual newlines',()=>{
+ assert.match(js,/function openInlineComposer/);
+ assert.match(js,/const fitMessage=\(\)=>/);
+ assert.match(js,/field\.scrollHeight/);
+ assert.match(js,/Math\.round\(window\.innerHeight\*0\.52\)/);
+ const composer=js.slice(js.indexOf('function openInlineComposer('),js.indexOf('async function init('));
+ assert.match(composer,/const content='To: '\+template\.to\+'\\n'/);
+ assert.doesNotMatch(composer,/const content='To: '\+template\.to\+'\\\\n'/);
+});
