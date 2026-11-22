@@ -274,18 +274,23 @@ async function maybeReviewDraftRecipient({rep,context,box,reason,switchRepresent
          agency_id:activeTriageRouting.agency_id||'',municipality:currentMunicipality})});
      const result=await response.json();
      if(!response.ok||!result.success)return;
+     // The selected civic topic already established this government level.
      classification={jurisdiction:activeTriageRouting.level,contact:result.contact,agency:result.agency};
    }else{
      const response=await fetch('/api/classify-situation',{method:'POST',headers:{'Content-Type':'application/json'},
        body:JSON.stringify({text:reason.slice(0,200),lang:currentLang,postal_code:currentPostalCode||'',municipality:currentMunicipality})});
      classification=await response.json();
-     if(!response.ok||!classification.success||classification.requires_clarification)return;
+     if(!response.ok||!classification.success||classification.requires_clarification||classification.out_of_scope)return;
+     // Keyword-only fallback cannot justify a potentially disruptive alert.
+     if(classification.classification_method==='rules')return;
    }
  }catch{return;} // Never block sending because guidance is unavailable.
  if(!box.isConnected||box.classList.contains('hidden')||currentComposition?.rep!==rep)return;
  const level=classification.jurisdiction;
  if(!['federal','provincial','municipal'].includes(level)||level===rep.level)return;
  const options=latestRepresentatives.filter(r=>r.level===level&&r.email&&r.name&&r.elected_office);
+ // Do not interrupt if we cannot offer any actionable alternative.
+ if(!options.length&&!classification.contact?.phone&&!classification.contact?.url&&!classification.agency?.url)return;
  const backdrop=el('div','recipient-review-backdrop');
  const dialog=el('section','recipient-review-dialog');
  dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');
@@ -302,7 +307,16 @@ async function maybeReviewDraftRecipient({rep,context,box,reason,switchRepresent
  const keep=el('button','civic-secondary-action');keep.type='button';keep.textContent=reviewCopy(6);
  const message=el('p','recipient-review-status');message.setAttribute('role','status');message.setAttribute('aria-live','polite');
  const initialFocus=document.activeElement;
- const dismiss=()=>{backdrop.remove();keep.removeEventListener('click',dismiss);if(initialFocus?.isConnected)initialFocus.focus({preventScroll:true});};
+ const previousScrollLock=document.body.style.overflow;
+ let isDismissed=false;
+ const dismiss=()=>{
+   if(isDismissed)return;
+   isDismissed=true;
+   backdrop.remove();
+   document.body.style.overflow=previousScrollLock;
+   keep.removeEventListener('click',dismiss);
+   if(initialFocus?.isConnected)initialFocus.focus({preventScroll:true});
+ };
  keep.addEventListener('click',dismiss);
  const keyHandler=e=>{
    if(e.key==='Escape'){e.preventDefault();dismiss();}
@@ -340,6 +354,7 @@ async function maybeReviewDraftRecipient({rep,context,box,reason,switchRepresent
    const unavailable=el('p','recipient-review-caution');unavailable.textContent=reviewCopy(10);dialog.append(unavailable);
  }
  actions.append(keep);dialog.append(actions,message);backdrop.append(dialog);box.append(backdrop);
+ document.body.style.overflow='hidden';
  keep.focus({preventScroll:true});
 }
 
