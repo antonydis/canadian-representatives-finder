@@ -6,12 +6,15 @@ Public, versioned research dataset for directing Canadian residents to relevant 
 
 | File | Rows | Status |
 | --- | ---: | --- |
+| `approved-contacts.json` | 19 | Previously curated official general contact points; bundled into classifier at build time |
 | `inventory-organizations.csv` | 420 | **Candidate institutions**, NOT independently verified service destinations |
 | `candidate-service-routes.csv` | 6 | Montréal service-page candidates; applicability and page requirements still require checking |
 
 The organization inventory is a **research seed**, not an exhaustive list, and should not be used to infer that all 420 entries are current or independently verified. Several entries use a **general government directory URL** instead of a body-specific URL; **some municipal entries inherit a generic Montréal source that does not establish their identity or jurisdiction**. Official names can also change. The `ultima_revision` column is the compilation date, **not an individual independent verification date**.
 
-**Do not surface these rows directly as verified contact recommendations in production.** In particular, do not use `enlace_fuente` as a case-specific service URL and do not treat an empty `url_tramite` as permission to generate one.
+The 19 previously curated contacts are now read from `approved-contacts.json` by `src-worker/civic-ai.js`, retaining their existing allowlisted IDs and URLs. This **does not activate the 420 candidate inventory** or create new program-specific procedures. Existing triage and pre-draft checking both reuse `/api/classify-situation`; resolving a contact by ID still uses `/api/resolve-civic-contact`.
+
+**Do not surface the candidate CSV rows directly as verified contact recommendations in production.** In particular, do not use `enlace_fuente` as a case-specific service URL and do not treat an empty `url_tramite` as permission to generate one.
 
 ## Data model
 
