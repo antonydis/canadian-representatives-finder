@@ -1,4 +1,4 @@
-index,id,nivel,tipo,nombre_oficial,ambito,tematica,enlace_fuente,estado_validacion,canal_recomendado,url_tramite,ultima_revision
+id,nivel,tipo,nombre_oficial,ambito,tematica,enlace_fuente,estado_validacion,canal_recomendado,url_tramite,ultima_revision
 IC-0001,Provincial,Ministerio,"Affaires municipales, Régions et Occupation du territoire",Québec,Por clasificar,https://www.quebec.ca/gouvernement/ministeres-organismes,Identificado en directorio oficial; canal específico pendiente,,,2026-11-22
 IC-0002,Provincial,Ministerio,"Agriculture, Pêcheries et Alimentation",Québec,Por clasificar,https://www.quebec.ca/gouvernement/ministeres-organismes,Identificado en directorio oficial; canal específico pendiente,,,2026-11-22
 IC-0003,Provincial,Ministerio,Conseil exécutif,Québec,Por clasificar,https://www.quebec.ca/gouvernement/ministeres-organismes,Identificado en directorio oficial; canal específico pendiente,,,2026-11-22
