@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InfoCivic approved official service",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "level",
+    "topics",
+    "jurisdiction",
+    "official_url",
+    "source_url",
+    "verified_at",
+    "reviewed_by",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3
+    },
+    "level": {
+      "enum": [
+        "federal",
+        "provincial",
+        "municipal"
+      ]
+    },
+    "topics": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 3
+      },
+      "minItems": 1
+    },
+    "jurisdiction": {
+      "type": "object",
+      "required": [
+        "country",
+        "province"
+      ],
+      "properties": {
+        "country": {
+          "const": "CA"
+        },
+        "province": {
+          "type": "string"
+        },
+        "municipality": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "borough": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "official_url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://"
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://"
+    },
+    "verified_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "reviewed_by": {
+      "type": "string",
+      "minLength": 2
+    },
+    "status": {
+      "const": "approved"
+    },
+    "contact_channel": {
+      "enum": [
+        "form",
+        "phone",
+        "email",
+        "website",
+        "other"
+      ]
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}
