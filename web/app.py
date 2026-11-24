@@ -127,6 +127,16 @@ def index():
     return render_template("index.html", translations=TRANSLATIONS, langs=SUPPORTED_LANGS)
 
 
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+
 @app.route("/laval")
 def laval():
     return render_template("laval.html")
