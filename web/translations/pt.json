@@ -149,5 +149,9 @@
   "laval_ask_deadline": "Perguntas aceitas até {date} ao meio-dia",
   "laval_popup_title": "Fique informado sobre seu distrito",
   "laval_popup_desc": "Receba um lembrete antes de cada sessão do conselho e alertas sobre decisões importantes no seu distrito. Gratuito — responda STOP a qualquer momento para cancelar.",
-  "laval_popup_close": "Talvez mais tarde"
+  "laval_popup_close": "Talvez mais tarde",
+  "hero_title": "Precisa de ajuda com um assunto público no Canadá?",
+  "hero_description": "Descubra quem representa você e qual órgão público contactar. Comece pelo seu código postal.",
+  "nav_about": "Sobre",
+  "nav_privacy": "Privacidade"
 }
