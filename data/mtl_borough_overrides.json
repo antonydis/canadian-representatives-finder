@@ -137,7 +137,7 @@
       ]
     },
     {
-      "_note": "Montréal – Côte-des-Neiges–Notre-Dame-de-Grâce — verified Apr 2026 from donnees.montreal.ca",
+      "_note": "Montréal – Côte-des-Neiges–Notre-Dame-de-Grâce — verified Apr 2026 from donnees.montreal.ca; borough mayor and Snowdon councillor checked against montreal.ca on 2026-11-24",
       "action": "enrich_by_district",
       "postal_prefixes": [
         "H3S",
@@ -150,15 +150,15 @@
       ],
       "representatives": [
         {
-          "name": "Stephanie Valenzuela",
+          "name": "Stéphanie Valenzuela",
           "elected_office": "Maire(sse) d'arrondissement",
           "level": "municipal",
           "party_name": "Ensemble Montréal",
           "district_name": "Côte-des-Neiges–Notre-Dame-de-Grâce",
           "email": "stephanie.valenzuela@montreal.ca",
-          "url": "https://montreal.ca/conseils-decisionnels/conseil-municipal",
+          "url": "https://montreal.ca/elus/stephanie-valenzuela-22238",
           "photo_url": "",
-          "phone": "514-868-3522"
+          "phone": "514-868-3521"
         },
         {
           "name": "Peter McQueen",
@@ -178,7 +178,7 @@
           "party_name": "Ensemble Montréal",
           "district_name": "Côte-des-Neiges–Notre-Dame-de-Grâce – Snowdon",
           "email": "sonny.moroz@montreal.ca",
-          "url": "https://montreal.ca/conseils-decisionnels/conseil-municipal",
+          "url": "https://montreal.ca/elus/sonny-moroz-22279",
           "photo_url": "",
           "phone": "514-868-3520"
         },
