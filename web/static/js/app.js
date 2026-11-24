@@ -131,7 +131,7 @@ async function shareResults(postalCode) {
 
   if (navigator.share) {
     try {
-      await navigator.share({ title: 'InfoCivic 🍁', text, url });
+      await navigator.share({ title: 'InfoCivic', text, url });
       return;
     } catch { /* user cancelled */ }
   }
@@ -152,7 +152,7 @@ function showShareToast() {
     toast.className = 'share-toast';
     document.body.appendChild(toast);
   }
-  toast.textContent = '🔗 ' + (translations[currentLang]?.link_copied || 'Link copied!');
+  toast.textContent = '' + (translations[currentLang]?.link_copied || 'Link copied!');
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2800);
 }
@@ -196,6 +196,7 @@ function applyLang(lang) {
     gtag('event', 'change_language', { language: lang });
   }
   document.documentElement.lang = lang;
+  document.title = pageTitle(resolveRoute(window.location.pathname));
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.dataset.i18n);
@@ -328,10 +329,9 @@ const ROUTES = {
   '/triage': 'triage',
 };
 
-const PAGE_TITLES = {
-  find:   'Find Your Reps | InfoCivic 🍁',
-  triage: 'Who Do I Contact? | InfoCivic 🍁',
-};
+function pageTitle(which) {
+  return 'InfoCivic | ' + (which === 'triage' ? t('tab_triage') : t('tab_find'));
+}
 
 function resolveRoute(pathname) {
   return ROUTES[pathname] || ROUTES['/'];
@@ -342,7 +342,7 @@ function navigateTo(which, pushState = true) {
   if (pushState && window.location.pathname !== path) {
     history.pushState({ view: which }, '', path);
   }
-  document.title = PAGE_TITLES[which];
+  document.title = pageTitle(which);
   _applyTab(which);
 }
 
@@ -383,7 +383,7 @@ function initTabs() {
   window.addEventListener('popstate', e => {
     const which = e.state?.view || resolveRoute(window.location.pathname);
     _applyTab(which);
-    document.title = PAGE_TITLES[which];
+    document.title = pageTitle(which);
   });
 }
 
