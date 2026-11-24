@@ -121,7 +121,7 @@
   "laval_label_phone": "Numéro de téléphone",
   "laval_placeholder_name": "Marie Tremblay",
   "laval_placeholder_phone": "+1 (450) 555-1234",
-  "laval_consent": "J'accepte de recevoir des messages SMS d'InfoCivic au numéro fourni. Aucune donnée n'est partagée avec des tiers.",
+  "laval_consent": "J'accepte de recevoir des messages SMS d'Infocivic au numéro fourni. Aucune donnée n'est partagée avec des tiers.",
   "laval_btn_subscribe": "S'inscrire aux alertes",
   "laval_success_subscribe": "Inscription confirmée. Vous recevrez un SMS de bienvenue sous peu.",
   "laval_err_name": "Veuillez entrer votre prénom et nom.",
@@ -151,5 +151,6 @@
   "laval_popup_desc": "Recevez un rappel avant chaque séance du conseil et des alertes sur les décisions importantes dans votre district. Gratuit — répondez STOP en tout temps pour vous désabonner.",
   "laval_popup_close": "Peut-être plus tard",
   "hero_title": "Besoin d’aide pour une question publique au Canada?",
-  "hero_description": "Découvrez qui vous représente et quel organisme public contacter. Commencez avec votre code postal."
+  "hero_description": "Découvrez qui vous représente et quel organisme public contacter. Commencez avec votre code postal.",
+  "language_availability": "Disponible en 6 langues"
 }
