@@ -149,5 +149,7 @@
   "laval_ask_deadline": "提问截止时间：{date} 中午",
   "laval_popup_title": "了解您所在选区的最新动态",
   "laval_popup_desc": "在每次议会会议前收到提醒，并获取有关您选区重要决策的通知。免费 — 随时回复 STOP 取消订阅。",
-  "laval_popup_close": "也许以后再说"
+  "laval_popup_close": "也许以后再说",
+  "hero_title": "在加拿大遇到公共事务问题，需要帮助吗？",
+  "hero_description": "了解谁代表您，以及应该联系哪个公共机构。从输入邮政编码开始。"
 }
