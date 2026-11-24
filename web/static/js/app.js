@@ -123,30 +123,29 @@ function closeInlineComposer(context) {
  currentComposition=null;
 }
 const CONTACT_CHECK_COPY={
-en:['Before you write','Do you know why you want to contact this representative?','Yes, I know why','Not sure this is the right person','What do you need help with?','Check who can help','Back','Checking…','Government level','This representative belongs to the suggested level.','This looks like a different government level. Consider choosing someone else.','The issue may involve several government levels.','Continue with this representative','Choose another representative','Could not check the issue. Try again or continue.','Describe the issue in more detail.','We need more details to identify the correct office.','This question is outside Infocivic’s civic guidance scope.'],
-fr:['Avant de rédiger','Savez-vous pourquoi vous voulez contacter cet élu ?','Oui, je sais pourquoi','Je ne suis pas sûr que ce soit le bon élu','Quel est votre problème ?','Trouver le bon interlocuteur','Retour','Vérification…','Palier de gouvernement','Cet élu appartient au palier suggéré.','Le problème semble relever d’un autre palier. Pensez à choisir un autre élu.','Plusieurs paliers peuvent être concernés.','Poursuivre avec cet élu','Choisir un autre élu','Impossible de vérifier. Réessayez ou poursuivez.','Décrivez davantage votre problème.','Plus de détails sont nécessaires pour trouver le bon service.','Cette demande est en dehors du champ d’Infocivic.'],
-es:['Antes de redactar','¿Sabes por qué quieres contactar a este representante?','Sí, sé por qué','No sé si es la persona adecuada','¿Cuál es el problema?','Comprobar quién puede ayudar','Volver','Consultando…','Nivel de gobierno','Este representante pertenece al nivel sugerido.','Este asunto parece corresponder a otro nivel de gobierno. Considera elegir otro representante.','El asunto puede involucrar varios niveles de gobierno.','Continuar con este representante','Elegir otro representante','No pudimos comprobarlo. Intenta nuevamente o continúa.','Describe el problema con más detalle.','Necesitamos más detalles para identificar el organismo correcto.','Esta consulta está fuera del alcance de Infocivic.'],
-pt:['Antes de escrever','Você sabe por que deseja contatar este representante?','Sim, sei por quê','Não sei se é a pessoa certa','Qual é o problema?','Verificar quem pode ajudar','Voltar','Verificando…','Nível de governo','Este representante pertence ao nível sugerido.','O problema parece ser de outro nível. Considere outro representante.','O assunto pode envolver vários níveis.','Continuar com este representante','Escolher outro representante','Não foi possível verificar. Tente novamente.','Descreva o problema com mais detalhes.','Precisamos de mais detalhes para identificar o serviço.','Esta pergunta está fora do escopo do Infocivic.'],
-zh:['写信之前','您知道为什么要联系这位代表吗？','是的，我知道','不确定是否找对人','您需要什么帮助？','查询负责部门','返回','正在查询…','政府层级','该代表属于建议的政府层级。','此问题似乎属于另一政府层级，请考虑其他代表。','问题可能涉及多个政府层级。','继续联系这位代表','选择其他代表','暂时无法查询，可重试或继续。','请更详细地描述问题。','需要更多信息才能确定负责部门。','此问题超出 Infocivic 的服务范围。'],
-tl:['Bago sumulat','Alam mo ba kung bakit mo gustong kontakin ang kinatawang ito?','Oo, alam ko','Hindi sigurado kung tamang tao','Ano ang kailangan mong tulong?','Alamin kung sino ang makakatulong','Bumalik','Sinusuri…','Antas ng pamahalaan','Nasa iminungkahing antas ang kinatawang ito.','Mukhang ibang antas ito. Isaalang-alang ang ibang kinatawan.','Maaaring maraming antas ang may saklaw.','Magpatuloy sa kinatawang ito','Pumili ng ibang kinatawan','Hindi masuri. Subukan muli o magpatuloy.','Ilarawan pa ang problema.','Kailangan ng dagdag na detalye upang mahanap ang opisina.','Hindi saklaw ng Infocivic ang tanong na ito.']
+en:['Before you write','Do you know why you want to contact this representative?','Yes, I know why','Not sure this is the right person','Describe your situation','Find the right service','Back','Checking…','Responsible level','This representative belongs to the suggested level.','This looks like a different government level. Consider choosing someone else.','The issue may involve several government levels.','Contact this representative','Choose another representative','Could not check the issue. Try again or continue.','Describe the issue in more detail.','We need more details to identify the correct office.','This question is outside Infocivic’s civic guidance scope.'],
+fr:['Avant de rédiger','Savez-vous pourquoi vous voulez contacter cet élu ?','Oui, je sais pourquoi','Je ne suis pas sûr que ce soit le bon élu','Décrivez votre situation','Trouver le service compétent','Retour','Vérification…','Palier responsable','Cet élu appartient au palier suggéré.','Le problème semble relever d’un autre palier. Pensez à choisir un autre élu.','Plusieurs paliers peuvent être concernés.','Contacter cet élu','Choisir un autre élu','Impossible de vérifier. Réessayez ou poursuivez.','Décrivez davantage votre problème.','Plus de détails sont nécessaires pour trouver le bon service.','Cette demande est en dehors du champ d’Infocivic.'],
+es:['Antes de redactar','¿Sabes por qué quieres contactar a este representante?','Sí, sé por qué','No sé si es la persona adecuada','Describe tu situación','Encontrar el servicio adecuado','Volver','Consultando…','Nivel responsable','Este representante pertenece al nivel sugerido.','Este asunto parece corresponder a otro nivel de gobierno. Considera elegir otro representante.','El asunto puede involucrar varios niveles de gobierno.','Contactar a este representante','Elegir otro representante','No pudimos comprobarlo. Intenta nuevamente o continúa.','Describe el problema con más detalle.','Necesitamos más detalles para identificar el organismo correcto.','Esta consulta está fuera del alcance de Infocivic.'],
+pt:['Antes de escrever','Você sabe por que deseja contatar este representante?','Sim, sei por quê','Não sei se é a pessoa certa','Descreva a situação','Encontrar o serviço adequado','Voltar','Verificando…','Nível responsável','Este representante pertence ao nível sugerido.','O problema parece ser de outro nível. Considere outro representante.','O assunto pode envolver vários níveis.','Contatar este representante','Escolher outro representante','Não foi possível verificar. Tente novamente.','Descreva o problema com mais detalhes.','Precisamos de mais detalhes para identificar o serviço.','Esta pergunta está fora do escopo do Infocivic.'],
+zh:['写信之前','您知道为什么要联系这位代表吗？','是的，我知道','不确定是否找对人','描述您的情况','查找负责机构','返回','正在查询…','负责层级','该代表属于建议的政府层级。','此问题似乎属于另一政府层级，请考虑其他代表。','问题可能涉及多个政府层级。','联系这位代表','选择其他代表','暂时无法查询，可重试或继续。','请更详细地描述问题。','需要更多信息才能确定负责部门。','此问题超出 Infocivic 的服务范围。'],
+tl:['Bago sumulat','Alam mo ba kung bakit mo gustong kontakin ang kinatawang ito?','Oo, alam ko','Hindi sigurado kung tamang tao','Ilarawan ang sitwasyon','Hanapin ang tamang serbisyo','Bumalik','Sinusuri…','Responsableng antas','Nasa iminungkahing antas ang kinatawang ito.','Mukhang ibang antas ito. Isaalang-alang ang ibang kinatawan.','Maaaring maraming antas ang may saklaw.','Kontakin ang kinatawang ito','Pumili ng ibang kinatawan','Hindi masuri. Subukan muli o magpatuloy.','Ilarawan pa ang problema.','Kailangan ng dagdag na detalye upang mahanap ang opisina.','Hindi saklaw ng Infocivic ang tanong na ito.']
 };
 const checkText=i=>(CONTACT_CHECK_COPY[currentLang]||CONTACT_CHECK_COPY.en)[i];
 
 const DIRECT_SERVICE_COPY={
- en:['Recommended first step','This service may be able to help directly, before contacting an elected representative.','Call','Open official service website','General information line — not necessarily a direct case-resolution service','You can still contact your representative below.','No verified direct contact is available for this situation.','Service details are based on a limited verified directory; confirm current contact options on the official website.'],
- fr:['Première démarche recommandée','Ce service pourrait vous aider directement, avant de contacter un élu.','Appeler','Consulter le site officiel','Ligne de renseignements généraux — pas nécessairement le service chargé du dossier','Vous pouvez aussi contacter votre élu ci-dessous.','Aucun contact direct vérifié n’est disponible pour cette situation.','Notre répertoire officiel est limité; vérifiez les coordonnées actuelles sur le site de l’organisme.'],
- es:['Primer paso recomendado','Este servicio podría ayudarte directamente antes de contactar a un representante.','Llamar','Visitar sitio oficial','Línea de información general; no necesariamente resuelve expedientes','También puedes contactar a tu representante más abajo.','No tenemos un contacto directo verificado para esta situación.','Nuestro directorio es limitado; confirma los datos actuales en el sitio oficial.'],
- pt:['Primeiro passo recomendado','Este serviço pode ajudar diretamente antes de contatar um representante.','Ligar','Visitar site oficial','Linha de informações gerais, não necessariamente resolve casos','Você ainda pode contatar seu representante abaixo.','Não temos um contato direto verificado para este caso.','Nosso diretório é limitado; confirme os contatos no site oficial.'],
- zh:['建议的第一步','联系民选代表前，该服务可能直接帮助您。','拨打电话','访问官方网站','一般咨询电话，不一定处理具体案件','您仍可在下方联系代表。','目前没有经过核实的直接联系方式。','目录范围有限，请在官方网站确认最新联系方式。'],
- tl:['Inirerekomendang unang hakbang','Maaaring makatulong nang direkta ang serbisyong ito bago lumapit sa kinatawan.','Tumawag','Bisitahin ang opisyal na website','Pangkalahatang impormasyon lamang, hindi laging tumutugon sa partikular na kaso','Maaari mo pa ring kontakin ang kinatawan sa ibaba.','Walang nakumpirmang direktang kontak para sa isyung ito.','Limitado ang aming direktoryo; kumpirmahin ang kasalukuyang detalye sa opisyal na site.']
+ en:['Suggested service','This service may be able to help directly, before contacting an elected representative.','Call','Visit official website','General information line — not necessarily a direct case-resolution service','You can still contact your representative below.','No verified direct contact is available for this situation.','Service details are based on a limited verified directory; confirm current contact options on the official website.'],
+ fr:['Service suggéré','Ce service pourrait vous aider directement, avant de contacter un élu.','Appeler','Consulter le site officiel','Ligne de renseignements généraux — pas nécessairement le service chargé du dossier','Vous pouvez aussi contacter votre élu ci-dessous.','Aucun contact direct vérifié n’est disponible pour cette situation.','Notre répertoire officiel est limité; vérifiez les coordonnées actuelles sur le site de l’organisme.'],
+ es:['Servicio recomendado','Este servicio podría ayudarte directamente antes de contactar a un representante.','Llamar','Visitar sitio oficial','Línea de información general; no necesariamente resuelve expedientes','También puedes contactar a tu representante más abajo.','No tenemos un contacto directo verificado para esta situación.','Nuestro directorio es limitado; confirma los datos actuales en el sitio oficial.'],
+ pt:['Serviço sugerido','Este serviço pode ajudar diretamente antes de contatar um representante.','Ligar','Visitar site oficial','Linha de informações gerais, não necessariamente resolve casos','Você ainda pode contatar seu representante abaixo.','Não temos um contato direto verificado para este caso.','Nosso diretório é limitado; confirme os contatos no site oficial.'],
+ zh:['建议联系的服务机构','联系民选代表前，该服务可能直接帮助您。','拨打电话','访问官方网站','一般咨询电话，不一定处理具体案件','您仍可在下方联系代表。','目前没有经过核实的直接联系方式。','目录范围有限，请在官方网站确认最新联系方式。'],
+ tl:['Iminungkahing serbisyo','Maaaring makatulong nang direkta ang serbisyong ito bago lumapit sa kinatawan.','Tumawag','Bisitahin ang opisyal na website','Pangkalahatang impormasyon lamang, hindi laging tumutugon sa partikular na kaso','Maaari mo pa ring kontakin ang kinatawan sa ibaba.','Walang nakumpirmang direktang kontak para sa isyung ito.','Limitado ang aming direktoryo; kumpirmahin ang kasalukuyang detalye sa opisyal na site.']
 };
 function directServiceText(i){return (DIRECT_SERVICE_COPY[currentLang]||DIRECT_SERVICE_COPY.en)[i];}
 function buildDirectServiceCard(contact,agency){
  const card=el('aside','direct-service-card');
  card.setAttribute('aria-label',directServiceText(0));
  const heading=el('h3','direct-service-title');heading.textContent=directServiceText(0);
- const intro=el('p','direct-service-intro');intro.textContent=directServiceText(1);
- card.append(heading,intro);
+ card.append(heading);
  const name=contact?.name||agency?.name||null;
  if(name){const serviceName=el('strong','direct-service-name');serviceName.textContent=name;card.append(serviceName);}
  const actions=el('div','direct-service-actions');
@@ -171,12 +170,7 @@ function buildDirectServiceCard(contact,agency){
    actions.append(site);
  }
  if(actions.childNodes.length)card.append(actions);
- if(contact?.label){
-   const detail=el('p','direct-service-qualifier');detail.textContent=contact.label;
-   card.append(detail);
- }
- const foot=el('p','direct-service-foot');foot.textContent=directServiceText(5);
- card.append(foot);
+ // Contact actions already present the phone numbers and website without duplicate descriptions.
  return card;
 }
 
@@ -192,9 +186,9 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
  const input=el('textarea');input.id=context+'-civic-check';input.rows=5;input.maxLength=500;label.htmlFor=input.id;
  input.setAttribute('data-civic-issue','true');
  input.setAttribute('spellcheck','true');
- input.setAttribute('aria-describedby',context+'-civic-hint');
- const hint=el('p','scar-hint');hint.id=context+'-civic-hint';hint.textContent=checkText(4);
- const count=el('p','civic-issue-count');count.setAttribute('aria-live','off');
+ input.setAttribute('aria-describedby',context+'-civic-count');
+ // The label already explains the field; no repeated hint needed.
+ const count=el('p','civic-issue-count');count.id=context+'-civic-count';count.setAttribute('aria-live','off');
  const showCount=()=>{count.textContent=input.value.length+' / 500';};
  input.addEventListener('input',()=>{showCount();result.replaceChildren();});
  showCount();
@@ -202,7 +196,7 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
  const back=el('button','civic-secondary-action');back.type='button';back.textContent=checkText(6);
  const actions=el('div','civic-compose-actions');actions.append(back,check);
  const result=el('div','contact-check-result');result.setAttribute('role','status');result.setAttribute('aria-live','polite');
- detail.append(label,input,hint,count,actions,result);
+ detail.append(label,input,count,actions,result);
  const continueToDraft=()=>{
    section.classList.add('hidden');
    form.classList.remove('hidden');
@@ -234,8 +228,8 @@ function buildContactDecisionGate({rep,context,box,form,template,subjectInput,me
    const title=el('strong');title.textContent=checkText(8)+': '+(labelNames[currentLang]||labelNames.en)[levels.indexOf(level)];
    const explanation=el('p');explanation.textContent=data.explanation||'';
    result.append(title,explanation);
-   const guidance=el('p');const same=level===rep.level;
-   guidance.textContent=level==='mixed'?checkText(11):same?checkText(9):checkText(10);result.append(guidance);
+   const same=level===rep.level;
+   if(level==='mixed'||!same){const guidance=el('p','contact-level-note');guidance.textContent=level==='mixed'?checkText(11):checkText(10);result.append(guidance);}
    const controls=el('div','civic-compose-actions');
    if(!same&&level!=='mixed')controls.append(option(checkText(13),()=>{
       const container=document.getElementById(context==='main'?'results':'triage-results');

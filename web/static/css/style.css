@@ -1337,3 +1337,27 @@ main{padding:0 20px 72px}
  .language-availability{max-width:72px;font-size:.68rem}
  .lang-dropdown-btn{padding:7px 8px}
 }
+
+/* Institutional civic guidance: simpler hierarchy, neutral surfaces and controls. */
+.contact-decision-detail{background:#fff;border:1px solid #cbd3db;border-radius:6px;padding:18px}
+.contact-decision-detail textarea{background:#fff;border:1px solid #9daab7;border-radius:5px}
+.contact-decision-detail label{font-size:.98rem;color:#26374a}
+.contact-decision-detail .civic-issue-count{color:#566575;font-size:.78rem}
+.contact-decision-detail .civic-compose-actions{gap:10px;margin-top:12px}
+.contact-decision-detail .civic-compose-actions button{border-radius:6px;min-height:44px}
+.contact-check-result{line-height:1.55}
+.contact-check-result>strong{display:block;margin:16px 0 7px;font-size:.94rem;color:#26374a}
+.contact-check-result>p{margin:5px 0 13px}
+.contact-check-result>.civic-compose-actions button{border-radius:6px}
+.direct-service-card{background:#fff;border:1px solid #cbd3db;border-left:4px solid #26374a;border-radius:6px;padding:20px 22px;margin:20px 0 16px;box-shadow:none}
+.direct-service-title{font-size:1.06rem;line-height:1.35;font-weight:700;margin:0 0 15px}
+.direct-service-name{font-size:1.04rem;font-weight:700;margin:0 0 16px;color:#26374a}
+.direct-service-actions{gap:10px}
+.direct-service-actions a{border-radius:6px;min-height:44px;padding:10px 16px;font-weight:600;box-shadow:none}
+.direct-service-qualifier{font-size:.81rem;line-height:1.45;margin:12px 0 0}
+@media(max-width:560px){
+ .contact-decision-detail{padding:15px}
+ .direct-service-card{padding:17px 15px;border-left-width:3px}
+ .direct-service-actions{flex-direction:column;align-items:stretch}
+ .direct-service-actions a{width:100%}
+}
