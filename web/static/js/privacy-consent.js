@@ -1,16 +1,16 @@
-/* InfoCivic analytics choice. Optional analytics is OFF until explicitly allowed. */
+/* Infocivic analytics choice. Optional analytics is OFF until explicitly allowed. */
 (()=>{
  'use strict';
  const STORAGE_KEY='infocivic-analytics-choice';
  const GA_ID='G-12Q5H9M7GX';
  const langs=['en','fr','es','pt','zh','tl'];
  const messages={
-  en:['Help us improve InfoCivic?','Optional analytics show which pages and features are useful. No analytics are loaded unless you agree. You can change your choice in Privacy.','Not now','Allow analytics','Privacy'],
-  fr:['Nous aider à améliorer InfoCivic ?','Les statistiques facultatives montrent les pages et les fonctions utiles. Aucun outil d’analyse n’est chargé sans votre accord. Modifiez votre choix dans Confidentialité.','Pas maintenant','Autoriser les statistiques','Confidentialité'],
-  es:['¿Nos ayudas a mejorar InfoCivic?','Las estadísticas opcionales muestran qué páginas y funciones se utilizan. No se activan sin tu permiso. Puedes cambiarlo en Privacidad.','Ahora no','Permitir estadísticas','Privacidad'],
-  pt:['Ajude a melhorar o InfoCivic?','As estatísticas opcionais mostram quais páginas e funções são úteis. Elas não são ativadas sem sua permissão. Altere a escolha em Privacidade.','Agora não','Permitir estatísticas','Privacidade'],
-  zh:['帮助改进 InfoCivic？','可选的使用统计帮助我们了解哪些功能有用。只有在您同意后才会启用，您可以在隐私页面修改选择。','暂不允许','允许统计','隐私'],
-  tl:['Tumulong na mapabuti ang InfoCivic?','Opsyonal ang analytics upang malaman kung anong mga pahina at tampok ang kapaki-pakinabang. Hindi ito i-aactivate nang walang pahintulot. Maaari mo itong baguhin sa Privacy.','Hindi muna','Payagan ang analytics','Privacy']
+  en:['Help us improve Infocivic?','Optional analytics show which pages and features are useful. No analytics are loaded unless you agree. You can change your choice in Privacy.','Not now','Allow analytics','Privacy'],
+  fr:['Nous aider à améliorer Infocivic ?','Les statistiques facultatives montrent les pages et les fonctions utiles. Aucun outil d’analyse n’est chargé sans votre accord. Modifiez votre choix dans Confidentialité.','Pas maintenant','Autoriser les statistiques','Confidentialité'],
+  es:['¿Nos ayudas a mejorar Infocivic?','Las estadísticas opcionales muestran qué páginas y funciones se utilizan. No se activan sin tu permiso. Puedes cambiarlo en Privacidad.','Ahora no','Permitir estadísticas','Privacidad'],
+  pt:['Ajude a melhorar o Infocivic?','As estatísticas opcionais mostram quais páginas e funções são úteis. Elas não são ativadas sem sua permissão. Altere a escolha em Privacidade.','Agora não','Permitir estatísticas','Privacidade'],
+  zh:['帮助改进 Infocivic？','可选的使用统计帮助我们了解哪些功能有用。只有在您同意后才会启用，您可以在隐私页面修改选择。','暂不允许','允许统计','隐私'],
+  tl:['Tumulong na mapabuti ang Infocivic?','Opsyonal ang analytics upang malaman kung anong mga pahina at tampok ang kapaki-pakinabang. Hindi ito i-aactivate nang walang pahintulot. Maaari mo itong baguhin sa Privacy.','Hindi muna','Payagan ang analytics','Privacy']
  };
  let choice='unset';
  try{const saved=localStorage.getItem(STORAGE_KEY);if(saved==='yes'||saved==='no')choice=saved;}catch{}

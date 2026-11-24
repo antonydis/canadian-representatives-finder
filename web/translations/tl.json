@@ -121,7 +121,7 @@
   "laval_label_phone": "Numero ng telepono",
   "laval_placeholder_name": "Marie Tremblay",
   "laval_placeholder_phone": "+1 (450) 555-1234",
-  "laval_consent": "Sumasang-ayon ako na makatanggap ng mga SMS mula sa InfoCivic sa numerong ibinigay. Walang data na ibinabahagi sa mga third party.",
+  "laval_consent": "Sumasang-ayon ako na makatanggap ng mga SMS mula sa Infocivic sa numerong ibinigay. Walang data na ibinabahagi sa mga third party.",
   "laval_btn_subscribe": "Mag-subscribe sa mga alerto",
   "laval_success_subscribe": "Nakumpirma ang subscription. Makakatanggap ka ng welcome SMS sa lalong madaling panahon.",
   "laval_err_name": "Mangyaring ilagay ang iyong pangalan at apelyido.",
@@ -151,5 +151,6 @@
   "laval_popup_desc": "Makatanggap ng paalala bago ang bawat sesyon ng konseho at mga alerto tungkol sa mahahalagang desisyon sa iyong distrito. Libre — sumagot ng STOP anumang oras upang mag-unsubscribe.",
   "laval_popup_close": "Marahil mamaya",
   "hero_title": "Kailangan ng tulong sa isang pampublikong usapin sa Canada?",
-  "hero_description": "Alamin kung sino ang kumakatawan sa iyo at kung aling pampublikong tanggapan ang dapat kontakin. Magsimula sa iyong postal code."
+  "hero_description": "Alamin kung sino ang kumakatawan sa iyo at kung aling pampublikong tanggapan ang dapat kontakin. Magsimula sa iyong postal code.",
+  "language_availability": "Available sa 6 na wika"
 }

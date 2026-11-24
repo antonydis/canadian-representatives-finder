@@ -121,7 +121,7 @@
   "laval_label_phone": "电话号码",
   "laval_placeholder_name": "Marie Tremblay",
   "laval_placeholder_phone": "+1 (450) 555-1234",
-  "laval_consent": "我同意接收 InfoCivic 发送至所提供号码的短信。数据不会与第三方共享。",
+  "laval_consent": "我同意接收 Infocivic 发送至所提供号码的短信。数据不会与第三方共享。",
   "laval_btn_subscribe": "订阅提醒",
   "laval_success_subscribe": "订阅已确认，您将很快收到欢迎短信。",
   "laval_err_name": "请输入您的姓名。",
@@ -151,5 +151,6 @@
   "laval_popup_desc": "在每次议会会议前收到提醒，并获取有关您选区重要决策的通知。免费 — 随时回复 STOP 取消订阅。",
   "laval_popup_close": "也许以后再说",
   "hero_title": "在加拿大遇到公共事务问题，需要帮助吗？",
-  "hero_description": "了解谁代表您，以及应该联系哪个公共机构。从输入邮政编码开始。"
+  "hero_description": "了解谁代表您，以及应该联系哪个公共机构。从输入邮政编码开始。",
+  "language_availability": "支持 6 种语言"
 }
