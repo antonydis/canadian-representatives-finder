@@ -121,7 +121,7 @@
   "laval_label_phone": "Número de teléfono",
   "laval_placeholder_name": "Marie Tremblay",
   "laval_placeholder_phone": "+1 (450) 555-1234",
-  "laval_consent": "Acepto recibir mensajes SMS de InfoCivic al número indicado. Ningún dato es compartido con terceros.",
+  "laval_consent": "Acepto recibir mensajes SMS de Infocivic al número indicado. Ningún dato es compartido con terceros.",
   "laval_btn_subscribe": "Suscribirse a las alertas",
   "laval_success_subscribe": "Suscripción confirmada. Recibirás un SMS de bienvenida en breve.",
   "laval_err_name": "Por favor ingresa tu nombre y apellido.",
@@ -151,5 +151,6 @@
   "laval_popup_desc": "Recibe un recordatorio antes de cada sesión del consejo y alertas sobre decisiones importantes en tu distrito. Gratis — responde STOP en cualquier momento para cancelar.",
   "laval_popup_close": "Quizás más tarde",
   "hero_title": "¿Necesitas ayuda con un asunto público en Canadá?",
-  "hero_description": "Descubre quién te representa y a qué organismo acudir. Empieza con tu código postal."
+  "hero_description": "Descubre quién te representa y a qué organismo acudir. Empieza con tu código postal.",
+  "language_availability": "Disponible en 6 idiomas"
 }
