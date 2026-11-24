@@ -149,5 +149,7 @@
   "laval_ask_deadline": "Questions accepted until {date} at noon",
   "laval_popup_title": "Stay informed about your district",
   "laval_popup_desc": "Receive a reminder before each council session and alerts about important decisions in your district. Free — reply STOP anytime to unsubscribe.",
-  "laval_popup_close": "Maybe later"
+  "laval_popup_close": "Maybe later",
+  "hero_title": "Need help with a public matter in Canada?",
+  "hero_description": "Find out who represents you and which public agency to contact. Start with your postal code."
 }
