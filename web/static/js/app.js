@@ -624,6 +624,15 @@ function applyLang(lang) {
   refreshCivicLabels();
   window.InfoCivicScar?.setLanguage(lang);
   document.querySelectorAll('[data-contact-copy]').forEach(node=>{node.textContent=checkText(Number(node.dataset.contactCopy));});
+  // Translate mounted representative actions without losing card state.
+  document.querySelectorAll('.rep-card-footer .civic-compose-btn').forEach(button=>{
+    const label=button.querySelector('[data-rep-contact-label]');
+    if(label)label.textContent=findText(15);
+    button.setAttribute('aria-label',findText(2));
+  });
+  document.querySelectorAll('.rep-card-footer .rep-card-flag-btn').forEach(button=>{
+    button.setAttribute('aria-label',t('feedback_title'));
+  });
   // Existing journeys and composer may be visible when the language changes.
   if(!document.getElementById('find-journey')?.classList.contains('hidden') && currentPostalCode){
     const step=document.getElementById('find-composer')?.classList.contains('hidden')?2:3;
@@ -1419,7 +1428,7 @@ function buildRepCard(rep, level, showEmailTemplate = false, activeCardContext =
   if(showEmailTemplate && rep.email){
     const messageButton=el('button','civic-compose-btn');
     messageButton.type='button';
-    messageButton.innerHTML=ICONS.compose+'<span></span>';
+    messageButton.innerHTML=ICONS.compose+'<span data-rep-contact-label></span>';
     messageButton.querySelector('span').textContent=findText(15);
     messageButton.setAttribute('aria-label',findText(2));
     messageButton.addEventListener('click',()=>openInlineComposer(rep,activeCardContext));
