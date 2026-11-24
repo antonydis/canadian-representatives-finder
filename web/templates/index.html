@@ -5,23 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Find your Canadian elected representatives by postal code — federal, provincial, and municipal. Not sure who to contact? Our AI helps you identify the right level of government." />
   <meta name="robots" content="index, follow" />
-  <title>Canadian Representatives Finder 🍁</title>
+  <title>InfoCivic | Know who to contact in Canada</title>
 
   <!-- Open Graph (WhatsApp, Facebook, LinkedIn, iMessage) -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://infocivic.ca/" />
-  <meta property="og:title" content="Canadian Representatives Finder 🍁" />
+  <meta property="og:title" content="InfoCivic | Know who to contact in Canada" />
   <meta property="og:description" content="Find your federal MP, provincial MNA/MPP, and municipal councillors by postal code — and get help figuring out who to contact." />
   <meta property="og:locale" content="en_CA" />
 
   <!-- Twitter / X card -->
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Canadian Representatives Finder 🍁" />
+  <meta name="twitter:title" content="InfoCivic | Know who to contact in Canada" />
   <meta name="twitter:description" content="Find your federal MP, provincial MNA/MPP, and municipal councillors by postal code — and get help figuring out who to contact." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="/static/css/style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍁</text></svg>" />
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
 
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-12Q5H9M7GX"></script>
@@ -39,14 +39,10 @@
   <!-- ── HEADER ─────────────────────────────────────────────────── -->
   <header role="banner">
     <div class="header-inner">
-      <a href="/" class="site-brand" aria-label="Canadian Representatives Finder — Home">
-        <span class="maple-icon" aria-hidden="true">🍁</span>
-        <div class="site-name">
-          <span class="primary">Canadian Representatives Finder</span>
-          <span class="secondary">Trouveur de représentants canadiens</span>
-        </div>
-      </a>
-      <nav aria-label="Language selection">
+      <a href="/" class="site-brand" aria-label="InfoCivic — Home"><span class="site-name"><span class="primary">InfoCivic</span></span></a>
+      <nav class="header-nav" aria-label="Site navigation">
+        <a href="/about" data-i18n="nav_about">About</a>
+        <a href="/privacy" data-i18n="nav_privacy">Privacy</a>
         <div class="lang-switcher" id="lang-switcher"></div>
       </nav>
     </div>
@@ -58,6 +54,10 @@
   <main role="main">
     <div class="container">
 
+      <section class="home-hero" aria-labelledby="hero-title">
+        <h1 id="hero-title" data-i18n="hero_title">Need help with a public matter in Canada?</h1>
+        <p class="hero-description" data-i18n="hero_description">Find out who represents you and which public agency to contact. Start with your postal code.</p>
+      </section>
       <!-- Tab navigation -->
       <div class="tabs" role="tablist" aria-label="Main sections">
         <button
@@ -81,10 +81,7 @@
       <!-- ── TAB 1 · Find My Representatives ──────────────────── -->
       <div id="panel-find" role="tabpanel" aria-labelledby="tab-find">
 
-        <h1 data-i18n="title">Find Your Canadian Representatives</h1>
-        <p class="lead" data-i18n="description">
-          Enter your Canadian postal code to find your elected representatives at all three levels of government.
-        </p>
+        <h2 class="sr-only" data-i18n="title">Find your representatives</h2>
 
         <div class="search-card">
           <form id="search-form" novalidate>
@@ -117,10 +114,7 @@
       <!-- ── TAB 2 · Smart Civic Triage ────────────────────────── -->
       <div id="panel-triage" role="tabpanel" aria-labelledby="tab-triage" hidden>
 
-        <h1 data-i18n="triage_title">Not sure who to contact?</h1>
-        <p class="lead" data-i18n="triage_subtitle">
-          Select your situation and we will point you to the right level of government.
-        </p>
+        <h2 class="sr-only" data-i18n="triage_title">Not sure who to contact?</h2>
 
         <!-- PHASE 1: Search input + chips -->
         <div id="triage-phase-1">
