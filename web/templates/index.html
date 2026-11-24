@@ -2,35 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="description" content="Find your Canadian elected representatives by postal code — federal, provincial, and municipal. Not sure who to contact? Our AI helps you identify the right level of government." />
   <meta name="robots" content="index, follow" />
-  <title>Canadian Representatives Finder 🍁</title>
+  <title>InfoCivic Canada | Civic guidance and representatives</title>
 
   <!-- Open Graph (WhatsApp, Facebook, LinkedIn, iMessage) -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://infocivic.ca/" />
-  <meta property="og:title" content="Canadian Representatives Finder 🍁" />
+  <meta property="og:title" content="InfoCivic Canada" />
   <meta property="og:description" content="Find your federal MP, provincial MNA/MPP, and municipal councillors by postal code — and get help figuring out who to contact." />
   <meta property="og:locale" content="en_CA" />
 
   <!-- Twitter / X card -->
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Canadian Representatives Finder 🍁" />
+  <meta name="twitter:title" content="InfoCivic Canada" />
   <meta name="twitter:description" content="Find your federal MP, provincial MNA/MPP, and municipal councillors by postal code — and get help figuring out who to contact." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="/static/css/info-pages.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍁</text></svg>" />
 
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-12Q5H9M7GX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-12Q5H9M7GX');
-  </script>
+  <script defer src="/static/js/privacy-consent.js"></script>
+
 </head>
 <body>
 
@@ -39,11 +34,11 @@
   <!-- ── HEADER ─────────────────────────────────────────────────── -->
   <header role="banner">
     <div class="header-inner">
-      <a href="/" class="site-brand" aria-label="Canadian Representatives Finder — Home">
+      <a href="/" class="site-brand" aria-label="InfoCivic Canada — Home">
         <span class="maple-icon" aria-hidden="true">🍁</span>
         <div class="site-name">
-          <span class="primary">Canadian Representatives Finder</span>
-          <span class="secondary">Trouveur de représentants canadiens</span>
+          <span class="primary">InfoCivic Canada</span>
+          <span class="secondary" id="brand-subtitle">Find your representatives and the right public service</span>
         </div>
       </a>
       <nav aria-label="Language selection">
@@ -110,7 +105,32 @@
           <p data-i18n="loading">Searching...</p>
         </div>
 
+        <div id="find-journey" class="hidden">
+          <nav class="civic-progress find-progress" aria-label="Representative search steps">
+            <span class="civic-progress-item completed" data-find-step="1"><span class="civic-progress-number">1</span><span class="civic-progress-text" id="find-step-location">Your location</span></span>
+            <span class="civic-progress-item current" data-find-step="2" aria-current="step"><span class="civic-progress-number">2</span><span class="civic-progress-text" id="find-step-reps">Your representatives</span></span>
+            <span class="civic-progress-item" data-find-step="3"><span class="civic-progress-number">3</span><span class="civic-progress-text" id="find-step-contact">Contact a representative</span></span>
+          </nav>
+          <section class="civic-step find-location-summary" aria-labelledby="find-location-title">
+            <div class="civic-step-heading">
+              <span class="civic-step-number" aria-hidden="true">1</span>
+              <div class="civic-step-heading-text">
+                <h2 id="find-location-title">Your location</h2>
+                <p id="find-location-code"></p>
+              </div>
+              <button type="button" class="civic-edit-btn" id="find-change-postal">Change</button>
+            </div>
+          </section>
+          <section class="find-representatives-heading" aria-labelledby="find-representatives-title">
+            <span class="civic-step-number" aria-hidden="true">2</span>
+            <div>
+              <h2 id="find-representatives-title">Your representatives</h2>
+              <p id="find-representatives-help">Choose a representative below to prepare a message.</p>
+            </div>
+          </section>
+        </div>
         <div id="results" class="hidden" aria-live="polite"></div>
+        <section id="find-composer" class="civic-inline-composer hidden" aria-live="polite"></section>
 
       </div><!-- /panel-find -->
 
@@ -137,7 +157,7 @@
                 placeholder="Describe the situation or process for which you need to contact a representative..."
                 autocomplete="off"
                 spellcheck="false"
-                maxlength="200"
+                maxlength="500"
                 aria-describedby="triage-input-hint"
               />
               <button type="submit" class="triage-send-btn" aria-label="Search">
@@ -147,8 +167,8 @@
               </button>
             </div>
             <div class="triage-input-meta">
-              <span id="triage-input-hint" class="triage-input-hint" data-i18n="triage_input_hint">Canadian civic situations only · 200 characters max</span>
-              <span id="triage-char-count" class="triage-char-count">0 / 200</span>
+              <span id="triage-input-hint" class="triage-input-hint" data-i18n="triage_input_hint">Canadian civic situations only · 500 characters max</span>
+              <span id="triage-char-count" class="triage-char-count">0 / 500</span>
             </div>
             <div id="triage-open-error" class="error-msg hidden" role="alert" aria-live="polite"></div>
           </form>
@@ -168,41 +188,74 @@
         <div id="triage-phase-2" hidden>
 
           <button id="triage-back-btn" class="back-btn" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M19 12H5M12 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 12H5M12 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <span data-i18n="triage_back">Consult another situation</span>
           </button>
 
-          <div class="triage-result" id="triage-result">
-            <div class="triage-result-header" id="triage-result-header">
-              <div class="triage-level-badge" id="triage-level-badge"></div>
-              <p class="triage-explanation" id="triage-explanation"></p>
-              <div class="triage-services">
-                <span class="triage-services-label" data-i18n="triage_key_contact">Key contacts</span>
-                <span class="triage-services-value" id="triage-services-value"></span>
-              </div>
-            </div>
+          <nav class="civic-progress" aria-label="Your civic guidance steps" id="civic-progress">
+            <span class="civic-progress-item completed" data-progress-step="1"><span class="civic-progress-number">1</span><span class="civic-progress-text" id="progress-understand">Your situation</span></span>
+            <span class="civic-progress-item current" data-progress-step="2" aria-current="step"><span class="civic-progress-number">2</span><span class="civic-progress-text" id="progress-agency">Responsible agency</span></span>
+            <span class="civic-progress-item" data-progress-step="3"><span class="civic-progress-number">3</span><span class="civic-progress-text" id="progress-postal">Find representative</span></span>
+            <span class="civic-progress-item" data-progress-step="4"><span class="civic-progress-number">4</span><span class="civic-progress-text" id="progress-contact">Prepare message</span></span>
+          </nav>
 
-            <div class="triage-postal-section">
-              <p class="triage-next-step" data-i18n="triage_next_step">
-                Enter your postal code to find your specific representative:
-              </p>
+          <section class="civic-step civic-step-understanding" aria-labelledby="civic-understanding-title">
+            <div class="civic-step-heading">
+              <span class="civic-step-number" aria-hidden="true">1</span>
+              <div class="civic-step-heading-text">
+                <h2 id="civic-understanding-title">What we understood</h2>
+                <p id="civic-understanding-summary"></p>
+              </div>
+              <button type="button" class="civic-edit-btn" id="civic-edit-question" aria-label="Edit your situation">Edit</button>
+            </div>
+            <details class="civic-original-details" id="civic-original-details">
+              <summary id="civic-original-label">See your original question</summary>
+              <p id="civic-original-question"></p>
+            </details>
+          </section>
+
+          <div class="triage-result" id="triage-result">
+            <section class="triage-result-header civic-agency-step" id="triage-result-header" aria-labelledby="civic-agency-title">
+              <div class="civic-step-heading">
+                <span class="civic-step-number" aria-hidden="true">2</span>
+                <div class="civic-step-heading-text">
+                  <h2 id="civic-agency-title">Who can help</h2>
+                  <div class="triage-level-badge" id="triage-level-badge"></div>
+                </div>
+              </div>
+              <div class="civic-agency-inner">
+                <p class="triage-explanation" id="triage-explanation"></p>
+                <div class="triage-services" id="triage-services">
+                  <span class="triage-services-label" id="triage-services-label">Suggested organization</span>
+                  <span class="triage-services-value" id="triage-services-value"></span>
+                </div>
+                <div id="triage-agency-link-container" class="civic-agency-link-container"></div>
+              </div>
+            </section>
+            <section class="triage-postal-section" aria-labelledby="civic-postal-title">
+              <div class="civic-step-heading">
+                <span class="civic-step-number" aria-hidden="true">3</span>
+                <div class="civic-step-heading-text">
+                  <h2 id="civic-postal-title">Find your representative</h2>
+                  <p class="triage-next-step" id="triage-next-step">Enter your postal code to find the elected representative for your area.</p>
+                </div>
+              </div>
               <form id="triage-search-form" novalidate>
+                <label for="triage-postal-input" class="sr-only" data-i18n="input_label">Your postal code</label>
                 <div class="input-row">
-                  <input
-                    type="text" id="triage-postal-input" class="postal-input"
-                    maxlength="7" autocomplete="postal-code" spellcheck="false"
-                    placeholder="e.g. H2X 1Y6"
-                    data-i18n-placeholder="input_placeholder"
-                    aria-required="true" aria-describedby="triage-error-msg"
-                  />
-                  <button type="submit" class="search-btn" data-i18n="button">
-                    Find my representatives
-                  </button>
+                  <input type="text" id="triage-postal-input" class="postal-input" maxlength="7" autocomplete="postal-code" spellcheck="false" placeholder="e.g. H2X 1Y6" data-i18n-placeholder="input_placeholder" aria-required="true" aria-describedby="triage-error-msg"/>
+                  <button type="submit" class="search-btn" id="triage-find-reps" data-i18n="button">Find my representatives</button>
                 </div>
                 <div id="triage-error-msg" class="error-msg hidden" role="alert" aria-live="polite"></div>
               </form>
+            </section>
+          </div>
+
+          <div id="civic-contact-stage" class="civic-contact-stage hidden" aria-live="polite">
+            <span class="civic-step-number" aria-hidden="true">4</span>
+            <div>
+              <h2 id="civic-contact-title">Prepare your message</h2>
+              <p id="civic-contact-help">Choose a representative below to prepare an email you can review and send yourself.</p>
             </div>
           </div>
 
@@ -212,6 +265,7 @@
           </div>
 
           <div id="triage-results" class="hidden" aria-live="polite"></div>
+          <section id="triage-composer" class="civic-inline-composer hidden" aria-live="polite"></section>
 
         </div><!-- /triage-phase-2 -->
 
@@ -224,7 +278,10 @@
   <footer role="contentinfo">
     <div class="footer-inner">
       <span data-i18n="footer_note">Independent civic project · Not an official government website</span>
-      <span>Data provided by <a href="https://represent.opennorth.ca/" target="_blank" rel="noopener noreferrer">OpenNorth</a></span>
+      <nav class="footer-legal-links" aria-label="Information and privacy">
+        <a href="/about" data-public-page="about">About</a>
+        <a href="/privacy" data-public-page="privacy">Privacy</a>
+      </nav>
     </div>
     <div class="footer-author">
       Built by <a href="https://github.com/antonydis" target="_blank" rel="noopener noreferrer">Antony</a>
@@ -322,11 +379,19 @@
             <button type="submit" class="search-btn" data-i18n="feedback_submit">Send</button>
           </div>
         </form>
+        <div id="feedback-next-step" class="hidden" role="region" aria-labelledby="feedback-next-title">
+          <h3 id="feedback-next-title" tabindex="-1"></h3>
+          <p id="feedback-next-explanation"></p>
+          <p><a id="feedback-official-link" class="btn-open-mail" target="_blank" rel="noopener noreferrer"></a></p>
+          <button type="button" id="feedback-next-back" class="btn-copy-template">Back to form</button>
+        </div>
+        <p id="feedback-email-note" class="hidden" role="status" aria-live="polite"></p>
       </div>
 
     </div>
   </div>
 
+  <script src="/static/js/scar-wizard.js"></script>
   <script src="/static/js/app.js"></script>
 </body>
 </html>

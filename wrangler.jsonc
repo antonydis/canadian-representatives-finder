@@ -1,0 +1,54 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "infocivic",
+  "main": "src-worker/index.js",
+  "compatibility_date": "2026-11-20",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*",
+      "/reps",
+      "/triage",
+      "/laval"
+    ]
+  },
+  "observability": {
+    "enabled": true
+  },
+  "ratelimits": [
+    {
+      "name": "AI_USER_LIMIT",
+      "namespace_id": "7081201",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    },
+    {
+      "name": "AI_GLOBAL_LIMIT",
+      "namespace_id": "7081202",
+      "simple": {
+        "limit": 60,
+        "period": 60
+      }
+    },
+    {
+      "name": "EMAIL_USER_LIMIT",
+      "namespace_id": "7081203",
+      "simple": {
+        "limit": 2,
+        "period": 60
+      }
+    },
+    {
+      "name": "EMAIL_GLOBAL_LIMIT",
+      "namespace_id": "7081204",
+      "simple": {
+        "limit": 20,
+        "period": 60
+      }
+    }
+  ],
+  "workers_dev": true
+}

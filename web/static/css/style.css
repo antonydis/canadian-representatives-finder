@@ -893,3 +893,372 @@ footer a:hover { text-decoration: underline; }
   flex-shrink: 0;
 }
 .laval-banner-close:hover { color: var(--text); }
+
+/* Identity and boundary verification disclosure */
+.data-quality-notice{margin:1rem 0;padding:1rem 1.15rem;border:1px solid #bc935b;border-radius:12px;background:#fff8e9;color:#493b28;line-height:1.5}
+.data-quality-notice p{margin:0 0 .5rem}
+.data-quality-notice a{color:#614312;text-decoration:underline;font-weight:600}
+
+/* P0 usability: keep actions from touching and make focus visible */
+.rep-card-footer{flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px 16px}
+.rep-card-flag-btn{min-height:36px;padding:7px 10px;line-height:1.3;max-width:100%;text-align:left}
+.rep-card-flag-btn:focus-visible,.triage-official-link:focus-visible,
+#feedback-next-back:focus-visible,#feedback-official-link:focus-visible{
+ outline:3px solid #2270c9;outline-offset:3px
+}
+#feedback-next-step{padding:8px 22px 24px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+#feedback-next-step.hidden{display:none}
+#feedback-next-step h3{font-size:1.05rem;margin:0;color:var(--navy)}
+#feedback-next-step p{margin:0;line-height:1.5}
+#feedback-next-step .btn-open-mail,#feedback-next-step .btn-copy-template{
+ display:inline-block;min-width:0;flex:none;text-decoration:none
+}
+#feedback-email-note{margin:0 22px 22px;line-height:1.5}
+.triage-official-link{display:inline-flex;margin:10px 0;padding:8px 0;min-height:36px;align-items:center;text-decoration:underline}
+@media(max-width:560px){
+ .rep-card-footer{justify-content:flex-start;gap:8px}
+ .rep-card-flag-btn{min-height:44px}
+ #feedback-next-step{padding:14px 16px 22px}
+}
+
+
+/* Civic orientation flow: compact, progressive, responsive and accessible */
+.civic-progress{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:18px 0 20px}
+.civic-progress-item{display:flex;align-items:center;gap:8px;color:#677386;font-size:.78rem;font-weight:600;min-width:0;padding:8px 6px}
+.civic-progress-item.current{color:var(--navy)}
+.civic-progress-item.completed{color:#216a56}
+.civic-progress-number,.civic-step-number{display:inline-flex;justify-content:center;align-items:center;border-radius:50%;font-weight:800;flex-shrink:0}
+.civic-progress-number{width:27px;height:27px;background:#edf0f4;color:#697588}
+.civic-progress-item.current .civic-progress-number{background:var(--navy);color:#fff}
+.civic-progress-item.completed .civic-progress-number{background:#deefe9;color:#216a56}
+.civic-progress-text{line-height:1.25}
+.civic-step{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 22px;margin-bottom:16px;box-shadow:var(--shadow)}
+.civic-step-heading{display:flex;align-items:flex-start;gap:13px}
+.civic-step-heading-text{flex:1;min-width:0}
+.civic-step-heading h2,.civic-contact-stage h2{font-size:1.08rem;line-height:1.35;color:var(--navy);margin:0 0 5px;font-weight:750}
+.civic-step-heading p,.civic-contact-stage p{margin:0;color:var(--text-muted);line-height:1.5;font-size:.92rem}
+.civic-step-number{width:30px;height:30px;background:#e6edf6;color:var(--navy);font-size:.85rem}
+.civic-step-understanding .civic-step-number{background:#deefe9;color:#216a56}
+.civic-edit-btn{margin-left:auto;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--navy);padding:9px 13px;min-height:40px;font:inherit;font-size:.85rem;font-weight:600;cursor:pointer;flex-shrink:0}
+.civic-edit-btn:hover{background:#f0f5fb}
+.civic-original-details{margin:13px 0 0 43px;font-size:.85rem;color:var(--text-muted)}
+.civic-original-details summary{cursor:pointer;text-decoration:underline;text-underline-offset:3px;min-height:30px}
+.civic-original-details p{white-space:pre-wrap;overflow-wrap:anywhere;border-left:3px solid #d7e1ef;padding:8px 12px;margin:6px 0 2px}
+.civic-agency-step .civic-step-heading{margin-bottom:12px}
+.civic-agency-step .triage-level-badge{margin:4px 0 0}
+.civic-agency-inner{padding-left:43px}
+.civic-agency-inner .triage-explanation{margin:0 0 13px}
+.civic-agency-inner .triage-services{display:flex;align-items:baseline;gap:5px 10px;flex-wrap:wrap}
+.civic-agency-link-container{margin-top:12px}
+.civic-official-action{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border:1px solid #b8c9e1;background:#f5f8fd;color:var(--navy);border-radius:8px;padding:9px 14px;font-size:.88rem;font-weight:650;text-decoration:none}
+.civic-official-action:hover{background:#e7eef8}
+.triage-postal-section .civic-step-heading{margin-bottom:15px}
+.triage-postal-section .triage-next-step{margin:0;font-weight:400}
+.civic-contact-stage{display:flex;gap:13px;align-items:flex-start;background:#edf4fa;border:1px solid #d1e0ee;border-radius:var(--radius-lg);padding:17px 22px;margin:0 0 14px}
+.civic-contact-stage.hidden{display:none}
+.civic-contact-stage p{font-weight:400}
+.civic-compose-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 16px;min-height:44px;border:0;border-radius:8px;background:var(--navy);color:#fff;font:inherit;font-size:.9rem;font-weight:700;cursor:pointer}
+.civic-compose-btn:hover{background:var(--navy-light)}
+.civic-compose-btn svg{width:17px;height:17px;stroke:currentColor;fill:none}
+.civic-compose-btn:focus-visible,.civic-edit-btn:focus-visible,.civic-official-action:focus-visible,.civic-original-details summary:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+@media(max-width:700px){
+ .civic-progress{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+ .civic-step{padding:15px}
+ .civic-step-heading{gap:9px}
+ .civic-agency-inner{padding-left:39px}
+ .civic-original-details{margin-left:39px}
+ .civic-contact-stage{padding:15px}
+ .civic-compose-btn{flex:1}
+}
+@media(max-width:380px){
+ .civic-progress-text{font-size:.72rem}
+ .civic-edit-btn{padding:8px 10px}
+}
+
+
+/* Shared InfoCivic controls — pill style used across primary journeys. */
+:root{--control-pill:999px}
+.search-btn,.civic-compose-btn,.civic-secondary-action,.civic-edit-btn,.civic-official-action,
+.btn-copy-template,.btn-open-mail,.triage-chip,.share-btn{border-radius:var(--control-pill)}
+.postal-input{border-radius:var(--control-pill);padding-inline:17px}
+.search-card{border-radius:20px}
+.find-progress{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:8px}
+.find-location-summary{margin-bottom:14px}
+.find-representatives-heading{display:flex;align-items:flex-start;gap:13px;padding:12px 2px 16px}
+.find-representatives-heading h2{color:var(--navy);font-size:1.1rem;margin:0 0 4px}
+.find-representatives-heading p{color:var(--text-muted);font-size:.91rem;margin:0}
+.civic-agency-name-link{color:#185587;text-underline-offset:3px;font-weight:650;overflow-wrap:anywhere}
+.civic-agency-name-link:hover{color:var(--navy);text-decoration-thickness:2px}
+.civic-agency-name-link:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+.civic-external-mark{font-size:.9em}
+.civic-inline-composer{background:#fff;border:1px solid #cbd9e8;border-top:4px solid var(--navy);
+ border-radius:16px;box-shadow:var(--shadow);padding:22px 24px;margin:24px 0}
+.civic-inline-composer.hidden{display:none}
+.civic-compose-heading{display:flex;align-items:flex-start;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.civic-compose-heading h2{margin:0 0 6px;color:var(--navy);font-size:1.12rem}
+.civic-compose-heading p{margin:0;color:var(--text-muted);line-height:1.45}
+.civic-compose-heading>.civic-edit-btn{margin-left:auto}
+.civic-compose-form{display:flex;flex-direction:column;gap:15px;padding-top:16px}
+.civic-compose-to{margin:0;color:var(--text);overflow-wrap:anywhere}
+.civic-compose-field{display:flex;flex-direction:column;gap:6px}
+.civic-compose-field label{color:var(--navy);font-weight:650;font-size:.88rem}
+.civic-compose-field input,.civic-compose-field textarea{width:100%;box-sizing:border-box;
+ border:1.5px solid #b9c8da;border-radius:12px;padding:11px 14px;font:inherit;color:var(--text);background:#fff}
+.civic-compose-field textarea{resize:vertical;min-height:168px;line-height:1.55}
+.civic-compose-field input:focus-visible,.civic-compose-field textarea:focus-visible{outline:3px solid #2373c8;outline-offset:1px}
+.civic-compose-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.civic-compose-actions .civic-compose-btn{display:inline-flex;text-decoration:none;min-height:46px}
+.civic-secondary-action{font:inherit;background:#f4f7fa;border:1px solid #b9c8da;color:var(--navy);
+ padding:11px 18px;min-height:46px;cursor:pointer;font-weight:650}
+.civic-secondary-action:hover{background:#e8eff7}
+.civic-secondary-action:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+.civic-compose-note{margin:0;color:var(--text-muted);font-size:.85rem;line-height:1.45}
+@media(max-width:560px){
+ .find-progress{grid-template-columns:1fr 1fr;gap:3px}
+ .find-progress [data-find-step="3"]{grid-column:1/-1}
+ .civic-inline-composer{padding:16px}
+ .civic-compose-heading{flex-wrap:wrap}
+ .civic-compose-heading>.civic-edit-btn{margin-left:42px}
+ .civic-compose-actions>*{flex:1 1 170px;text-align:center;justify-content:center}
+ .search-card{padding:18px}
+}
+
+
+/* SCAR: progressive writing assistance, optional, screen-reader friendly */
+.scar-wizard{border:1px solid #d0ddeb;background:#f6f9fd;border-radius:18px;padding:20px;margin:0 0 16px}
+.scar-wizard h3{font-size:1.05rem;line-height:1.35;margin:0 0 7px;color:var(--navy);font-weight:750}
+.scar-wizard-intro{color:var(--text-muted);font-size:.91rem;line-height:1.5;margin:0 0 18px}
+.scar-wizard-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px}
+.scar-wizard-fields>.civic-compose-field{min-width:0}
+.scar-wizard-fields .civic-compose-field textarea{width:100%;min-height:86px;box-sizing:border-box;border-radius:14px;background:#fff;font-size:.9rem}
+.scar-language-field{grid-column:1/-1;display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+.scar-language-field label{font-size:.87rem;color:var(--navy);font-weight:700}
+.scar-language-field select{border:1.5px solid #b9c8da;border-radius:999px;padding:10px 15px;min-height:44px;color:var(--navy);background:#fff;font:inherit;font-size:.9rem}
+.scar-language-field select:focus-visible{outline:3px solid #2373c8;outline-offset:2px}
+.scar-wizard-fields>.scar-hint,.scar-wizard-fields>.scar-privacy,.scar-wizard-fields>.civic-compose-actions,.scar-wizard-fields>.scar-status{grid-column:1/-1}
+.scar-hint,.scar-privacy{font-size:.82rem;color:var(--text-muted);margin:0;line-height:1.5}
+.scar-privacy{color:#6b4f31}
+.scar-status{font-size:.9rem;font-weight:650;min-height:0;color:var(--navy);margin:0}
+.scar-wizard>.scar-privacy{margin-top:14px}
+.scar-wizard .civic-compose-actions{gap:10px}
+.scar-wizard button:disabled{opacity:.58;cursor:progress}
+@media(max-width:640px){.scar-wizard-fields{grid-template-columns:1fr}.scar-wizard{padding:15px}.scar-wizard-fields>.civic-compose-field{grid-column:1/-1}}
+
+
+/* Minimal two-step message flow replaces the four-question intake. */
+.scar-simple{max-width:750px;margin-inline:auto}
+.scar-simple .scar-step{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
+.scar-simple .scar-step.hidden{display:none}
+.scar-simple .scar-step-counter{font-size:.78rem;color:#53677e;font-weight:750;letter-spacing:.02em;margin:0}
+.scar-simple .civic-compose-field input,
+.scar-simple .civic-compose-field textarea{width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #b9c8da;border-radius:14px;padding:12px 15px;min-height:46px;font:inherit;line-height:1.5}
+.scar-simple .civic-compose-field textarea{min-height:116px;resize:vertical}
+.scar-simple .civic-compose-field input:focus-visible,
+.scar-simple .civic-compose-field textarea:focus-visible{outline:3px solid #2373c8;outline-offset:2px}
+.scar-simple .scar-step>.civic-compose-btn{align-self:flex-start}
+.scar-simple .scar-step .civic-compose-actions{display:flex;flex-wrap:wrap;gap:12px}
+.scar-simple .scar-skip,.scar-simple .scar-edit{border:0;background:transparent;padding:10px 2px;margin-top:6px;color:#285981;font:inherit;font-size:.88rem;font-weight:650;text-decoration:underline;text-underline-offset:3px;cursor:pointer;align-self:flex-start}
+.scar-simple .scar-skip:hover,.scar-simple .scar-edit:hover{color:var(--navy)}
+.scar-simple .scar-skip:focus-visible,.scar-simple .scar-edit:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+.scar-simple .scar-status{min-height:0;line-height:1.5}
+.scar-simple .scar-privacy{font-size:.79rem}
+.scar-simple>.civic-secondary-action{margin:10px 0}
+.civic-compose-form.hidden{display:none}
+@media(max-width:560px){.scar-simple .scar-step>.civic-compose-btn{width:100%}.scar-simple .scar-step .civic-compose-actions>*{flex:1 1 100%}}
+
+
+/* Contact checkpoint: reduce friction, do not redirect away from the representative. */
+.contact-decision-gate{padding:18px 4px 10px;max-width:710px;margin-inline:auto}
+.contact-decision-gate h3{font-size:1.16rem;color:var(--navy);margin:0 0 9px;line-height:1.4}
+.contact-decision-gate .contact-decision-options{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:18px}
+.contact-decision-gate .contact-decision-options .civic-compose-btn,
+.contact-decision-gate .contact-decision-options .civic-secondary-action{min-height:46px}
+.contact-decision-detail{margin-top:18px;padding:16px;border:1px solid #d0ddeb;border-radius:14px;background:#f6f9fd}
+.contact-decision-detail label{font-weight:700;display:block;color:var(--navy);margin-bottom:8px}
+.contact-decision-detail textarea{width:100%;box-sizing:border-box;border-radius:12px;border:1.5px solid #b9c8da;padding:12px;font:inherit;line-height:1.5;resize:vertical;min-height:92px}
+.contact-decision-detail textarea:focus-visible,.contact-decision-options button:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+.contact-decision-detail .civic-compose-actions{margin-top:12px}
+.contact-check-result{margin-top:14px;line-height:1.55}
+.contact-check-result:empty{display:none}
+.contact-check-result>p{margin:8px 0}
+.contact-check-result>.civic-compose-actions{margin-top:16px}
+.contact-check-result .civic-agency-name-link{display:inline-block;margin:4px 0}
+.scar-postal-info{padding:10px 12px;margin:2px 0;background:#edf4fa;border-radius:10px;font-size:.89rem;font-weight:650;color:var(--navy)}
+@media(max-width:560px){.contact-decision-gate{padding:12px 0}.contact-decision-options>*{flex:1 1 100%}.contact-check-result .civic-compose-actions>*{flex:1 1 100%}}
+
+/* Verified governmental phone contact in jurisdiction guidance */
+.civic-phone-help{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 9px;padding:12px 14px;background:#eff6fc;border:1px solid #cddded;border-radius:12px;margin:12px 0}
+.civic-phone-help>a{font-weight:750;color:#155b93;text-decoration:underline;text-underline-offset:3px;min-height:28px}
+.civic-phone-help>a:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+.civic-phone-note{font-size:.79rem;flex-basis:100%;margin:0;color:#506477;line-height:1.5}
+
+
+/* Mobile-first refinement — no squeezed headings, iOS zoom or horizontal overflow. */
+.civic-inline-composer,
+.civic-compose-heading,
+.civic-compose-heading-text,
+.civic-compose-form,
+.civic-compose-field,
+.scar-wizard,
+.contact-decision-gate{min-width:0;max-width:100%;box-sizing:border-box}
+.civic-compose-heading{
+ display:grid;
+ grid-template-columns:30px minmax(0,1fr) auto;
+ gap:12px;
+ align-items:start;
+}
+.civic-compose-heading>.civic-step-number{grid-column:1}
+.civic-compose-heading>.civic-step-heading-text{grid-column:2;min-width:0}
+.civic-compose-heading>.civic-edit-btn{grid-column:3;margin:0;max-width:100%;white-space:normal;text-align:center}
+.civic-compose-heading .civic-step-heading-text p,
+.civic-compose-to,
+.rep-contact a,
+.contact-item,
+.civic-agency-name-link,
+.civic-step-heading-text{overflow-wrap:anywhere;word-break:normal}
+.civic-compose-heading h2{font-size:clamp(1.05rem,2.4vw,1.2rem);line-height:1.32}
+.civic-compose-heading p{font-size:.9rem;line-height:1.5}
+.civic-inline-composer .civic-compose-btn,
+.civic-inline-composer .civic-secondary-action,
+.civic-inline-composer .civic-edit-btn{min-height:44px}
+.civic-inline-composer input,
+.civic-inline-composer textarea,
+.civic-inline-composer select,
+.postal-input{font-size:16px} /* iOS Safari: don't zoom inputs */
+.civic-compose-field input,.civic-compose-field textarea,
+.contact-decision-detail textarea{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+.civic-inline-composer .civic-compose-actions>*{min-width:0}
+@media(max-width:720px){
+ .civic-compose-heading{grid-template-columns:30px minmax(0,1fr);gap:10px}
+ .civic-compose-heading>.civic-edit-btn{
+  grid-column:2;grid-row:2;justify-self:start;margin:6px 0 0;
+  padding-inline:16px;font-size:.875rem;
+ }
+ .civic-compose-heading>.civic-step-heading-text{grid-column:2}
+ .civic-inline-composer{padding:clamp(12px,4vw,20px);margin:18px 0;border-radius:18px}
+ .civic-compose-heading p{max-width:100%;font-size:.91rem}
+ .civic-compose-actions{gap:10px}
+ .civic-progress-item{min-width:0}
+ .rep-contact{min-width:0}
+}
+@media(max-width:420px){
+ .civic-inline-composer{padding:14px 12px}
+ .civic-compose-heading{gap:8px}
+ .civic-compose-heading .civic-step-number{width:28px;height:28px}
+ .civic-compose-heading>.civic-edit-btn{
+  grid-column:1/-1;grid-row:auto;justify-self:start;
+  margin:5px 0 0 36px;max-width:calc(100% - 36px);
+ }
+ .civic-compose-heading h2{font-size:1.075rem}
+ .civic-step-heading-text p{line-height:1.45}
+ .civic-compose-actions>*{flex:1 1 100%;justify-content:center}
+ .contact-decision-options>*{flex:1 1 100%}
+}
+@supports(padding:max(0px)){
+ .civic-inline-composer{padding-bottom:max(14px,env(safe-area-inset-bottom))}
+}
+
+
+/* Mobile finishing pass: predictable widths, comfortable taps and safe areas. */
+html{overflow-x:clip;scroll-padding-top:16px}
+body{min-width:0}
+main,.container,.header-inner,.tabs,.search-card,.rep-card,.rep-card-footer,
+.triage-input-wrapper,.civic-step,.civic-inline-composer{min-width:0}
+.contact-item{min-width:0}
+.contact-item a{overflow-wrap:anywhere;min-width:0}
+.rep-name{overflow-wrap:break-word}
+.civic-compose-to{overflow-wrap:anywhere}
+.civic-inline-composer input,.civic-inline-composer textarea,.civic-inline-composer select,
+.triage-open-input,.postal-input-pill,.feedback-email-input,.feedback-textarea{font-size:16px}
+.lang-dropdown-btn,.tab-btn,.rep-card-footer button,.email-modal-close,
+.civic-edit-btn,.search-btn,.search-pill-btn{min-height:44px}
+@media(max-width:640px){
+ main{padding-left:clamp(12px,4vw,20px);padding-right:clamp(12px,4vw,20px);padding-bottom:48px}
+ .header-inner{padding:12px clamp(12px,4vw,20px);gap:8px;flex-wrap:nowrap}
+ .site-brand{min-width:0;gap:8px}
+ .site-name{min-width:0}
+ .site-name .primary{font-size:clamp(.78rem,3vw,1rem);line-height:1.3;overflow-wrap:break-word}
+ .lang-switcher{flex-shrink:0}
+ .tabs{gap:6px;margin-bottom:24px}
+ .tab-btn{min-width:0;margin:0;white-space:normal;line-height:1.4;padding:12px 8px}
+ .rep-card{padding:15px;gap:10px}
+ .rep-card-footer{justify-content:flex-start}
+ .rep-card-footer .civic-compose-btn{max-width:100%;white-space:normal;text-align:center}
+ .triage-open-input,.postal-input-pill{width:100%;min-width:0}
+ .civic-progress-item{padding:8px 3px;align-items:flex-start}
+ .civic-progress-text{overflow-wrap:break-word}
+ .civic-compose-heading>.civic-edit-btn{max-width:100%}
+ .email-modal-overlay{padding:12px}
+ .email-modal{max-width:100%;max-height:calc(100dvh - 24px)}
+ .email-modal-body{padding:16px}
+ .email-modal-actions{padding:12px 16px 18px}
+ .email-modal-actions>*{flex:1 1 100%;min-width:0}
+}
+@media(max-width:360px){
+ .header-inner{gap:6px}
+ .site-name .primary{font-size:.8rem}
+ .lang-dropdown-btn{padding:6px 8px}
+ .civic-inline-composer{padding:12px 10px}
+ .civic-progress-text{font-size:.69rem}
+ .civic-compose-heading>.civic-edit-btn{margin-left:0;max-width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ .civic-inline-composer *{scroll-behavior:auto}
+}
+
+
+/* Official agency first: in-flow recommendation, never a blocking pop-up. */
+.direct-service-card{background:#f0f6fc;border:1px solid #c6d8ed;border-radius:16px;padding:18px 20px;margin:14px 0 18px;min-width:0}
+.direct-service-title{color:var(--navy);font-weight:750;font-size:1.08rem;margin:0 0 7px;line-height:1.4}
+.direct-service-intro{font-size:.93rem;line-height:1.55;margin:0 0 12px}
+.direct-service-name{display:block;overflow-wrap:anywhere;font-size:.96rem;margin:0 0 12px;color:var(--navy)}
+.direct-service-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.direct-service-actions a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;min-height:44px;box-sizing:border-box;padding:10px 15px;border-radius:999px;white-space:normal;text-align:center;overflow-wrap:anywhere}
+.direct-service-qualifier{font-size:.8rem;color:#4f6177;margin:10px 0 0;line-height:1.5}
+.direct-service-foot{font-size:.83rem;color:#536477;margin:12px 0 0;line-height:1.5}
+.direct-service-actions a:focus-visible{outline:3px solid #2373c8;outline-offset:3px}
+@media(max-width:560px){.direct-service-card{padding:15px;margin:12px 0 16px}.direct-service-actions{flex-direction:column;align-items:stretch}.direct-service-actions a{width:100%}}
+
+
+/* Civic correspondence: non-blocking confidence review before opening email. */
+.recipient-review-backdrop{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(12,26,41,.48);overflow-y:auto;overscroll-behavior:contain}
+.recipient-review-dialog{background:#fff;width:min(100%,510px);max-height:min(90dvh,760px);overflow-y:auto;border-radius:20px;box-shadow:0 18px 70px rgba(0,0,0,.22);padding:clamp(18px,4vw,26px);line-height:1.5;min-width:0}
+.recipient-review-dialog h3{font-size:1.2rem;line-height:1.35;color:var(--navy);margin:0 0 8px}
+.recipient-review-dialog>p{font-size:.91rem;margin:8px 0}
+.recipient-review-comparison{background:#f3f7fb;border-radius:12px;padding:12px 14px;margin:15px 0;overflow-wrap:anywhere}
+.recipient-review-comparison p{margin:3px 0}
+.recipient-review-comparison p:last-child{color:var(--navy);font-weight:750}
+.recipient-review-caution{color:#536477;font-size:.84rem}
+.recipient-review-explanation{font-size:.9rem;color:var(--text)}
+.recipient-review-dialog .direct-service-card{margin:14px 0;padding:14px}
+.recipient-review-select{width:100%;max-width:100%;background:#fff;border:1.5px solid #aab9c9;border-radius:12px;padding:12px;margin:10px 0;font:inherit;font-size:16px;min-height:46px;box-sizing:border-box}
+.recipient-review-actions{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.recipient-review-actions button{width:100%;min-height:48px;white-space:normal}
+.recipient-review-status{min-height:0;font-size:.85rem;color:var(--navy);margin:8px 0 0}
+@media(max-width:540px){.recipient-review-backdrop{align-items:flex-end;padding:0}.recipient-review-dialog{border-radius:22px 22px 0 0;width:100%;max-height:calc(100dvh - env(safe-area-inset-top) - 24px);padding:20px 18px max(20px,env(safe-area-inset-bottom));}.recipient-review-dialog h3{font-size:1.15rem}}
+@media(prefers-reduced-motion:reduce){.recipient-review-dialog{scroll-behavior:auto}}
+
+/* Mobile writing: keep native text selection and the iOS keyboard reliable. */
+[data-civic-issue],.scar-simple textarea,.contact-decision-detail textarea{
+ -webkit-user-select:text;user-select:text;
+ -webkit-touch-callout:default;touch-action:auto;
+ position:relative;z-index:1;
+ font-size:16px;line-height:1.5;
+ min-height:130px;
+ caret-color:var(--navy);
+}
+.civic-issue-count{font-size:.8rem;color:var(--text-muted);text-align:right;margin:5px 0 0}
+
+/* Mobile UX audit: preserve edited email content and iPhone keyboard comfort. */
+.scar-replacement-notice{border:1px solid #d1ac66;background:#fff9ed;border-radius:12px;padding:14px;margin:12px 0;max-width:100%;box-sizing:border-box}
+.scar-replacement-notice p{color:#54401f;font-size:.88rem;line-height:1.5;margin:0 0 12px}
+.scar-replacement-notice .civic-compose-actions{gap:10px;flex-wrap:wrap}
+.scar-replacement-notice .civic-compose-actions>button{flex:1 1 155px;min-height:44px}
+.recipient-review-edit-warning{color:#654619;font-size:.86rem;line-height:1.5;background:#fff8e8;padding:10px 12px;border:1px solid #e4d4af;border-radius:10px;margin:12px 0}
+.civic-compose-form textarea{min-height:160px;max-height:52dvh;overscroll-behavior:contain;resize:vertical}
+@media(max-width:520px){
+ .scar-replacement-notice{padding:12px}
+ .scar-replacement-notice .civic-compose-actions>button{flex-basis:100%}
+ .recipient-review-edit-warning{font-size:.83rem}
+}
