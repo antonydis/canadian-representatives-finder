@@ -30,7 +30,17 @@ function applyOverrides(reps,postal,city=""){
    const next=mapRep(raw),action=rule.action||"inject";
    if(action==="enrich_by_district"){
     // Postal prefixes can cover multiple council districts; enrich only exact matches.
-    const i=list.findIndex(r=>r.level==="municipal"&&r.district.toLowerCase()===next.district.toLowerCase());
+    const districtKey = value => norm(value).replace(/[\u2010-\u2015\u2212-]/g," ").replace(/\s+/g," ").trim();
+    const officeKey = value => {
+      const o=norm(value);
+      if(/maire|mayor/.test(o))return /arrondissement|borough/.test(o)?"borough-mayor":"mayor";
+      if(/conseiller|councill?or/.test(o))return /arrondissement|borough/.test(o)?"borough-councillor":"councillor";
+      return o;
+    };
+    const i=list.findIndex(r=>{
+      if(r.level!=="municipal"||officeKey(r.elected_office)!==officeKey(next.elected_office))return false;
+      return districtKey(r.district)===districtKey(next.district);
+    });
     if(i>=0)list[i]=next;
    }else if(action==="replace_or_inject"){
     const i=list.findIndex(r=>repKey(r)===repKey(next)||r.level==="municipal"&&/plante/i.test(r.name)&&/maire|mayor/i.test(next.elected_office));
