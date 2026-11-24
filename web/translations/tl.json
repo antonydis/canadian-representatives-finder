@@ -149,5 +149,9 @@
   "laval_ask_deadline": "Tinatanggap ang mga tanong hanggang {date} ng tanghali",
   "laval_popup_title": "Manatiling may kaalaman sa iyong distrito",
   "laval_popup_desc": "Makatanggap ng paalala bago ang bawat sesyon ng konseho at mga alerto tungkol sa mahahalagang desisyon sa iyong distrito. Libre — sumagot ng STOP anumang oras upang mag-unsubscribe.",
-  "laval_popup_close": "Marahil mamaya"
+  "laval_popup_close": "Marahil mamaya",
+  "hero_title": "Kailangan ng tulong sa isang pampublikong usapin sa Canada?",
+  "hero_description": "Alamin kung sino ang kumakatawan sa iyo at kung aling pampublikong tanggapan ang dapat kontakin. Magsimula sa iyong postal code.",
+  "nav_about": "Tungkol dito",
+  "nav_privacy": "Privacy"
 }
